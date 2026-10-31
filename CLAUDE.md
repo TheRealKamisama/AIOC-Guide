@@ -20,9 +20,9 @@ There are no tests or linter. To check the page, open `site/index.html` in a bro
 
 ## Deploy
 
-- GitHub repo: `TheRealKamisama/AIOC-Guide` (private for now). Commits use the noreply identity set in the repo's git config (`35005476+TheRealKamisama@users.noreply.github.com`); don't commit with any other email.
+- GitHub repo: `TheRealKamisama/AIOC-Guide` (public). Commits use the noreply identity set in the repo's git config (`35005476+TheRealKamisama@users.noreply.github.com`); don't commit with any other email.
 - `.github/workflows/pages.yml` runs on every push to `main` (or manually): `npm ci && npm run build` with `OUT_DIR=_site`, then deploys `_site/` to GitHub Pages. The site serves `index.html` plus `AIOC-Quick-Start-Guide.md` (the public Markdown, without Appendix A) for agents to fetch.
-- Pages source must be set to **GitHub Actions**. Pages on a private repo needs a paid GitHub plan; on a free plan, deploys only work once the repo is public.
+- Pages source must be set to **GitHub Actions**. Pages is enabled (source: GitHub Actions) at https://therealkamisama.github.io/AIOC-Guide/. Pages on a private repo needs a paid plan, so making the repo private again stops deploys.
 
 ## How the build works (`site/build.mjs`)
 
