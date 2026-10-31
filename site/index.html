@@ -250,7 +250,7 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <li class="l3"><a href="#s5-17">5.17 Reticulum (RNS, NomadNet, Sideband, MeshChat) over packet</a></li>
 <li class="l3"><a href="#s5-18">5.18 Mobile / HF radios (wiring the AIOC to a data or mic port)</a></li>
 <li class="l2"><a href="#s6">6. PTT Troubleshooting Flow</a></li>
-<li class="l2"><a href="#s7">7. Configuring the AIOC Itself (aioc-util)</a></li>
+<li class="l2"><a href="#s7">7. Configuring the AIOC Itself (AIOC Toolkit / aioc-util)</a></li>
 <li class="l3"><a href="#s7-1">7.1 Requirements</a></li>
 <li class="l3"><a href="#s7-2">7.2 Common commands</a></li>
 <li class="l3"><a href="#s7-3">7.3 Register reference (for advanced users and agents)</a></li>
@@ -656,11 +656,27 @@ You can also run <code>sudo systemctl disable --now ModemManager</code> if you d
 </tr>
 <tr>
 <td><strong>Fox hunt beacon (no PC)</strong></td>
-<td>aioc-util (to set it up)</td>
-<td>aioc-util</td>
-<td>aioc-util</td>
+<td>AIOC Toolkit or aioc-util (to set it up)</td>
+<td>same</td>
+<td>same</td>
 <td>—</td>
 <td>7.4</td>
+</tr>
+<tr>
+<td><strong>Change AIOC settings (PTT source, VPTT/VCOS, gain)</strong></td>
+<td><strong>AIOC Toolkit</strong> (Chrome/Edge)</td>
+<td>AIOC Toolkit or aioc-util</td>
+<td>AIOC Toolkit or aioc-util</td>
+<td>—</td>
+<td>7</td>
+</tr>
+<tr>
+<td><strong>Update AIOC firmware</strong></td>
+<td><strong>AIOC Toolkit</strong> (Flash Firmware tab)</td>
+<td>dfu-util or AIOC Toolkit</td>
+<td>dfu-util or AIOC Toolkit</td>
+<td>—</td>
+<td>9</td>
 </tr>
 <tr>
 <td><strong>Record or monitor RX audio, scanner logging</strong></td>
@@ -1198,6 +1214,8 @@ Follow your country&#39;s amateur rules: no encryption is a common licence condi
 <div class="code"><pre><code>Radio does not transmit when the software &quot;keys&quot;?
 │
 ├─ 1. Is the plug fully seated? Is the radio on, VOX off, not locked, not on a TX-inhibited channel?
+│      Quick hardware test: AIOC Toolkit → Configure → Manual PTT State → PTT 1 ON.
+│      If the radio keys here, the cable is fine and the problem is the software&#39;s PTT setting.
 │
 ├─ 2. Does the software support CM108 PTT? → use it (Linux: check /dev/hidraw permissions, Section 2.5)
 │
@@ -1223,15 +1241,34 @@ because CHIRP toggles those lines. Tell the user to switch back with <code>--def
 or to keep a second AIOC for programming.</p>
 </blockquote>
 </section>
-<section class="doc-section"><h2 id="s7"><a class="anchor" href="#s7" aria-label="Link to this section">#</a>7. Configuring the AIOC Itself (aioc-util)</h2>
+<section class="doc-section"><h2 id="s7"><a class="anchor" href="#s7" aria-label="Link to this section">#</a>7. Configuring the AIOC Itself (AIOC Toolkit / aioc-util)</h2>
+<p>Every <code>aioc-util</code> command in this guide has a matching control in the browser-based <strong>AIOC Toolkit</strong> (<a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a>). For example, <code>--ptt1 VPTT</code> is <strong>PTT Sources → Auto PTT1 (VPTT)</strong>, and <code>--store</code> is <strong>Store to Flash</strong>. Point customers who don&#39;t use the command line to the Toolkit. <span class="tag tag-tool">Tool docs</span></p>
 <h3 id="s7-1"><a class="anchor" href="#s7-1" aria-label="Link to this section">#</a>7.1 Requirements <span class="tag tag-tool">Tool docs</span></h3>
 <ul>
 <li>AIOC <strong>firmware ≥ 1.3.0</strong> (tested with 1.3 and 1.4.1; 1.2 does <strong>not</strong> work).</li>
 <li><strong>Command line:</strong> <code>aioc-util</code> by Hrafnkell Eiríksson TF3HR — <a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a></li>
-<li><strong>Browser versions (no install, Chrome/Edge on a desktop; on Linux the udev rule must be installed):</strong><ul>
-<li><a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a> (TF3HR&#39;s aioc-util in the browser)</li>
-<li><a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> (G1LRO&#39;s version, with buttons for Hardware/Virtual COS, threshold and timing, then <strong>Apply</strong> → <strong>Store to Flash</strong>; it shows the live &quot;GPIO (Vol−)&quot; COS state) <span class="tag tag-community">Community</span></li>
-<li><strong>Recommend these to non-technical customers</strong>: no Python and no hidapi.dll needed.</li>
+<li><strong>Browser tools (no install; Chrome or Edge 89+ on a desktop; on Linux the udev rule from 2.5 must be installed):</strong><ul>
+<li><strong>AIOC Toolkit by G1LRO: <a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a> (recommended).</strong> <span class="tag tag-tool">Tool docs</span> It does both settings and firmware flashing, built on aioc-util and webdfu (source: <a href="https://github.com/G1LRO/aioc-toolkit">https://github.com/G1LRO/aioc-toolkit</a>).<ul>
+<li><strong>Configure</strong> tab: <strong>Connect (WebHID)</strong> finds the AIOC even when its USB ID has been changed (checks the &quot;AIOC&quot; magic register). It shows:<ul>
+<li>live <strong>GPIO Status</strong> (PTT1/PTT2 out, Vol+, Vol−/VCOS, mute buttons)</li>
+<li><strong>Manual PTT State</strong> on/off, to test keying without other software</li>
+<li><strong>PTT Sources</strong> (with <strong>Swap PTT1/PTT2</strong> and <strong>Auto PTT1 (VPTT)</strong>)</li>
+<li><strong>CM108 Button Sources</strong></li>
+<li><strong>COS Mode</strong> (Virtual or Hardware COS)</li>
+<li><strong>Audio Settings</strong> (RX gain 1–16×, TX boost)</li>
+<li><strong>AutoPTT &amp; VCOS Thresholds</strong> (level and timing; timing is ms × 16)</li>
+<li><strong>Foxhunt (CW Beacon)</strong></li>
+<li><strong>USB VID / PID Override</strong>: <strong>Fill CM108 IDs</strong> = <code>0x0D8C</code>/<code>0x000C</code> for AllStar/HamVOIP</li>
+<li><strong>Device Actions</strong>: <strong>Store to Flash</strong>, <strong>Recall from Flash</strong>, <strong>Load Defaults</strong>, <strong>Reboot Device</strong></li>
+<li><strong>Raw Register Dump</strong></li>
+</ul>
+</li>
+<li><strong>Flash Firmware</strong> tab: covered in 9.2.</li>
+<li>Always press <strong>Apply</strong>, then <strong>Store to Flash</strong>, or changes are lost when the AIOC is unplugged. A USB ID change only takes effect after <strong>Store</strong> and then <strong>Reboot</strong>.</li>
+</ul>
+</li>
+<li>Older single-purpose pages: <a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a> (TF3HR) and <a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> (G1LRO). <span class="tag tag-community">Community</span></li>
+<li><strong>Recommend the Toolkit to non-technical customers</strong>: no Python, no hidapi.dll, no Zadig.</li>
 </ul>
 </li>
 </ul>
@@ -1473,7 +1510,7 @@ Users must follow local rules for unattended beacons and station identification.
 <tr>
 <td>aioc-util &quot;Unexpected magic&quot; / can&#39;t open</td>
 <td>fw &lt; 1.3, USB ID was changed, or Windows missing hidapi.dll</td>
-<td>Update firmware; use <code>--open-usb</code>; add hidapi.dll; or use the browser tools (7.1)</td>
+<td>Update firmware; use <code>--open-usb</code>; add hidapi.dll; or use the AIOC Toolkit in the browser (7.1), which finds AIOCs with changed USB IDs</td>
 </tr>
 <tr>
 <td>aioc-util <code>module &#39;hid&#39; has no attribute &#39;Device&#39;</code> / <code>No module named &#39;hid&#39;</code></td>
@@ -1585,9 +1622,16 @@ Users must follow local rules for unattended beacons and station identification.
 <ul>
 <li><strong>Linux/macOS:</strong> install <code>dfu-util</code> (<code>apt install dfu-util</code> / <code>brew install dfu-util</code>). You may need <code>sudo</code> or the <code>plugdev</code> group.</li>
 <li><strong>Windows:</strong> dfu-util needs a <strong>libusb/WinUSB driver</strong> for the DFU interface. Use <strong>Zadig</strong> to install WinUSB for the AIOC DFU interface / &quot;STM32 BOOTLOADER&quot; device. (See the guide linked in the AIOC README: yeswolf.github.io/dfu.)
-<span class="tag tag-community">Community</span> dfu-util on Windows 11 often hangs or reports <code>LIBUSB_ERROR_NOT_SUPPORTED</code> (GitHub #28). Easiest fixes: use a Linux PC or Raspberry Pi, or the browser tool below.</li>
-<li><strong>Browser flashing (WebDFU) [Community, used in G1LRO&#39;s guide]:</strong> put the AIOC in bootloader mode (9.3, step 1), then open
-<a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a> in Chrome/Edge → <strong>Connect</strong> → choose <strong>STM32 Bootloader</strong> → <strong>Internal Flash</strong> → pick the <code>.bin</code> → <strong>Download</strong>. Unplug it when it finishes.</li>
+<span class="tag tag-community">Community</span> dfu-util on Windows 11 often hangs or reports <code>LIBUSB_ERROR_NOT_SUPPORTED</code> (GitHub #28). Easiest fixes: use the AIOC Toolkit in the browser (below), or a Linux PC or Raspberry Pi.</li>
+<li><strong>Browser flashing with the AIOC Toolkit (easiest, especially on Windows)</strong> <span class="tag tag-tool">Tool docs</span>:<ol>
+<li>Download the <code>.bin</code> from the <strong>Latest Firmware</strong> box (<strong>Download Firmware</strong> link) on <a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a> → <strong>Flash Firmware</strong> tab. Browsers can&#39;t fetch GitHub release files directly, so you save the file and then select it.</li>
+<li><strong>Put the AIOC in bootloader mode first</strong> (9.3, step 1: short the two outer header pins, then plug in). The Toolkit doesn&#39;t switch modes itself and blocks flashing while the AIOC is in normal &quot;DFU runtime&quot; mode. In bootloader mode it shows up as <code>0483:df11</code>.</li>
+<li>Connect, check <strong>Device Status</strong>, choose the file, start <strong>Flash Firmware</strong> and watch the <strong>Log</strong>. Remove the short and replug when it&#39;s done.
+Flash only official <code>aioc-fw-x.y.z.bin</code> files. A failed flash can be recovered by repeating these steps.</li>
+</ol>
+</li>
+<li><strong>Alternative browser flasher (plain WebDFU) [Community, used in G1LRO&#39;s guide]:</strong> with the AIOC in bootloader mode, open
+<a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a> → <strong>Connect</strong> → choose <strong>STM32 Bootloader</strong> → <strong>Internal Flash</strong> → pick the <code>.bin</code> → <strong>Download</strong>.</li>
 </ul>
 <h3 id="s9-3"><a class="anchor" href="#s9-3" aria-label="Link to this section">#</a>9.3 First programming / unbricking <span class="tag tag-official">Official</span></h3>
 <ol>
@@ -1600,7 +1644,7 @@ Users must follow local rules for unattended beacons and station identification.
 <h3 id="s9-4"><a class="anchor" href="#s9-4" aria-label="Link to this section">#</a>9.4 Which firmware do I have?</h3>
 <p>The USB descriptor doesn&#39;t report the firmware version. Practical checks:</p>
 <ul>
-<li>aioc-util works → ≥ 1.3.0. <code>--audio-get-settings</code> / fox-hunt commands work → ≥ 1.4.0.</li>
+<li>aioc-util or the AIOC Toolkit can connect → ≥ 1.3.0. Audio settings / fox-hunt can be read → ≥ 1.4.0.</li>
 <li>If unsure, just flash the latest release (9.2). That is the recommended fix for most issues.</li>
 </ul>
 </section>
@@ -1631,7 +1675,8 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 <li>AIOC Discord: linked from the GitHub README</li>
 <li>aioc-util (CLI): <a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a> · Web version: <a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a></li>
 <li>G1LRO AIOC + ASL3 guide (current): <a href="https://g1lro.uk/?p=1593">https://g1lro.uk/?p=1593</a> · older guide: <a href="https://g1lro.uk/?p=676">https://g1lro.uk/?p=676</a> · scripts: <a href="https://github.com/G1LRO/AIOC-ASL3-Config">https://github.com/G1LRO/AIOC-ASL3-Config</a></li>
-<li>G1LRO browser config tool: <a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> · WebDFU flasher: <a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a></li>
+<li><strong>AIOC Toolkit (configure + flash in the browser):</strong> <a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a> · source: <a href="https://github.com/G1LRO/aioc-toolkit">https://github.com/G1LRO/aioc-toolkit</a></li>
+<li>Older browser tools: G1LRO config <a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> · WebDFU flasher <a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a></li>
 <li>AllStarLink forum, AIOC as a CM108 alternative: <a href="https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225">https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225</a></li>
 <li>M0AWS AllStar node build with an AIOC: <a href="https://m0aws.co.uk/?cat=408">https://m0aws.co.uk/?cat=408</a></li>
 <li>DL-Nordwest AIOC series (German), part 4 troubleshooting: <a href="https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/">https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/</a></li>
@@ -1663,7 +1708,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 > this document should be able to answer: *"I have an AIOC and radio X. I want to
 > do Y on computer Z. What software do I install and how do I set it up?"*
 >
-> **Document version:** 2026-10-31 (rev 2, with community research added) · Written for AIOC firmware **v1.4.1**
+> **Document version:** 2026-10-31 (rev 3: community research, AIOC Toolkit) · Written for AIOC firmware **v1.4.1**
 > (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
 
 ---
@@ -1849,7 +1894,9 @@ The aioc-util project also ships a ready-made udev rule (`udev/rules.d/91-aioc.r
 | **Mesh / off-grid networking over packet** | Reticulum via Direwolf KISS | Reticulum (RNS, NomadNet, Sideband) via Direwolf KISS | Reticulum | Sideband | 5.17 |
 | **AllStar-style linking on GMRS** | — | GMRSLive (AllStar-based) | — | — | 5.12 |
 | **Wire to a mobile/HF rig (audio + PTT + CAT)** | WSJT-X/fldigi + CAT | same | same | — | 5.18 |
-| **Fox hunt beacon (no PC)** | aioc-util (to set it up) | aioc-util | aioc-util | — | 7.4 |
+| **Fox hunt beacon (no PC)** | AIOC Toolkit or aioc-util (to set it up) | same | same | — | 7.4 |
+| **Change AIOC settings (PTT source, VPTT/VCOS, gain)** | **AIOC Toolkit** (Chrome/Edge) | AIOC Toolkit or aioc-util | AIOC Toolkit or aioc-util | — | 7 |
+| **Update AIOC firmware** | **AIOC Toolkit** (Flash Firmware tab) | dfu-util or AIOC Toolkit | dfu-util or AIOC Toolkit | — | 9 |
 | **Record or monitor RX audio, scanner logging** | Audacity / any recorder | Audacity / arecord / rtl-style tools | Audacity | Any recorder | 2.4 |
 
 ---
@@ -2261,6 +2308,8 @@ Follow your country's amateur rules: no encryption is a common licence condition
 Radio does not transmit when the software "keys"?
 │
 ├─ 1. Is the plug fully seated? Is the radio on, VOX off, not locked, not on a TX-inhibited channel?
+│      Quick hardware test: AIOC Toolkit → Configure → Manual PTT State → PTT 1 ON.
+│      If the radio keys here, the cable is fine and the problem is the software's PTT setting.
 │
 ├─ 2. Does the software support CM108 PTT? → use it (Linux: check /dev/hidraw permissions, Section 2.5)
 │
@@ -2287,15 +2336,31 @@ Radio does not transmit when the software "keys"?
 
 ---
 
-## 7. Configuring the AIOC Itself (aioc-util)
+## 7. Configuring the AIOC Itself (AIOC Toolkit / aioc-util)
+
+Every `aioc-util` command in this guide has a matching control in the browser-based **AIOC Toolkit** (https://g1lro.github.io/aioc-toolkit/). For example, `--ptt1 VPTT` is **PTT Sources → Auto PTT1 (VPTT)**, and `--store` is **Store to Flash**. Point customers who don't use the command line to the Toolkit. **[Tool docs]**
 
 ### 7.1 Requirements **[Tool docs]**
 - AIOC **firmware ≥ 1.3.0** (tested with 1.3 and 1.4.1; 1.2 does **not** work).
 - **Command line:** `aioc-util` by Hrafnkell Eiríksson TF3HR — https://github.com/hrafnkelle/aioc-util
-- **Browser versions (no install, Chrome/Edge on a desktop; on Linux the udev rule must be installed):**
-  - https://aioc-util.tf3hr.net/ (TF3HR's aioc-util in the browser)
-  - https://g1lro.github.io/aioc-util/ (G1LRO's version, with buttons for Hardware/Virtual COS, threshold and timing, then **Apply** → **Store to Flash**; it shows the live "GPIO (Vol−)" COS state) **[Community]**
-  - **Recommend these to non-technical customers**: no Python and no hidapi.dll needed.
+- **Browser tools (no install; Chrome or Edge 89+ on a desktop; on Linux the udev rule from 2.5 must be installed):**
+  - **AIOC Toolkit by G1LRO: https://g1lro.github.io/aioc-toolkit/ (recommended).** **[Tool docs]** It does both settings and firmware flashing, built on aioc-util and webdfu (source: https://github.com/G1LRO/aioc-toolkit).
+    - **Configure** tab: **Connect (WebHID)** finds the AIOC even when its USB ID has been changed (checks the "AIOC" magic register). It shows:
+      - live **GPIO Status** (PTT1/PTT2 out, Vol+, Vol−/VCOS, mute buttons)
+      - **Manual PTT State** on/off, to test keying without other software
+      - **PTT Sources** (with **Swap PTT1/PTT2** and **Auto PTT1 (VPTT)**)
+      - **CM108 Button Sources**
+      - **COS Mode** (Virtual or Hardware COS)
+      - **Audio Settings** (RX gain 1–16×, TX boost)
+      - **AutoPTT & VCOS Thresholds** (level and timing; timing is ms × 16)
+      - **Foxhunt (CW Beacon)**
+      - **USB VID / PID Override**: **Fill CM108 IDs** = `0x0D8C`/`0x000C` for AllStar/HamVOIP
+      - **Device Actions**: **Store to Flash**, **Recall from Flash**, **Load Defaults**, **Reboot Device**
+      - **Raw Register Dump**
+    - **Flash Firmware** tab: covered in 9.2.
+    - Always press **Apply**, then **Store to Flash**, or changes are lost when the AIOC is unplugged. A USB ID change only takes effect after **Store** and then **Reboot**.
+  - Older single-purpose pages: https://aioc-util.tf3hr.net/ (TF3HR) and https://g1lro.github.io/aioc-util/ (G1LRO). **[Community]**
+  - **Recommend the Toolkit to non-technical customers**: no Python, no hidapi.dll, no Zadig.
 
 **Install (Linux/macOS):**
 ```bash
@@ -2376,7 +2441,7 @@ Users must follow local rules for unattended beacons and station identification.
 | UV-K5 firmware flash fails partway | Serial buffer limits in old firmware | Update the AIOC to ≥ v1.4.0 **[Official]** |
 | Direwolf CM108 warnings | Upstream Direwolf behaviour | Harmless; ignore (direwolf issue #448) **[Official]** |
 | Linux "permission denied" on /dev/ttyACM0 or /dev/hidraw | User not in dialout/plugdev; no udev rule | Section 2.5 |
-| aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the browser tools (7.1) |
+| aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the AIOC Toolkit in the browser (7.1), which finds AIOCs with changed USB IDs |
 | aioc-util `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Wrong Python package (Debian's `python3-hid`/`hidapi`) | Use a venv and `pip install hid`; remove the apt package **[Community]** |
 | **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]** |
 | Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting | Seen on **Android 11** phones; Android 12+ was fine (GitHub #121) | Try another phone or Android version **[Community]** |
@@ -2417,9 +2482,14 @@ dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
 The AIOC reboots into the bootloader, flashes, and restarts on its own.
 - **Linux/macOS:** install `dfu-util` (`apt install dfu-util` / `brew install dfu-util`). You may need `sudo` or the `plugdev` group.
 - **Windows:** dfu-util needs a **libusb/WinUSB driver** for the DFU interface. Use **Zadig** to install WinUSB for the AIOC DFU interface / "STM32 BOOTLOADER" device. (See the guide linked in the AIOC README: yeswolf.github.io/dfu.)
-  **[Community]** dfu-util on Windows 11 often hangs or reports `LIBUSB_ERROR_NOT_SUPPORTED` (GitHub #28). Easiest fixes: use a Linux PC or Raspberry Pi, or the browser tool below.
-- **Browser flashing (WebDFU) [Community, used in G1LRO's guide]:** put the AIOC in bootloader mode (9.3, step 1), then open
-  https://devanlai.github.io/webdfu/dfu-util/ in Chrome/Edge → **Connect** → choose **STM32 Bootloader** → **Internal Flash** → pick the `.bin` → **Download**. Unplug it when it finishes.
+  **[Community]** dfu-util on Windows 11 often hangs or reports `LIBUSB_ERROR_NOT_SUPPORTED` (GitHub #28). Easiest fixes: use the AIOC Toolkit in the browser (below), or a Linux PC or Raspberry Pi.
+- **Browser flashing with the AIOC Toolkit (easiest, especially on Windows)** **[Tool docs]**:
+  1. Download the `.bin` from the **Latest Firmware** box (**Download Firmware** link) on https://g1lro.github.io/aioc-toolkit/ → **Flash Firmware** tab. Browsers can't fetch GitHub release files directly, so you save the file and then select it.
+  2. **Put the AIOC in bootloader mode first** (9.3, step 1: short the two outer header pins, then plug in). The Toolkit doesn't switch modes itself and blocks flashing while the AIOC is in normal "DFU runtime" mode. In bootloader mode it shows up as `0483:df11`.
+  3. Connect, check **Device Status**, choose the file, start **Flash Firmware** and watch the **Log**. Remove the short and replug when it's done.
+  Flash only official `aioc-fw-x.y.z.bin` files. A failed flash can be recovered by repeating these steps.
+- **Alternative browser flasher (plain WebDFU) [Community, used in G1LRO's guide]:** with the AIOC in bootloader mode, open
+  https://devanlai.github.io/webdfu/dfu-util/ → **Connect** → choose **STM32 Bootloader** → **Internal Flash** → pick the `.bin` → **Download**.
 
 ### 9.3 First programming / unbricking **[Official]**
 1. **Short the two outermost pins** of the programming header on the PCB (this is BOOT mode).
@@ -2431,7 +2501,7 @@ After any update: **re-apply your aioc-util settings** (they are erased).
 
 ### 9.4 Which firmware do I have?
 The USB descriptor doesn't report the firmware version. Practical checks:
-- aioc-util works → ≥ 1.3.0. `--audio-get-settings` / fox-hunt commands work → ≥ 1.4.0.
+- aioc-util or the AIOC Toolkit can connect → ≥ 1.3.0. Audio settings / fox-hunt can be read → ≥ 1.4.0.
 - If unsure, just flash the latest release (9.2). That is the recommended fix for most issues.
 
 ---
@@ -2473,7 +2543,8 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 - AIOC Discord: linked from the GitHub README
 - aioc-util (CLI): https://github.com/hrafnkelle/aioc-util · Web version: https://aioc-util.tf3hr.net/
 - G1LRO AIOC + ASL3 guide (current): https://g1lro.uk/?p=1593 · older guide: https://g1lro.uk/?p=676 · scripts: https://github.com/G1LRO/AIOC-ASL3-Config
-- G1LRO browser config tool: https://g1lro.github.io/aioc-util/ · WebDFU flasher: https://devanlai.github.io/webdfu/dfu-util/
+- **AIOC Toolkit (configure + flash in the browser):** https://g1lro.github.io/aioc-toolkit/ · source: https://github.com/G1LRO/aioc-toolkit
+- Older browser tools: G1LRO config https://g1lro.github.io/aioc-util/ · WebDFU flasher https://devanlai.github.io/webdfu/dfu-util/
 - AllStarLink forum, AIOC as a CM108 alternative: https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225
 - M0AWS AllStar node build with an AIOC: https://m0aws.co.uk/?cat=408
 - DL-Nordwest AIOC series (German), part 4 troubleshooting: https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/
@@ -2532,12 +2603,12 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
       ptt: 'Direwolf does the PTT.', tip: 'Check your licence rules on encryption first.', sec: [['s5-17', 'Reticulum']] },
     { id: 'rig', label: 'Mobile / HF rig', sw: { win: 'Hand-wired AIOC + WSJT-X, fldigi, VARA', linux: 'Hand-wired AIOC + WSJT-X, fldigi, Direwolf', mac: 'Hand-wired AIOC + WSJT-X, fldigi', android: NO_PHONE, ios: NO_PHONE },
       ptt: 'AIOC PTT, or CAT PTT over the AIOC serial port.', tip: 'Hardware rev 1.2 separates PTT from serial data. Icom CI-V does not work.', sec: [['s5-18', 'Wiring to other radios']] },
-    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'aioc-util, or the browser tool in Chrome/Edge', linux: 'aioc-util, or the browser tool', mac: 'aioc-util, or the browser tool', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
+    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'AIOC Toolkit in Chrome/Edge (Foxhunt box)', linux: 'AIOC Toolkit or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
       ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
-    { id: 'config', label: 'Change AIOC settings', sw: { win: 'Browser tool (Chrome/Edge), or aioc-util + hidapi.dll', linux: 'aioc-util, or the browser tool (install the udev rule)', mac: 'aioc-util, or the browser tool', android: NO_PHONE, ios: NO_PHONE },
-      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'Always finish with Store to flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
-    { id: 'firmware', label: 'Update firmware', sw: { win: 'WebDFU in Chrome/Edge (easiest), or dfu-util + Zadig', linux: 'dfu-util', mac: 'dfu-util (Homebrew), or WebDFU', android: NO_PHONE, ios: NO_PHONE },
-      ptt: '—', tip: 'Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
+    { id: 'config', label: 'Change AIOC settings', sw: { win: 'AIOC Toolkit in Chrome/Edge (no install)', linux: 'AIOC Toolkit (install the udev rule) or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+    { id: 'firmware', label: 'Update firmware', sw: { win: 'AIOC Toolkit, Flash Firmware tab (easiest), or dfu-util + Zadig', linux: 'dfu-util, or the AIOC Toolkit', mac: 'dfu-util (Homebrew), or the AIOC Toolkit', android: NO_PHONE, ios: NO_PHONE },
+      ptt: '—', tip: 'For the Toolkit, put the AIOC in bootloader mode first. Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
   ];
 
   var state = { goal: 'aprs', os: 'win' };

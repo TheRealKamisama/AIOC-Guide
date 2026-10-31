@@ -281,12 +281,12 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
       ptt: 'Direwolf does the PTT.', tip: 'Check your licence rules on encryption first.', sec: [['s5-17', 'Reticulum']] },
     { id: 'rig', label: 'Mobile / HF rig', sw: { win: 'Hand-wired AIOC + WSJT-X, fldigi, VARA', linux: 'Hand-wired AIOC + WSJT-X, fldigi, Direwolf', mac: 'Hand-wired AIOC + WSJT-X, fldigi', android: NO_PHONE, ios: NO_PHONE },
       ptt: 'AIOC PTT, or CAT PTT over the AIOC serial port.', tip: 'Hardware rev 1.2 separates PTT from serial data. Icom CI-V does not work.', sec: [['s5-18', 'Wiring to other radios']] },
-    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'aioc-util, or the browser tool in Chrome/Edge', linux: 'aioc-util, or the browser tool', mac: 'aioc-util, or the browser tool', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
+    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'AIOC Toolkit in Chrome/Edge (Foxhunt box)', linux: 'AIOC Toolkit or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
       ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
-    { id: 'config', label: 'Change AIOC settings', sw: { win: 'Browser tool (Chrome/Edge), or aioc-util + hidapi.dll', linux: 'aioc-util, or the browser tool (install the udev rule)', mac: 'aioc-util, or the browser tool', android: NO_PHONE, ios: NO_PHONE },
-      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'Always finish with Store to flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
-    { id: 'firmware', label: 'Update firmware', sw: { win: 'WebDFU in Chrome/Edge (easiest), or dfu-util + Zadig', linux: 'dfu-util', mac: 'dfu-util (Homebrew), or WebDFU', android: NO_PHONE, ios: NO_PHONE },
-      ptt: '—', tip: 'Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
+    { id: 'config', label: 'Change AIOC settings', sw: { win: 'AIOC Toolkit in Chrome/Edge (no install)', linux: 'AIOC Toolkit (install the udev rule) or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+    { id: 'firmware', label: 'Update firmware', sw: { win: 'AIOC Toolkit, Flash Firmware tab (easiest), or dfu-util + Zadig', linux: 'dfu-util, or the AIOC Toolkit', mac: 'dfu-util (Homebrew), or the AIOC Toolkit', android: NO_PHONE, ios: NO_PHONE },
+      ptt: '—', tip: 'For the Toolkit, put the AIOC in bootloader mode first. Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
   ];
 
   var state = { goal: 'aprs', os: 'win' };
