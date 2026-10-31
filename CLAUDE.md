@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A knowledge base for the **AIOC (ham radio All-In-One-Cable)**, maintained by an AIOC retailer. It has two outputs, both from one Markdown source:
 
 1. `AIOC-Quick-Start-Guide.md`: the guide itself. It is written so that **AI agents** can answer customer questions ("I have radio X and OS Y and want to do Z: which software and settings?"). It is also pasted into chat assistants as-is.
-2. `site/index.html`: a single-file web page built from the Markdown. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It will go on GitHub Pages later. A private copy is published as a claude.ai artifact (slug `9723f2b5-e6cd-4cc2-bf58-b291fc9e5947`); republish it with `publish_files` after rebuilding.
+2. `site/index.html`: a single-file web page built from the Markdown. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It is live on GitHub Pages (see Deploy). A private copy is published as a claude.ai artifact (slug `9723f2b5-e6cd-4cc2-bf58-b291fc9e5947`); republish it with `publish_files` after rebuilding.
 
 ## Build
 
@@ -22,7 +22,7 @@ There are no tests or linter. To check the page, open `site/index.html` in a bro
 
 - GitHub repo: `TheRealKamisama/AIOC-Guide` (public). Commits use the noreply identity set in the repo's git config (`35005476+TheRealKamisama@users.noreply.github.com`); don't commit with any other email.
 - `.github/workflows/pages.yml` runs on every push to `main` (or manually): `npm ci && npm run build` with `OUT_DIR=_site`, then deploys `_site/` to GitHub Pages. The site serves `index.html` plus `AIOC-Quick-Start-Guide.md` (the public Markdown, without Appendix A) for agents to fetch.
-- Pages source must be set to **GitHub Actions**. Pages is enabled (source: GitHub Actions) at https://therealkamisama.github.io/AIOC-Guide/. Pages on a private repo needs a paid plan, so making the repo private again stops deploys.
+- Pages is enabled (source: **GitHub Actions**) at https://therealkamisama.github.io/AIOC-Guide/. Pages on a private repo needs a paid plan, so making the repo private again stops deploys.
 
 ## How the build works (`site/build.mjs`)
 
