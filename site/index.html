@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIOC Quick Start Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a radio-shack field manual. Sticky index on the left, the manual on the right,
+   a "find your setup" selector up top that points into the manual. Signal-amber accent = PTT/TX. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #15212c;
+  --muted: #566573;
+  --line: #d5dce3;
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe9df;
+  --code-bg: #f4f6f9;
+  --lcd: #1c2a35;
+  --lcd-ink: #ffb26b;
+  --t-official: #0f6b5c; --t-official-bg: #dcf1ec;
+  --t-tool: #3b4fa8;     --t-tool-bg: #e2e7fa;
+  --t-community: #8a4a00; --t-community-bg: #fdecd2;
+  --t-typical: #4f5b66;  --t-typical-bg: #e7ebef;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151e27; --ink: #e3eaf0; --muted: #94a3b1; --line: #26333f;
+    --accent: #f28a4b; --accent-ink: #1a0d05; --accent-soft: #3a2316; --code-bg: #101820;
+    --lcd: #0a1016; --lcd-ink: #ffb26b;
+    --t-official: #6fd6c0; --t-official-bg: #123a33;
+    --t-tool: #a9b6f5;     --t-tool-bg: #1f2850;
+    --t-community: #f3c27e; --t-community-bg: #3d2a10;
+    --t-typical: #b3bfca;  --t-typical-bg: #24303b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151e27; --ink: #e3eaf0; --muted: #94a3b1; --line: #26333f;
+  --accent: #f28a4b; --accent-ink: #1a0d05; --accent-soft: #3a2316; --code-bg: #101820;
+  --lcd: #0a1016; --lcd-ink: #ffb26b;
+  --t-official: #6fd6c0; --t-official-bg: #123a33;
+  --t-tool: #a9b6f5;     --t-tool-bg: #1f2850;
+  --t-community: #f3c27e; --t-community-bg: #3d2a10;
+  --t-typical: #b3bfca;  --t-typical-bg: #24303b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-body); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; }
+code, pre { font-family: var(--font-mono); font-size: 0.86em; }
+
+/* ---------- Header ---------- */
+.masthead { background: var(--lcd); color: #e9eef2; }
+.masthead-inner { max-width: 1240px; margin: 0 auto; padding: 28px 24px 24px; display: grid; gap: 18px; grid-template-columns: 1fr auto; align-items: end; }
+.kicker { font: 600 13px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lcd-ink); margin: 0 0 10px; }
+.masthead h1 { font-size: clamp(30px, 4.4vw, 46px); margin: 0 0 8px; font-weight: 700; color: #fff; }
+.masthead p.lede { margin: 0; max-width: 62ch; color: #b9c6d1; }
+.readout { display: grid; grid-template-columns: repeat(2, minmax(150px, auto)); gap: 1px; background: #2c3c49; border: 1px solid #2c3c49; border-radius: var(--radius); overflow: hidden; font-family: var(--font-mono); }
+.readout div { background: #111b23; padding: 8px 12px; }
+.readout dt { font-size: 11px; color: #8597a6; text-transform: uppercase; letter-spacing: .06em; }
+.readout dd { margin: 2px 0 0; color: var(--lcd-ink); font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.actions { max-width: 1240px; margin: 0 auto; padding: 0 24px 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 600 14px/1 var(--font-body); padding: 10px 14px; border-radius: var(--radius); border: 1px solid transparent; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { background: transparent; color: #e9eef2; border-color: #3b4e5d; }
+.btn-ghost:hover { border-color: #6c8395; }
+.copy-status { font: 13px var(--font-mono); color: var(--lcd-ink); align-self: center; min-height: 1em; }
+
+/* ---------- Setup finder ---------- */
+.finder { max-width: 1240px; margin: 24px auto 0; padding: 0 24px; }
+.finder-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 16px; }
+.finder-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; }
+.finder-head h2 { margin: 0; font-size: 24px; }
+.finder-head p { margin: 0; color: var(--muted); font-size: 14px; }
+.field-label { font: 600 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; display: block; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 14px/1.2 var(--font-body); padding: 7px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.result { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; display: grid; gap: 8px; }
+.result h3 { margin: 0; font-size: 20px; }
+.result dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.result dt { font: 600 12px/1.9 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.result dd { margin: 0; }
+.result .na { color: var(--muted); font-style: italic; }
+.result .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.result .links a { font-weight: 600; }
+
+/* ---------- Main layout ---------- */
+.layout { max-width: 1240px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 28px; align-items: start; }
+nav.index { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 10px 14px 14px; }
+.search { width: 100%; font: 14px var(--font-body); padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+.search-note { font: 12px var(--font-mono); color: var(--muted); margin: 6px 2px 10px; min-height: 1.2em; }
+nav.index ul { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+nav.index li a { display: block; padding: 4px 6px; color: var(--ink); text-decoration: none; border-radius: 4px; line-height: 1.35; }
+nav.index li a:hover { background: var(--bg); }
+nav.index li.l2 { margin-top: 8px; }
+nav.index li.l2 > a { font-weight: 600; font-family: var(--font-display); font-size: 15px; }
+nav.index li.l3 a { padding-left: 16px; color: var(--muted); font-size: 13.5px; }
+nav.index li.l4 { display: none; }
+nav.index li.hidden { display: none; }
+
+/* ---------- Guide content ---------- */
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+main.guide { min-width: 0; }
+.doc-section { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 32px 24px; margin-bottom: 20px; }
+.doc-section.hidden { display: none; }
+.guide h2 { font-size: 30px; margin: 22px 0 10px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+.guide h3 { font-size: 21px; margin: 34px 0 8px; }
+.guide h4 { font-size: 17px; margin: 24px 0 6px; }
+.guide h2, .guide h3, .guide h4 { position: relative; }
+.anchor { position: absolute; left: -22px; color: var(--muted); text-decoration: none; opacity: 0; font-weight: 400; }
+h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1; }
+.guide p, .guide li { max-width: 78ch; }
+.guide ul, .guide ol { padding-left: 1.4em; }
+.guide li { margin: 3px 0; }
+.guide blockquote { margin: 14px 0; padding: 10px 16px; border-left: 4px solid var(--t-community); background: var(--t-community-bg); border-radius: 0 var(--radius) var(--radius) 0; }
+.guide blockquote p { margin: 6px 0; }
+.guide :not(pre) > code { background: var(--code-bg); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.code { position: relative; margin: 12px 0; }
+.code pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; line-height: 1.5; margin: 0; }
+.copy-btn { position: absolute; top: 8px; right: 8px; font: 600 12px var(--font-mono); padding: 5px 9px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.copy-btn:hover { color: var(--ink); border-color: var(--muted); }
+.table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: var(--radius); }
+.guide table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+.guide th, .guide td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.guide th { background: var(--bg); font-family: var(--font-display); font-size: 14px; letter-spacing: .02em; }
+.guide tr:last-child td { border-bottom: 0; }
+.guide td code { white-space: nowrap; }
+.tag { display: inline-block; font: 600 11px/1.5 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; vertical-align: 1px; white-space: nowrap; }
+.tag-official { color: var(--t-official); background: var(--t-official-bg); }
+.tag-tool { color: var(--t-tool); background: var(--t-tool-bg); }
+.tag-community { color: var(--t-community); background: var(--t-community-bg); }
+.tag-typical { color: var(--t-typical); background: var(--t-typical-bg); }
+mark { background: var(--accent-soft); color: inherit; outline: 1px solid var(--accent); border-radius: 2px; }
+footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(--muted); font-size: 13.5px; }
+
+@media (max-width: 900px) {
+  .masthead-inner { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; }
+  nav.index { position: static; max-height: 340px; }
+  .doc-section { padding: 4px 18px 18px; }
+  .anchor { display: none; }
+}
+@media (max-width: 420px) {
+  .readout { grid-template-columns: 1fr 1fr; }
+  .masthead-inner, .actions, .finder, .layout, footer { padding-left: 16px; padding-right: 16px; }
+  .result dl { grid-template-columns: 1fr; gap: 2px; }
+  .result dt { margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <p class="kicker">Ham radio · All-In-One-Cable</p>
+      <h1>AIOC Quick Start Guide</h1>
+      <p class="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
+        Pick what you want to do below to see the software and settings, or read the full guide.</p>
+    </div>
+    <dl class="readout" aria-label="AIOC key facts">
+      <div><dt>USB ID</dt><dd>1209:7388</dd></div>
+      <div><dt>Firmware</dt><dd>v1.4.1</dd></div>
+      <div><dt>Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
+      <div><dt>CM108 PTT</dt><dd>GPIO3</dd></div>
+      <div><dt>Audio</dt><dd>48 kHz mono</dd></div>
+      <div><dt>Radio plug</dt><dd>Kenwood K1</dd></div>
+    </dl>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" id="copy-md" type="button">Copy guide for your AI assistant</button>
+    <a class="btn btn-ghost" href="#s6">Radio won't transmit?</a>
+    <a class="btn btn-ghost" href="#s8">Known issues</a>
+    <a class="btn btn-ghost" href="#s9">Update firmware</a>
+    <span class="copy-status" id="copy-status" role="status"></span>
+  </div>
+</header>
+
+<section class="finder" aria-labelledby="finder-title">
+  <div class="finder-card">
+    <div class="finder-head">
+      <h2 id="finder-title">Find your setup</h2>
+      <p>Choose a task and your device. The answer links to the step-by-step section.</p>
+    </div>
+    <div>
+      <span class="field-label" id="goal-label">I want to</span>
+      <div class="chips" id="goals" role="group" aria-labelledby="goal-label"></div>
+    </div>
+    <div>
+      <span class="field-label" id="os-label">On</span>
+      <div class="chips" id="oses" role="group" aria-labelledby="os-label"></div>
+    </div>
+    <div class="result" id="result" aria-live="polite"></div>
+  </div>
+</section>
+
+<div class="layout">
+  <nav class="index" aria-label="Guide contents">
+    <label class="field-label" for="search">Search the guide</label>
+    <input class="search" id="search" type="search" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
+    <p class="search-note" id="search-note"></p>
+    <ul id="toc">
+<li class="l2"><a href="#s0">0. Instructions for AI Agents (read first)</a></li>
+<li class="l2"><a href="#s1">1. What the AIOC Is</a></li>
+<li class="l3"><a href="#hardware-revisions-and-firmware-compatib">Hardware revisions and firmware compatibility</a></li>
+<li class="l3"><a href="#tested-radios-official">Tested radios</a></li>
+<li class="l3"><a href="#limitations-tell-users-before-they-buy-o">Limitations (tell users before they buy or try)</a></li>
+<li class="l2"><a href="#s2">2. First-Time Setup (every user)</a></li>
+<li class="l3"><a href="#s2-1">2.1 Plug in</a></li>
+<li class="l3"><a href="#s2-2">2.2 Check that the computer sees it</a></li>
+<li class="l3"><a href="#s2-3">2.3 OS audio settings (important)</a></li>
+<li class="l3"><a href="#s2-4">2.4 Setting audio levels (all digital modes)</a></li>
+<li class="l3"><a href="#s2-5">2.5 Linux permissions (do this once)</a></li>
+<li class="l2"><a href="#s3">3. Decision Table — "What software do I need?"</a></li>
+<li class="l2"><a href="#s4">4. PTT Methods (understand this before any recipe)</a></li>
+<li class="l2"><a href="#s5">5. Software Recipes</a></li>
+<li class="l3"><a href="#s5-1">5.1 CHIRP — programming radios (Windows / Linux / macOS)</a></li>
+<li class="l3"><a href="#s5-2">5.2 Quansheng UV-K5 firmware flashing</a></li>
+<li class="l3"><a href="#s5-3">5.3 Direwolf — APRS, packet TNC, iGate, digipeater (Windows / Linux / macOS)</a></li>
+<li class="l3"><a href="#s5-4">5.4 APRS client programs (use Direwolf as the modem)</a></li>
+<li class="l3"><a href="#s5-5">5.5 APRSdroid — APRS on Android</a></li>
+<li class="l3"><a href="#s5-6">5.6 UZ7HO Soundmodem (Windows) / QtSoundModem (Linux, Windows)</a></li>
+<li class="l3"><a href="#s5-7">5.7 Packet BBS, nodes and terminals</a></li>
+<li class="l3"><a href="#s5-8">5.8 Winlink email — Winlink Express, Pat, VARA FM, packet</a></li>
+<li class="l3"><a href="#s5-9">5.9 SSTV — slow-scan TV pictures</a></li>
+<li class="l3"><a href="#s5-10">5.10 fldigi / flmsg / flamp — NBEMS EmComm text and forms over FM</a></li>
+<li class="l3"><a href="#s5-11">5.11 WSJT-X / JS8Call (FT8, FT4, JS8 — non-standard on FM)</a></li>
+<li class="l3"><a href="#s5-12">5.12 AllStarLink 3 (ASL3) — HT as an AllStar node radio</a></li>
+<li class="l3"><a href="#s5-13">5.13 SvxLink (Linux) and EchoLink (Windows)</a></li>
+<li class="l3"><a href="#s5-14">5.14 Hamlib / scripts / generic PTT</a></li>
+<li class="l3"><a href="#s5-15">5.15 DigiPi (Raspberry Pi all-in-one data station)</a></li>
+<li class="l3"><a href="#s5-16">5.16 iPhone / iPad (RadioMail, Packet Commander)</a></li>
+<li class="l3"><a href="#s5-17">5.17 Reticulum (RNS, NomadNet, Sideband, MeshChat) over packet</a></li>
+<li class="l3"><a href="#s5-18">5.18 Mobile / HF radios (wiring the AIOC to a data or mic port)</a></li>
+<li class="l2"><a href="#s6">6. PTT Troubleshooting Flow</a></li>
+<li class="l2"><a href="#s7">7. Configuring the AIOC Itself (aioc-util)</a></li>
+<li class="l3"><a href="#s7-1">7.1 Requirements</a></li>
+<li class="l3"><a href="#s7-2">7.2 Common commands</a></li>
+<li class="l3"><a href="#s7-3">7.3 Register reference (for advanced users and agents)</a></li>
+<li class="l3"><a href="#s7-4">7.4 Fox-hunt beacon mode (fw ≥ 1.4.0)</a></li>
+<li class="l2"><a href="#s8">8. Known Issues and Fixes</a></li>
+<li class="l2"><a href="#s9">9. Firmware Update</a></li>
+<li class="l3"><a href="#s9-1">9.1 Releases</a></li>
+<li class="l3"><a href="#s9-2">9.2 Updating firmware that is already ≥ 1.2.0 (no case opening)</a></li>
+<li class="l3"><a href="#s9-3">9.3 First programming / unbricking</a></li>
+<li class="l3"><a href="#s9-4">9.4 Which firmware do I have?</a></li>
+<li class="l2"><a href="#s10">10. Ready-Made Answers (FAQ for agents)</a></li>
+<li class="l2"><a href="#s11">11. Reference Links</a></li>
+    </ul>
+  </nav>
+
+  <main class="guide" id="guide">
+    <div class="legend" aria-label="Source labels">
+      <span>Where each statement comes from:</span>
+      <span class="tag tag-official">Official</span><span>AIOC project</span>
+      <span class="tag tag-tool">Tool docs</span><span>software docs</span>
+      <span class="tag tag-community">Community</span><span>user reports</span>
+      <span class="tag tag-typical">Typical</span><span>common settings, check your screen</span>
+    </div>
+<section class="doc-section"><h2 id="s0"><a class="anchor" href="#s0" aria-label="Link to this section">#</a>0. Instructions for AI Agents (read first)</h2>
+<ol>
+<li><strong>Work out four things first.</strong> Ask only for the ones the user hasn&#39;t told you:<ul>
+<li><strong>Goal</strong>: what they want to do (programming, APRS, Winlink, SSTV, AllStar node, …).</li>
+<li><strong>OS</strong>: Windows, Linux (including Raspberry Pi), macOS, Android, or iPhone/iPad.</li>
+<li><strong>Radio</strong>: brand and model. The AIOC uses the Kenwood-style <strong>K1</strong> 2-pin plug.</li>
+<li><strong>AIOC firmware version</strong>, if it matters for the task. Features like VPTT and aioc-util need v1.3.0 or newer.</li>
+</ul>
+</li>
+<li><strong>Use the Decision Table (Section 3)</strong> to pick the software, then go to the recipe for that software.</li>
+<li><strong>PTT is the most common problem.</strong> If the radio doesn&#39;t key, use the PTT Troubleshooting Flow (Section 6).</li>
+<li><strong>How sure each statement is.</strong> Statements are tagged:<ul>
+<li><span class="tag tag-official">Official</span>: from the AIOC GitHub README, the release notes or the firmware source (skuep/AIOC).</li>
+<li><span class="tag tag-tool">Tool docs</span>: from the aioc-util documentation or the other software&#39;s own docs.</li>
+<li><span class="tag tag-community">Community</span>: reported by AIOC users in GitHub issues, the AllStarLink forum, the DigiPi group, or published guides (G1LRO, DL-Nordwest, M0AWS). These are real-world results, but not guaranteed for every setup.</li>
+<li><span class="tag tag-typical">Typical</span>: commonly used settings that are known to work in general. Menu names may differ between software versions, so tell the user to check them on their screen.</li>
+</ul>
+</li>
+<li><strong>Safety and legal.</strong> Transmitting needs an amateur radio licence. Tell users to transmit into a dummy load, or on low power on a clear simplex frequency, while they test. Never suggest settings that break band plans or ID rules.</li>
+<li><strong>Don&#39;t invent menu paths.</strong> If a menu item isn&#39;t covered here, describe what the setting does (for example &quot;choose the AIOC as the audio input&quot;) instead of guessing its exact name.</li>
+</ol>
+</section>
+<section class="doc-section"><h2 id="s1"><a class="anchor" href="#s1" aria-label="Link to this section">#</a>1. What the AIOC Is</h2>
+<p>The AIOC is a small open-source PCB with a <strong>USB-C</strong> socket. It plugs straight
+into a handheld radio&#39;s <strong>Kenwood K1 connector</strong> (3.5 mm + 2.5 mm plugs). It replaces
+three things: a programming cable, a sound-card interface (like a SignaLink or Digirig),
+and a PTT interface. <span class="tag tag-official">Official</span></p>
+<p>When plugged into a computer it shows up as a USB composite device with these parts:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Shows up as</th>
+<th>Used for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>USB sound card</strong></td>
+<td>&quot;All-In-One-Cable&quot; / &quot;AIOC Audio&quot; (1 mono input, 1 mono output)</td>
+<td>RX audio from the radio to the PC, TX audio from the PC to the radio</td>
+</tr>
+<tr>
+<td><strong>Virtual serial port (CDC-ACM)</strong></td>
+<td>Windows: <code>COMx</code> · Linux: <code>/dev/ttyACMx</code> · macOS: <code>/dev/cu.usbmodemXXXX</code></td>
+<td>Radio programming (CHIRP etc.) <strong>and</strong> serial PTT</td>
+</tr>
+<tr>
+<td><strong>CM108-compatible HID</strong></td>
+<td>Linux: <code>/dev/hidrawX</code></td>
+<td>CM108-style PTT (GPIO3) and COS input (fw ≥ 1.2.0); configuration interface (fw ≥ 1.3.0)</td>
+</tr>
+<tr>
+<td><strong>DFU runtime</strong></td>
+<td>—</td>
+<td>Firmware updates without opening the case (fw ≥ 1.2.0)</td>
+</tr>
+</tbody></table></div>
+<p>Key facts <span class="tag tag-official">Official</span>:</p>
+<ul>
+<li><strong>USB VID:PID = <code>1209:7388</code></strong>. In bootloader (DFU) mode it shows up as the STM32 bootloader, <code>0483:df11</code>.</li>
+<li>USB strings: Manufacturer <code>AIOC</code>, Product <code>All-In-One-Cable</code>.</li>
+<li>MCU: STM32F302, with the built-in ADC/DAC used as the sound card.</li>
+<li>Works on <strong>Windows, Linux and macOS</strong> without drivers. Android works through USB OTG for audio.</li>
+<li>Supported sample rates: <strong>48000 Hz (preferred)</strong>, 32000, 24000, 22050 (for APRSdroid), 16000, 12000, 11025, 8000.</li>
+<li>Supports <strong>dual-PTT</strong> radios (PTT1 and PTT2 outputs).</li>
+<li>Default PTT1 sources: <strong>CM108 GPIO3</strong> OR <strong>serial <code>DTR=1 AND RTS=0</code></strong>. Both work at the same time.</li>
+<li>Default PTT2 source: CM108 GPIO4.</li>
+<li>Default COS: the <strong>Virtual COS</strong> (VCOS, based on RX audio level) is reported as the CM108 <strong>Volume Down</strong> button.</li>
+</ul>
+<h3 id="hardware-revisions-and-firmware-compatib"><a class="anchor" href="#hardware-revisions-and-firmware-compatib" aria-label="Link to this section">#</a>Hardware revisions and firmware compatibility</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Hardware</th>
+<th>Firmware</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>rev 1.0 / 1.1</strong> (most units sold 2023–2025)</td>
+<td>1.2.0, <strong>1.3.0 (safest)</strong>, 1.4.x</td>
+<td><span class="tag tag-community">Community</span> Some rev 1.0 units on fw 1.4.x <strong>hang with PTT stuck on</strong>, or show audio &quot;Code 10&quot; errors inside Windows VMs (GitHub #120, #138, still open). If that happens, flash <strong>v1.3.0</strong>.</td>
+</tr>
+<tr>
+<td><strong>rev 1.2</strong> (from Sept 2025)</td>
+<td><strong>1.4.0 or newer required</strong> <span class="tag tag-official">Official</span></td>
+<td>Adds: external hardware COS input, a split PTT/UART pad (lets you separate CAT serial from PTT), adjustable RX gain 1–16×, TX boost (line level).</td>
+</tr>
+<tr>
+<td><strong>G1LRO &quot;dual-COS&quot; AIOC / URC</strong></td>
+<td>ships with 1.3.0</td>
+<td><span class="tag tag-community">Community</span> Has a solder jumper: <strong>LOGIC COS</strong> (Tidradio H3 new firmware, SA818 modules) or <strong>SPK COS</strong> (Baofeng/Quansheng speaker-based COS).</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p><strong>The hardware revision is printed on the PCB.</strong> Use only the official <code>aioc-fw-x.y.z.bin</code> builds for the STM32F302.
+<span class="tag tag-community">Community</span> Boards built with an STM32F373 (it appears in an old BOM) don&#39;t enumerate (error -71) and need the MCU replaced (GitHub #122).</p>
+</blockquote>
+<h3 id="tested-radios-official"><a class="anchor" href="#tested-radios-official" aria-label="Link to this section">#</a>Tested radios <span class="tag tag-official">Official</span></h3>
+<ul>
+<li>Baofeng UV-5R (CHIRP + APRS)</li>
+<li>Wouxun UV-9D Mate (CHIRP + APRS)</li>
+<li>BTECH UV-6X2 / 6X2 (CHIRP)</li>
+<li>Quansheng UV-K5 (stock firmware, Egzumer custom firmware, Quansheng Dock)</li>
+</ul>
+<p><strong>Also reported working [Community]:</strong> Baofeng UV-82, BF-888, Puxing PX-888(D), Wouxun KG-UV9D Plus,
+Retevis RT85, Explorer QRZ-1, Tidradio H3, and the <strong>Kenwood TH-F6A</strong> (set the jack to <strong>SP/MIC</strong> mode: Menu 9).
+Users have also wired the AIOC by hand to mobile and HF radios&#39; data/mic ports: <strong>Yaesu FT-817ND / FT-857D /
+FT-7800R</strong> (audio, PTT and CAT serial), Xiegu G90, and a Radtel RT-950 Pro through a Kenwood adapter. Note that
+CAT serial data could trigger PTT on rev 1.0 boards (GitHub #34). Hardware rev 1.2&#39;s split PTT/UART pad fixes this.</p>
+<p><strong>In general [Typical]:</strong> any HT with a Kenwood-style 2-pin K1 jack. That includes most Baofeng
+(UV-5R family, BF-888S, UV-82 <em>(UV-82 has a dual-PTT variant)</em>), Quansheng (UV-K5/K6/K5(8)/UV-5R Plus),
+BTECH, Wouxun, TIDRADIO, Radtel, Retevis, Abbree, Puxing and Kenwood HTs with the K1 jack. Radios with
+<strong>other connectors</strong> (Yaesu, Icom, Motorola multi-pin, Baofeng/BTECH &quot;screw-on&quot; UV-5X-style plugs,
+Anytone/Alinco single-plug) <strong>do not fit</strong> without an adapter.</p>
+<h3 id="limitations-tell-users-before-they-buy-o"><a class="anchor" href="#limitations-tell-users-before-they-buy-o" aria-label="Link to this section">#</a>Limitations (tell users before they buy or try)</h3>
+<ul>
+<li><strong>Only audio through the mic/speaker jack.</strong> The K1 jack carries filtered, de-emphasised speaker audio
+and a mic input. So <strong>9600 baud packet, M17, DMR, D-STAR, or any mode that needs &quot;flat&quot;
+discriminator/modulator audio will not work</strong> through the K1 jack. 1200 baud AFSK packet/APRS, VARA FM
+(narrow), SSTV, fldigi modes and voice all work well.</li>
+<li><strong>SSB digital modes (FT8, JS8, FreeDV)</strong> need an SSB radio. With an FM HT these programs <em>run</em>, but
+they won&#39;t reach the normal FT8/JS8 users on HF/SSB.</li>
+<li><strong>APRSdroid has no PTT control.</strong> Use the AIOC <strong>Virtual PTT (VPTT)</strong> (fw ≥ 1.3.0) or the radio&#39;s VOX.</li>
+<li><strong>iPhone/iPad apps can only use the AIOC as a sound card</strong>: iOS doesn&#39;t let apps reach the serial or HID parts.
+Transmitting therefore needs <strong>VPTT</strong>. <span class="tag tag-community">Community</span></li>
+<li><strong>Budget HTs switch between TX and RX slowly.</strong> Packet works, but with more retries than on a mobile rig. <span class="tag tag-community">Community</span></li>
+<li><strong>Settings are erased when you flash new firmware.</strong> Re-apply your aioc-util settings after an update. <span class="tag tag-official">Official</span></li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s2"><a class="anchor" href="#s2" aria-label="Link to this section">#</a>2. First-Time Setup (every user)</h2>
+<h3 id="s2-1"><a class="anchor" href="#s2-1" aria-label="Link to this section">#</a>2.1 Plug in</h3>
+<ol>
+<li><strong>Turn the radio OFF</strong>, then push the AIOC firmly into the K1 jack. Both plugs must go all the way in.</li>
+<li>Connect the USB-C cable to the computer, phone or Raspberry Pi.</li>
+<li>Turn the radio on and set it to the frequency you want.</li>
+</ol>
+<h3 id="s2-2"><a class="anchor" href="#s2-2" aria-label="Link to this section">#</a>2.2 Check that the computer sees it</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>OS</th>
+<th>How to check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Windows</strong></td>
+<td>Device Manager → <em>Ports (COM &amp; LPT)</em> shows a new <strong>COMx</strong>. <em>Sound settings</em> shows &quot;All-In-One-Cable&quot; as both input (microphone) and output (speaker).</td>
+</tr>
+<tr>
+<td><strong>Linux</strong></td>
+<td><code>lsusb</code> shows <code>1209:7388</code>. <code>arecord -l</code> / <code>aplay -l</code> show the card. <code>ls /dev/ttyACM*</code> shows the serial port. <code>ls /dev/hidraw*</code> shows the HID.</td>
+</tr>
+<tr>
+<td><strong>macOS</strong></td>
+<td>System Settings → Sound shows &quot;All-In-One-Cable&quot;. <code>ls /dev/cu.usbmodem*</code> shows the serial port.</td>
+</tr>
+<tr>
+<td><strong>Android</strong></td>
+<td>Needs a USB-C OTG connection. Apps that use the system audio input will use the AIOC once it&#39;s connected.</td>
+</tr>
+</tbody></table></div>
+<h3 id="s2-3"><a class="anchor" href="#s2-3" aria-label="Link to this section">#</a>2.3 OS audio settings (important)</h3>
+<ul>
+<li><strong>Do NOT make the AIOC the default system playback device.</strong> If you do, system sounds (notifications,
+YouTube, beeps) go out over the radio, and with VPTT turned on they <strong>will key the transmitter</strong>.
+Keep your normal speakers as the default and pick the AIOC only inside the radio software.</li>
+<li><strong>Windows:</strong> in Sound Control Panel → AIOC device → <em>Properties</em>:<ul>
+<li><em>Advanced</em>: set the format to <strong>1 channel, 16 bit, 48000 Hz</strong>.</li>
+<li>Turn off &quot;Audio enhancements&quot; and the &quot;Communications → reduce other sounds&quot; ducking.</li>
+<li><em>Listen</em> tab: make sure &quot;Listen to this device&quot; is <strong>off</strong>.</li>
+</ul>
+</li>
+<li><strong>Linux (PipeWire/PulseAudio):</strong> use <code>pavucontrol</code> to set levels. Many programs (Direwolf, ALSA-based)
+can talk to ALSA directly (<code>plughw:CARD,0</code>). That avoids resampling.</li>
+<li><strong>macOS:</strong> Audio MIDI Setup → AIOC → set the format to 48,000 Hz.</li>
+</ul>
+<h3 id="s2-4"><a class="anchor" href="#s2-4" aria-label="Link to this section">#</a>2.4 Setting audio levels (all digital modes)</h3>
+<p><span class="tag tag-typical">Typical</span></p>
+<ul>
+<li><strong>RX (radio to PC):</strong> set the <strong>radio&#39;s volume knob</strong> to about 30–50% (some VARA FM users go up to about 75%; G1LRO suggests about 50% for AllStar nodes) <span class="tag tag-community">Community</span>. Adjust it until the program&#39;s level
+meter shows a strong but un-clipped signal. Direwolf, for example, should show &quot;audio level&quot; around 30–70 on a received packet.
+On hardware rev 1.2 with fw ≥ 1.4.0, you can also raise the AIOC&#39;s internal RX gain (1×–16×) with aioc-util.</li>
+<li><strong>TX (PC to radio):</strong> start the <strong>OS output volume for the AIOC at about 30–50%</strong>. Too high causes over-deviation
+and distortion, and decoders will fail. Listen on a second radio, or check how other stations decode you.
+On hardware rev 1.2 there is a TX &quot;boost&quot; for line-level inputs (not needed for normal HTs).</li>
+<li><strong>Radio settings:</strong> turn <strong>VOX OFF</strong> (unless you are deliberately using VOX). Turn off keypad beeps and
+roger beeps. Turn <strong>battery save OFF</strong>: it clips the start of incoming packets. <span class="tag tag-community">Community</span>
+<strong>Squelch:</strong> for packet/APRS with Direwolf or Soundmodem, <strong>squelch open (0)</strong> often decodes better, because
+slow Baofeng squelch cuts off the first part of a packet and the software modem does its own carrier detection. <span class="tag tag-community">Community</span>
+For VOX-style setups (VPTT/VCOS, AllStarLink, SvxLink, EchoLink), squelch must be <strong>closed</strong> when the channel is idle. Set the
+<strong>TOT (time-out timer)</strong> longer than your longest transmission (SSTV and Winlink can last more than 2 minutes).</li>
+</ul>
+<h3 id="s2-5"><a class="anchor" href="#s2-5" aria-label="Link to this section">#</a>2.5 Linux permissions (do this once)</h3>
+<p>Programs that open <code>/dev/ttyACM*</code> or <code>/dev/hidraw*</code> need permission to use them:</p>
+<div class="code"><pre><code class="language-bash"># Serial port access
+sudo usermod -aG dialout $USER     # (Arch/Fedora may use group &quot;uucp&quot;)
+# Audio
+sudo usermod -aG audio $USER
+
+# udev rule for the AIOC HID (CM108 PTT / config) + stop ModemManager grabbing the serial port
+sudo tee /etc/udev/rules.d/91-aioc.rules &gt;/dev/null &lt;&lt;&#39;EOF&#39;
+SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;1209&quot;, ATTRS{idProduct}==&quot;7388&quot;, MODE=&quot;0666&quot;
+SUBSYSTEM==&quot;tty&quot;,    ATTRS{idVendor}==&quot;1209&quot;, ATTRS{idProduct}==&quot;7388&quot;, ENV{ID_MM_DEVICE_IGNORE}=&quot;1&quot;, SYMLINK+=&quot;aioc&quot;, MODE=&quot;0666&quot;
+EOF
+sudo udevadm control --reload &amp;&amp; sudo udevadm trigger
+# log out/in (for group changes), then unplug/replug the AIOC
+</code></pre></div>
+<p>After this, the serial port is also available as <strong><code>/dev/aioc</code></strong>. That name doesn&#39;t change when ttyACM numbers do.
+The aioc-util project also ships a ready-made udev rule (<code>udev/rules.d/91-aioc.rules</code>). <span class="tag tag-tool">Tool docs</span></p>
+<blockquote>
+<p><strong>ModemManager</strong> (on Ubuntu, Debian desktop, Fedora) may probe new ttyACM devices and send AT commands
+to them. That causes programming failures or random PTT. The <code>ID_MM_DEVICE_IGNORE</code> rule above prevents it.
+You can also run <code>sudo systemctl disable --now ModemManager</code> if you don&#39;t use a cellular modem.</p>
+</blockquote>
+</section>
+<section class="doc-section"><h2 id="s3"><a class="anchor" href="#s3" aria-label="Link to this section">#</a>3. Decision Table — &quot;What software do I need?&quot;</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>User wants to…</th>
+<th>Windows</th>
+<th>Linux / Raspberry Pi</th>
+<th>macOS</th>
+<th>Android</th>
+<th>Section</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Program channels / memories</strong></td>
+<td>CHIRP</td>
+<td>CHIRP</td>
+<td>CHIRP</td>
+<td>—</td>
+<td>5.1</td>
+</tr>
+<tr>
+<td><strong>Flash custom firmware (Quansheng UV-K5)</strong></td>
+<td>Web flasher (Chrome) / k5prog</td>
+<td>Web flasher / k5prog</td>
+<td>Web flasher</td>
+<td>—</td>
+<td>5.2</td>
+</tr>
+<tr>
+<td><strong>Send/receive APRS (with a map)</strong></td>
+<td>Direwolf + APRSIS32 / YAAC / PinPoint</td>
+<td>Direwolf + YAAC / Xastir</td>
+<td>Direwolf + YAAC</td>
+<td>APRSdroid (+VPTT)</td>
+<td>5.3–5.5</td>
+</tr>
+<tr>
+<td><strong>APRS iGate / digipeater</strong></td>
+<td>Direwolf</td>
+<td>Direwolf (headless Pi)</td>
+<td>Direwolf</td>
+<td>—</td>
+<td>5.3</td>
+</tr>
+<tr>
+<td><strong>Packet TNC (KISS/AGW) for other apps</strong></td>
+<td>Direwolf, UZ7HO Soundmodem</td>
+<td>Direwolf, QtSoundModem</td>
+<td>Direwolf</td>
+<td>—</td>
+<td>5.3, 5.6</td>
+</tr>
+<tr>
+<td><strong>Packet BBS / node / terminal</strong></td>
+<td>Direwolf + QtTermTCP / EasyTerm / BPQ32</td>
+<td>Direwolf + Paracon / QtTermTCP / LinBPQ / Linpac</td>
+<td>Direwolf + QtTermTCP</td>
+<td>—</td>
+<td>5.7</td>
+</tr>
+<tr>
+<td><strong>Winlink email over VHF/UHF</strong></td>
+<td>Winlink Express + VARA FM / packet</td>
+<td>Pat + Direwolf (packet) or VARA FM (Wine)</td>
+<td>Pat + Direwolf</td>
+<td>—</td>
+<td>5.8</td>
+</tr>
+<tr>
+<td><strong>VARA FM keyboard chat</strong></td>
+<td>VarAC / VARA Chat</td>
+<td>VarAC under Wine</td>
+<td>—</td>
+<td>—</td>
+<td>5.8</td>
+</tr>
+<tr>
+<td><strong>SSTV (send/receive pictures, ISS SSTV)</strong></td>
+<td>MMSSTV</td>
+<td>QSSTV</td>
+<td>Black Cat SSTV / MultiScan</td>
+<td>Robot36 (RX only)</td>
+<td>5.9</td>
+</tr>
+<tr>
+<td><strong>Text/forms for ARES/EmComm (NBEMS)</strong></td>
+<td>fldigi + flmsg + flamp</td>
+<td>fldigi + flmsg + flamp</td>
+<td>fldigi</td>
+<td>—</td>
+<td>5.10</td>
+</tr>
+<tr>
+<td><strong>FT8 / JS8 (non-standard on FM)</strong></td>
+<td>WSJT-X / JS8Call</td>
+<td>WSJT-X / JS8Call</td>
+<td>WSJT-X / JS8Call</td>
+<td>—</td>
+<td>5.11</td>
+</tr>
+<tr>
+<td><strong>AllStarLink node (HT as node radio)</strong></td>
+<td>—</td>
+<td><strong>AllStarLink 3</strong> (Debian / Pi)</td>
+<td>—</td>
+<td>—</td>
+<td>5.12</td>
+</tr>
+<tr>
+<td><strong>EchoLink link / simplex node / repeater controller</strong></td>
+<td>EchoLink (Sysop mode)</td>
+<td><strong>SvxLink</strong></td>
+<td>—</td>
+<td>—</td>
+<td>5.13</td>
+</tr>
+<tr>
+<td><strong>PTT from scripts / generic rig control</strong></td>
+<td>Hamlib (rigctl/rigctld)</td>
+<td>Hamlib, aioc-util</td>
+<td>Hamlib</td>
+<td>—</td>
+<td>5.14</td>
+</tr>
+<tr>
+<td><strong>All-in-one Pi data station (APRS, Winlink, packet, SSTV in a web UI)</strong></td>
+<td>—</td>
+<td><strong>DigiPi</strong> (Raspberry Pi image)</td>
+<td>—</td>
+<td>—</td>
+<td>5.15</td>
+</tr>
+<tr>
+<td><strong>Winlink / packet from an iPhone or iPad</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>iOS: RadioMail, Packet Commander (+VPTT)</td>
+<td>5.16</td>
+</tr>
+<tr>
+<td><strong>Mesh / off-grid networking over packet</strong></td>
+<td>Reticulum via Direwolf KISS</td>
+<td>Reticulum (RNS, NomadNet, Sideband) via Direwolf KISS</td>
+<td>Reticulum</td>
+<td>Sideband</td>
+<td>5.17</td>
+</tr>
+<tr>
+<td><strong>AllStar-style linking on GMRS</strong></td>
+<td>—</td>
+<td>GMRSLive (AllStar-based)</td>
+<td>—</td>
+<td>—</td>
+<td>5.12</td>
+</tr>
+<tr>
+<td><strong>Wire to a mobile/HF rig (audio + PTT + CAT)</strong></td>
+<td>WSJT-X/fldigi + CAT</td>
+<td>same</td>
+<td>same</td>
+<td>—</td>
+<td>5.18</td>
+</tr>
+<tr>
+<td><strong>Fox hunt beacon (no PC)</strong></td>
+<td>aioc-util (to set it up)</td>
+<td>aioc-util</td>
+<td>aioc-util</td>
+<td>—</td>
+<td>7.4</td>
+</tr>
+<tr>
+<td><strong>Record or monitor RX audio, scanner logging</strong></td>
+<td>Audacity / any recorder</td>
+<td>Audacity / arecord / rtl-style tools</td>
+<td>Audacity</td>
+<td>Any recorder</td>
+<td>2.4</td>
+</tr>
+</tbody></table></div>
+</section>
+<section class="doc-section"><h2 id="s4"><a class="anchor" href="#s4" aria-label="Link to this section">#</a>4. PTT Methods (understand this before any recipe)</h2>
+<p>The AIOC can key the radio (PTT1) in several ways, and they can be combined. <span class="tag tag-official">Official</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Method</th>
+<th>How software triggers it</th>
+<th>Best for</th>
+<th>Default?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CM108 HID GPIO3</strong></td>
+<td>Software that supports &quot;CM108 PTT&quot; (Direwolf, AllStarLink, SvxLink, Hamlib <code>-P CM108</code>, QtSoundModem on Linux)</td>
+<td>Linux; the most reliable method</td>
+<td>✅ on</td>
+</tr>
+<tr>
+<td><strong>Serial <code>DTR=1 AND RTS=0</code></strong></td>
+<td>Software sets DTR high and RTS low on the AIOC COM port</td>
+<td>Windows/macOS programs with COM-port PTT</td>
+<td>✅ on</td>
+</tr>
+<tr>
+<td><strong>Serial DTR only</strong> (<code>SERIALDTR</code>)</td>
+<td>Software that raises DTR but also leaves RTS high</td>
+<td>Programs that can&#39;t keep RTS low</td>
+<td>needs aioc-util</td>
+</tr>
+<tr>
+<td><strong>Serial RTS only</strong> (<code>SERIALRTS</code>)</td>
+<td>Software that keys with RTS</td>
+<td>Programs that only do RTS PTT</td>
+<td>needs aioc-util</td>
+</tr>
+<tr>
+<td><strong>Serial NOT-DTR AND RTS</strong> (<code>SERIALNDTRRTS</code>)</td>
+<td>Reverse logic</td>
+<td>Rare</td>
+<td>needs aioc-util</td>
+</tr>
+<tr>
+<td><strong>Virtual PTT (VPTT)</strong></td>
+<td><strong>No PTT control needed.</strong> The AIOC keys whenever the software plays audio above a threshold (like a very fast, clean VOX inside the AIOC)</td>
+<td>APRSdroid, any app without PTT</td>
+<td>needs aioc-util, fw ≥ 1.3.0</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p><strong>Before firmware 1.2.0</strong>, PTT was &quot;DTR=1&quot; only. That keyed the radio during CHIRP programming. Firmware ≥ 1.2.0
+changed it to DTR=1 AND RTS=0. <span class="tag tag-official">Official</span></p>
+<p><strong>UART lockout:</strong> by default, while PTT1 is active, serial data from the radio is ignored. This lets the
+AIOC work as both a programming cable and a sound card. You can change this in the <code>SERIAL_CTRL</code> register. <span class="tag tag-official">Official</span></p>
+</blockquote>
+<p><strong>Rule of thumb for agents:</strong></p>
+<ol>
+<li>If the software offers <strong>CM108 PTT</strong>, use it.</li>
+<li>Otherwise use the <strong>COM port with &quot;DTR&quot; PTT</strong> and keep RTS off/low.</li>
+<li>If the radio still doesn&#39;t key, see Section 6.</li>
+</ol>
+</section>
+<section class="doc-section"><h2 id="s5"><a class="anchor" href="#s5" aria-label="Link to this section">#</a>5. Software Recipes</h2>
+<blockquote>
+<p>In the examples, replace <code>N0CALL</code> with the user&#39;s callsign. Replace <code>COM5</code>, <code>/dev/ttyACM0</code>, <code>/dev/hidraw0</code>, and
+<code>plughw:1,0</code> with the user&#39;s actual devices (see Section 2.2).</p>
+</blockquote>
+<h3 id="s5-1"><a class="anchor" href="#s5-1" aria-label="Link to this section">#</a>5.1 CHIRP — programming radios (Windows / Linux / macOS)</h3>
+<p><span class="tag tag-official">Official</span> CHIRP works the same way it does with a normal programming cable. No driver is needed.</p>
+<ol>
+<li>Install <strong>CHIRP-next</strong> from chirpmyradio.com. Linux: pipx/flatpak; macOS: the .app.</li>
+<li>Plug the AIOC into the radio and turn the radio on. It must be on a <strong>normal channel/VFO screen</strong> (not in a menu).</li>
+<li>CHIRP → <strong>Radio → Download from Radio</strong> → select the AIOC port (<code>COMx</code>, <code>/dev/ttyACM0</code>, or
+<code>/dev/cu.usbmodem…</code>) → choose Vendor/Model → OK.</li>
+<li>Edit the channels → <strong>Radio → Upload to Radio</strong>.</li>
+</ol>
+<p>Tips <span class="tag tag-typical">Typical</span>:</p>
+<ul>
+<li>Always <strong>download first and save a backup <code>.img</code></strong> before uploading.</li>
+<li>Quansheng UV-K5 on <strong>stock firmware</strong>: use the &quot;Quansheng UV-K5&quot; driver. On <strong>Egzumer/other custom firmware</strong>: use the
+matching CHIRP driver module that the firmware author provides (in CHIRP: <em>Help → Developer mode → File → Load module</em>),
+or use the driver that comes with newer CHIRP builds if it lists that firmware.</li>
+<li><strong>[Community] Windows: radio stays transmitting after a CHIRP read.</strong> Early firmware (before 1.2.0) did this because Windows changes
+DTR/RTS when the port closes. Update the AIOC to ≥ 1.2.0. If the red LED stays on, unplug and replug the USB.</li>
+<li><span class="tag tag-community">Community</span> If a read fails once, try again. The first attempt after plugging in sometimes fails, and wiggling the plug fixes it (contact problem).</li>
+<li>If you get &quot;radio did not respond&quot;: re-seat the plug, check the radio is on, choose the exact model (e.g. UV-5R vs.
+UV-5R Plus / UV-5RM are different radios), try lower volume, and turn VOX off.</li>
+<li>Baofeng <strong>UV-5RM / UV-5R Mini / UV-17</strong> and similar newer models may need a specific CHIRP model or the vendor&#39;s own
+software. The AIOC still works as the cable for them.</li>
+<li><strong>Vendor programming software</strong> (Baofeng/BTECH/Radtel/TIDRADIO tools) works too: choose the AIOC COM port.
+<strong>RT Systems</strong> software may only work with RT Systems&#39; own cables.</li>
+</ul>
+<h3 id="s5-2"><a class="anchor" href="#s5-2" aria-label="Link to this section">#</a>5.2 Quansheng UV-K5 firmware flashing</h3>
+<p><span class="tag tag-official">Official</span> Firmware v1.4.0 doubled the serial buffer, specifically to fix problems flashing firmware on some HTs.
+Make sure the AIOC is on v1.4.x before you start.</p>
+<p><span class="tag tag-typical">Typical</span></p>
+<ol>
+<li>Turn the radio off. <strong>Hold PTT while turning it on</strong> to enter bootloader mode (the flashlight LED turns on, the screen stays blank).</li>
+<li>Use a web flasher in Chrome/Edge (Web Serial). The Egzumer project links to one. You can also use a command-line tool such as <code>k5prog</code>/<code>uvk5</code> tools.</li>
+<li>Choose the AIOC serial port, load the <code>.bin</code>, and flash.</li>
+<li>Warn the user: <strong>flashing custom firmware is at their own risk.</strong> They should keep a backup of the stock firmware and calibration (CHIRP/K5 tools can dump calibration).</li>
+</ol>
+<h3 id="s5-3"><a class="anchor" href="#s5-3" aria-label="Link to this section">#</a>5.3 Direwolf — APRS, packet TNC, iGate, digipeater (Windows / Linux / macOS)</h3>
+<p>Direwolf is the core &quot;software TNC&quot;. Most APRS and packet programs connect to it through <strong>AGW (port 8000)</strong> or <strong>KISS-TCP (port 8001)</strong>.</p>
+<p><strong>Install [Typical]:</strong> Linux <code>sudo apt install direwolf</code>. Windows: zip from GitHub releases (wb2osz/direwolf). macOS: <code>brew install direwolf</code>.</p>
+<p><strong>Find the audio device:</strong></p>
+<ul>
+<li>Linux: <code>arecord -l</code>, e.g. <code>card 1: AllInOneCable [All-In-One-Cable], device 0</code> → <code>plughw:1,0</code> (or by name <code>plughw:CARD=AllInOneCable,DEV=0</code>; check the exact card ID in <code>arecord -l</code>).</li>
+<li>Windows: start Direwolf once. It lists the audio devices with numbers; use the AIOC&#39;s number.</li>
+</ul>
+<p><strong>Minimal <code>direwolf.conf</code> [Official settings + Typical extras]:</strong></p>
+<div class="code"><pre><code class="language-conf"># --- Audio ---
+ADEVICE plughw:1,0        # Linux  (Windows: ADEVICE 3 3   &lt;- the AIOC input/output numbers Direwolf lists)
+ARATE 48000
+ACHANNELS 1
+
+# --- Channel 0 ---
+CHANNEL 0
+MYCALL N0CALL-10
+MODEM 1200
+
+# --- PTT: pick ONE ---
+PTT CM108                 # Linux: CM108 HID PTT (recommended). Auto-detects; or &quot;PTT CM108 /dev/hidraw0&quot;
+#PTT /dev/ttyACM0 DTR -RTS  # Linux serial PTT
+#PTT COM5 DTR -RTS          # Windows serial PTT
+#PTT /dev/cu.usbmodem1101 DTR -RTS   # macOS serial PTT
+
+# --- Ports for client apps ---
+AGWPORT 8000
+KISSPORT 8001
+</code></pre></div>
+<p><span class="tag tag-official">Official</span> Direwolf may print <strong>warnings when using CM108 PTT with the AIOC</strong>. They are harmless (see direwolf issue #448).</p>
+<p><strong>Add-ons [Typical]:</strong></p>
+<div class="code"><pre><code class="language-conf"># Position beacon (every 30 min, path WIDE1-1,WIDE2-1). Use your own lat/long.
+PBEACON delay=1 every=30 overlay=S symbol=&quot;digi&quot; lat=42^37.14N long=071^20.83W power=5 height=20 gain=3 comment=&quot;AIOC + HT&quot; via=WIDE1-1,WIDE2-1
+
+# RX-only iGate (needs internet + APRS-IS passcode)
+IGSERVER noam.aprs2.net        # euro.aprs2.net / asia.aprs2.net / aunz.aprs2.net
+IGLOGIN N0CALL-10 12345
+
+# Fill-in digipeater (WIDE1-1 only) — only if appropriate locally
+DIGIPEAT 0 0 ^WIDE1-1$ ^WIDE1-1$
+</code></pre></div>
+<p><strong>[Community] Direwolf gotchas reported by AIOC users:</strong></p>
+<ul>
+<li><code>PTT CM108 3 -3</code>: the trailing <code>-3</code> <strong>inverts</strong> the PTT, so the radio stays keyed. Use <code>PTT CM108</code> or <code>PTT CM108 3</code>.</li>
+<li>If you use CM108 PTT, comment out any old <code>DCD</code> line that points at the same device.</li>
+<li>Serial form that works on a Raspberry Pi: <code>PTT /dev/ttyACM0 DTR -RTS</code> (the order <code>-RTS DTR</code> works too).</li>
+<li>Windows &quot;pre filter size&quot; warnings at 48000 Hz: harmless. You can also try <code>ARATE 24000</code>, or Direwolf 1.6 instead of a development build.</li>
+<li>PTT that <strong>stays on</strong> after the first transmission, or a &quot;crashing&quot; AIOC while transmitting, is almost always RF feedback (Section 8).</li>
+</ul>
+<p>Start it with: <code>direwolf -c direwolf.conf</code> (add <code>-t 0</code> to turn off colours in logs).
+Test: <code>direwolf</code> shows decoded packets with the audio level. Send a beacon and check it on aprs.fi.</p>
+<p><strong>APRS frequencies [Typical]:</strong> 144.390 MHz (North America), 144.800 MHz (Europe/Africa), 145.175 MHz (Australia),
+144.640 MHz (China), 144.660 MHz (Japan), 145.825 MHz (ISS digipeater, worldwide). Users must check their local band plan.</p>
+<h3 id="s5-4"><a class="anchor" href="#s5-4" aria-label="Link to this section">#</a>5.4 APRS client programs (use Direwolf as the modem)</h3>
+<p>All of these connect to a Direwolf running on the same machine. Direwolf does the audio and PTT.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Program</th>
+<th>OS</th>
+<th>Connection setting <span class="tag tag-typical">Typical</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>YAAC</strong> (Java)</td>
+<td>Win/Linux/macOS</td>
+<td><em>File → Configure → Expert mode → Ports → Add → &quot;AGWPE&quot;</em>, host <code>localhost</code>, port <code>8000</code> (or &quot;KISS over TCP&quot; <code>8001</code>)</td>
+</tr>
+<tr>
+<td><strong>Xastir</strong></td>
+<td>Linux/macOS</td>
+<td><em>Interface → Interface Control → Add → &quot;Networked AGWPE&quot;</em>, host <code>localhost</code>, port <code>8000</code></td>
+</tr>
+<tr>
+<td><strong>APRSIS32</strong></td>
+<td>Windows (runs in Wine)</td>
+<td><em>Configure → Ports → New Port → type &quot;AGW&quot;</em>, <code>127.0.0.1:8000</code> (or KISS TCP <code>8001</code>)</td>
+</tr>
+<tr>
+<td><strong>PinPoint APRS</strong></td>
+<td>Windows</td>
+<td>TNC type &quot;AGWPE&quot;, <code>127.0.0.1:8000</code></td>
+</tr>
+<tr>
+<td><strong>UI-View32</strong> (legacy)</td>
+<td>Windows</td>
+<td>AGWPE mode via Direwolf AGW port</td>
+</tr>
+<tr>
+<td><strong>APRS Messenger / others</strong></td>
+<td>Windows</td>
+<td>AGW or KISS-TCP to Direwolf</td>
+</tr>
+</tbody></table></div>
+<p>YAAC also has its own built-in sound-card modem. Direwolf decodes better and handles AIOC PTT more reliably, so it is the recommended choice.</p>
+<h3 id="s5-5"><a class="anchor" href="#s5-5" aria-label="Link to this section">#</a>5.5 APRSdroid — APRS on Android</h3>
+<p><span class="tag tag-official">Official</span> The AIOC supports the fixed <strong>22050 Hz</strong> sample rate that APRSdroid needs (the actual rate is 22052 Hz, an error of about 90 ppm, which doesn&#39;t matter for APRS).
+APRSdroid has <strong>no PTT control</strong>, so for transmitting <strong>turn on Virtual PTT</strong> in the AIOC first (one-time setup on a PC with fw ≥ 1.3.0):</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --ptt1 VPTT --store
+# keep CM108 + serial PTT working too:
+./aioc-util.py --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store
+</code></pre></div>
+<p>APRSdroid setup <span class="tag tag-typical">Typical</span>:</p>
+<ol>
+<li>Connect the AIOC to the phone with a USB-C OTG cable/adapter.</li>
+<li>APRSdroid → <em>Preferences → Connection Protocol: &quot;AFSK&quot;</em> (audio modem). Set the callsign/SSID and passcode (passcode only needed for APRS-IS).</li>
+<li>Turn off &quot;high-quality demodulator&quot; if the phone is slow. Keep the phone&#39;s media volume moderate.</li>
+<li>Make sure no other app plays sound (with VPTT on, any sound will key the radio). Turn on Do Not Disturb.</li>
+</ol>
+<p>Other Android apps <span class="tag tag-typical">Typical</span>: <strong>Robot36</strong> (SSTV RX), <strong>DroidSSTV</strong>, and any voice recorder. Apps need to use the USB audio input. Most do automatically once the AIOC is connected.</p>
+<h3 id="s5-6"><a class="anchor" href="#s5-6" aria-label="Link to this section">#</a>5.6 UZ7HO Soundmodem (Windows) / QtSoundModem (Linux, Windows)</h3>
+<p>A software modem like Direwolf (AFSK 1200, and others). It provides AGW (8000) and KISS (8100) ports.
+<span class="tag tag-typical">Typical</span></p>
+<ul>
+<li><em>Settings → Devices</em>: Input device = AIOC microphone, Output device = AIOC speakers.
+<strong>UZ7HO Soundmodem doesn&#39;t accept sample rates above 12000. Use 12000</strong>, which the AIOC supports. <span class="tag tag-community">Community</span></li>
+<li>PTT: <em>PTT Port</em> = the AIOC COM port. <strong>Tick &quot;Swap COM pins for PTT&quot;</strong>: Soundmodem keys RTS by default, and swapping makes it use DTR, which matches the AIOC. Leave &quot;Dual PTT&quot; unticked. <span class="tag tag-community">Community, GitHub #11</span><ul>
+<li>If it still doesn&#39;t key, change the AIOC PTT source to <code>SERIALDTR</code> (Section 6), or to <code>VPTT</code>.</li>
+</ul>
+</li>
+<li>QtSoundModem on Linux can also use <strong>CM108 PTT</strong> (choose the hidraw device / CM108 option if your version has it).</li>
+<li>Modem: AFSK AX.25 1200bd for normal VHF packet/APRS.</li>
+</ul>
+<h3 id="s5-7"><a class="anchor" href="#s5-7" aria-label="Link to this section">#</a>5.7 Packet BBS, nodes and terminals</h3>
+<p>All of these use a Direwolf (or Soundmodem) TNC through AGW or KISS. <span class="tag tag-typical">Typical</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Program</th>
+<th>OS</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>QtTermTCP</strong></td>
+<td>Win/Linux/macOS</td>
+<td>Setup → AGW: host 127.0.0.1, port 8000. Connect to BBSes/nodes.</td>
+</tr>
+<tr>
+<td><strong>Paracon</strong></td>
+<td>Win/Linux/macOS (Python)</td>
+<td>AGWPE client, 127.0.0.1:8000. Simple multi-session packet terminal.</td>
+</tr>
+<tr>
+<td><strong>EasyTerm / Outpost</strong></td>
+<td>Windows</td>
+<td>Outpost (used by EmComm/ARES packet messaging) can use AGWPE or KISS.</td>
+</tr>
+<tr>
+<td><strong>BPQ32 / LinBPQ</strong></td>
+<td>Win / Linux</td>
+<td>Node + BBS + chat. <code>PORT</code> block with <code>DRIVER=UZ7HO</code> (AGW to Direwolf/Soundmodem) or KISS over TCP (<code>TYPE=ASYNC</code>, <code>PROTOCOL=KISS</code>, <code>IPADDR=127.0.0.1</code>, <code>TCPPORT=8001</code>).</td>
+</tr>
+<tr>
+<td><strong>Linux AX.25 stack + Linpac / JNOS</strong></td>
+<td>Linux</td>
+<td><code>kissattach</code> to the Direwolf pseudo-terminal (<code>direwolf -p</code> creates <code>/tmp/kisstnc</code>), or use <code>tncattach</code>.</td>
+</tr>
+</tbody></table></div>
+<h3 id="s5-8"><a class="anchor" href="#s5-8" aria-label="Link to this section">#</a>5.8 Winlink email — Winlink Express, Pat, VARA FM, packet</h3>
+<h4 id="s5-8-1"><a class="anchor" href="#s5-8-1" aria-label="Link to this section">#</a>5.8.1 Winlink Express (Windows) with VARA FM</h4>
+<p><span class="tag tag-official">Official</span> In VARA FM, set <strong>PTT pin to &quot;DTR only&quot;</strong> so that VARA produces the DTR/RTS pattern the AIOC expects.</p>
+<p><strong>[Typical] Setup:</strong></p>
+<ol>
+<li>Install <strong>Winlink Express</strong> and <strong>VARA FM</strong> (from the Rosmodem site; the free mode is speed-limited, a paid licence unlocks full speed).</li>
+<li>Open VARA FM → <em>Settings → SoundCard</em>: Device Input = AIOC microphone, Device Output = AIOC speakers.</li>
+<li>VARA FM → <em>Settings → PTT</em>: <strong>COM port</strong> = AIOC COM, <strong>Pin = DTR only</strong>.</li>
+<li>Choose <strong>Narrow</strong> (VARA FM 1200) for most HTs. Wide (9600) usually won&#39;t work through K1 audio (see Limitations).</li>
+<li>Adjust the RX level so VARA&#39;s meter sits in the green. Adjust TX drive (VARA → <em>Tune</em>, plus Windows output volume) to the lowest level that gives reliable connections.</li>
+<li>Winlink Express → <em>Open Session: &quot;VARA FM Winlink&quot;</em> → <em>Settings</em> → leave host 127.0.0.1, ports 8300/8301 → find a gateway with <em>Channel Selection</em> → <em>Start</em>.</li>
+<li>Set the radio&#39;s <strong>TOT</strong> to the maximum or turn it off. Use low or medium power to keep the HT cool.</li>
+</ol>
+<h4 id="s5-8-2"><a class="anchor" href="#s5-8-2" aria-label="Link to this section">#</a>5.8.2 Winlink Express with packet (1200 baud)</h4>
+<p><span class="tag tag-typical">Typical</span> Run Direwolf (5.3) or UZ7HO Soundmodem → Winlink Express → <em>Open Session: &quot;Packet Winlink&quot;</em> →
+<em>Settings</em>: TNC type <strong>KISS</strong>, connection <strong>TCP</strong>, host <code>127.0.0.1</code>, port <code>8001</code> (Direwolf KISS) / <code>8100</code> (UZ7HO).</p>
+<h4 id="s5-8-3"><a class="anchor" href="#s5-8-3" aria-label="Link to this section">#</a>5.8.3 Pat (Linux, macOS, Windows, Raspberry Pi)</h4>
+<p><span class="tag tag-typical">Typical</span> Pat is a Winlink client in a single program with a web UI.</p>
+<div class="code"><pre><code class="language-bash">pat configure        # set mycall, secure_login_password, locator
+</code></pre></div>
+<ul>
+<li><strong>Packet through Direwolf (AGWPE):</strong> in <code>config.json</code> set <code>&quot;ax25&quot;: {&quot;engine&quot;: &quot;agwpe&quot;, ...}</code> and <code>&quot;agwpe&quot;: {&quot;addr&quot;: &quot;localhost:8000&quot;}</code>.
+Connect: <code>pat connect ax25:///GATEWAYCALL-10</code> (or use the web UI: <code>pat http</code>, then open <a href="http://localhost:8080">http://localhost:8080</a>).</li>
+<li><strong>Linux kernel AX.25 instead:</strong> <code>kissattach</code> the Direwolf PTY, then <code>&quot;engine&quot;: &quot;linux&quot;</code> with <code>&quot;port&quot;: &quot;wl2k&quot;</code>.</li>
+<li><strong>VARA FM:</strong> run VARA FM under Wine (with the AIOC as the sound card and COM PTT &quot;DTR only&quot;), then in Pat set
+<code>&quot;varafm&quot;: {&quot;addr&quot;: &quot;localhost:8300&quot;}</code> and connect with <code>pat connect varafm:///GATEWAYCALL</code>.</li>
+</ul>
+<h4 id="s5-8-4"><a class="anchor" href="#s5-8-4" aria-label="Link to this section">#</a>5.8.4 VarAC / VARA Chat (keyboard chat over VARA)</h4>
+<p><span class="tag tag-typical">Typical</span> Install VARA FM first and set it up as in 5.8.1. In VarAC (or VARA Chat), choose <strong>VARA FM</strong> as the modem.
+VarAC connects to VARA&#39;s TCP ports. PTT stays inside VARA (DTR only). VarAC can also do its own PTT/CAT, but leave that <strong>off</strong> so VARA does the keying.</p>
+<h3 id="s5-9"><a class="anchor" href="#s5-9" aria-label="Link to this section">#</a>5.9 SSTV — slow-scan TV pictures</h3>
+<p><span class="tag tag-typical">Typical</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Program</th>
+<th>OS</th>
+<th>Audio</th>
+<th>PTT</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MMSSTV</strong></td>
+<td>Windows</td>
+<td><em>Option → Setup → Misc → Sound card</em>: AIOC in/out</td>
+<td><em>Setup → TX → PTT port</em>: AIOC COM. If it doesn&#39;t key, change the AIOC to <code>SERIALDTR</code>/<code>SERIALRTS</code> or <code>VPTT</code> (Section 6).</td>
+</tr>
+<tr>
+<td><strong>QSSTV</strong></td>
+<td>Linux</td>
+<td><em>Options → Configuration → Sound</em>: ALSA/PulseAudio AIOC</td>
+<td><em>CAT</em> tab: Hamlib &quot;Dummy&quot; with PTT via serial <strong>DTR</strong> on <code>/dev/ttyACM0</code>, or Hamlib CM108 if offered; otherwise VPTT.</td>
+</tr>
+<tr>
+<td><strong>Black Cat SSTV / MultiScan 3B</strong></td>
+<td>macOS</td>
+<td>Choose AIOC in/out</td>
+<td>Use AIOC VPTT (simplest)</td>
+</tr>
+<tr>
+<td><strong>Robot36</strong></td>
+<td>Android</td>
+<td>USB audio</td>
+<td>RX only</td>
+</tr>
+</tbody></table></div>
+<p>Tips: RX-only use (for example <strong>ISS SSTV events on 145.800 MHz FM</strong>) needs no PTT setup at all. Turn squelch <strong>off</strong>
+or set it low for weak satellite signals. Watch for HT overheating on long transmissions, and set TOT ≥ 3 minutes.</p>
+<h3 id="s5-10"><a class="anchor" href="#s5-10" aria-label="Link to this section">#</a>5.10 fldigi / flmsg / flamp — NBEMS EmComm text and forms over FM</h3>
+<p><span class="tag tag-typical">Typical</span></p>
+<ol>
+<li><em>Configure → Sound card → Audio → Devices</em>: PortAudio (or PulseAudio) → Capture <strong>and</strong> Playback = AIOC. Sample rate: Native/48000.</li>
+<li>PTT, choose one:<ul>
+<li><em>Configure → Rig Control → <strong>CM108 / C-Media PTT</strong></em> (newer fldigi versions): choose the AIOC HID, <strong>GPIO 3</strong>.</li>
+<li><em>Configure → Rig Control → <strong>GPIO / Hardware PTT</strong></em>: &quot;Use separate serial port PTT&quot;, device = AIOC COM/ttyACM, check <strong>Use DTR</strong> (DTR = +V), leave <strong>RTS unchecked</strong>. Click <em>Initialize</em>.
+If it doesn&#39;t key: set the AIOC source to <code>SERIALDTR</code> (Section 6).</li>
+<li>Or use Hamlib with <code>ptt_type=CM108</code>.</li>
+</ul>
+</li>
+<li>Common FM modes: <strong>MT63-2000L</strong> (the usual ARES/NBEMS FM mode), <strong>8PSK</strong>, <strong>Olivia</strong>. Use the waterfall to centre the signal at about 1500 Hz.</li>
+<li><strong>flmsg</strong> (ICS-213 and other forms) and <strong>flamp</strong> (multicast files) work through fldigi. Set their &quot;fldigi&quot; connection to the defaults (XML-RPC 127.0.0.1:7362).</li>
+</ol>
+<h3 id="s5-11"><a class="anchor" href="#s5-11" aria-label="Link to this section">#</a>5.11 WSJT-X / JS8Call (FT8, FT4, JS8 — non-standard on FM)</h3>
+<p><span class="tag tag-typical">Typical</span> These are normally SSB modes. On an FM HT they work only between stations that also use FM
+(for example local 2 m FM experiments). Setup:</p>
+<ul>
+<li><em>Settings → Radio</em>: Rig <strong>None</strong>. <strong>PTT Method: DTR</strong>. Port: the AIOC COM/ttyACM.
+(If it doesn&#39;t key, use <code>SERIALDTR</code> on the AIOC, or choose PTT &quot;VOX&quot; with AIOC VPTT turned on.)</li>
+<li><em>Settings → Audio</em>: Input/Output = AIOC, mono.</li>
+<li>Keep TX audio low (a clean single tone). FM capture effect works against weak signals.</li>
+</ul>
+<h3 id="s5-12"><a class="anchor" href="#s5-12" aria-label="Link to this section">#</a>5.12 AllStarLink 3 (ASL3) — HT as an AllStar node radio</h3>
+<p><span class="tag tag-official">Official + Tool docs</span> The AIOC emulates a CM108, so ASL3 can drive PTT and read COS from it directly.
+ASL3 recognises the AIOC&#39;s own USB ID <code>1209:7388</code>. You only need to <strong>uncomment it</strong> in <code>res_usbradio.conf</code>.</p>
+<p><strong>Steps:</strong></p>
+<ol>
+<li>Install ASL3 (Debian 12 / Raspberry Pi OS image from allstarlink.org). Set up your node number and password with <code>asl-menu</code>.</li>
+<li>Install the AIOC udev rule (Section 2.5) so Asterisk can open the HID.</li>
+<li>Allow the AIOC USB ID:<div class="code"><pre><code class="language-ini">; /etc/asterisk/res_usbradio.conf
+[general]
+usb_devices = 1209:7388    ; AIOC (all in one cable)
+</code></pre></div>
+<em>(Alternative: change the AIOC to look like a C-Media CM108 with <code>./aioc-util.py --set-usb 0x0d8c 0x000c --store</code>. You then need <code>--open-usb 0x0d8c 0x000c</code> to configure it later.)</em></li>
+<li>Set the Virtual COS (squelch detection from RX audio) hang time. <strong>The timing registers count in 1/16 ms: value = milliseconds × 16</strong>
+(confirmed from the firmware defaults and G1LRO&#39;s script, where 1500 ms = <code>0x5DC0</code>). <span class="tag tag-official">Official + Community</span><div class="code"><pre><code class="language-bash">./aioc-util.py --vcos-timctrl 24000 --store      # 1500 ms hang time (G1LRO&#39;s recommendation)
+</code></pre></div>
+<em>(The aioc-util README example <code>--vcos-timctrl 1500</code> sets about 94 ms.)</em> If speech drops out between words, raise it.
+If the COS opens on noise, raise the threshold (<code>--vcos-lvlctrl</code>, default 256). G1LRO suggests a threshold of about 1500 for noisy radios.
+Make sure the radio&#39;s <strong>squelch is closed</strong> when the channel is idle. VCOS opens on audio level.
+<strong>Better: hardware COS.</strong> Rev 1.2 or G1LRO dual-COS boards can read the radio&#39;s real squelch: <code>./aioc-util.py --enable-hwcos --store</code>.
+<strong>The easy way [Community]:</strong> G1LRO&#39;s script does steps 3–6 for you (it edits <code>res_usbradio.conf</code>, <code>simpleusb.conf</code> and <code>rpt.conf</code>, and backs them up first):<div class="code"><pre><code class="language-bash">wget -O customize.sh https://raw.githubusercontent.com/G1LRO/AIOC-ASL3-Config/main/customize.sh
+sudo bash customize.sh
+</code></pre></div>
+</li>
+<li>In <code>asl-menu</code> <span class="tag tag-official">Official example</span>:<ul>
+<li>Device type: <code>usbradio</code> (menu 2 &gt; A1 &gt; N4 &gt; I2) (or <code>simpleusb</code>, which also works well for HT nodes)</li>
+<li>Duplex type: <code>1</code> (menu 2 &gt; A1 &gt; N5)</li>
+</ul>
+</li>
+<li>Edit <code>usbradio.conf</code> (menu 6 &gt; H). The official example is for a Puxing PX-888; it suits most HTs as a starting point:<div class="code"><pre><code class="language-ini">rxboost = 0
+rxsqhyst = 500
+carrierfrom = usbinvert
+ctcssfrom = no
+rxdemod = speaker
+txprelim = no
+invertptt = no
+</code></pre></div>
+(For <code>simpleusb.conf</code>, the equivalents are <code>carrierfrom = usbinvert</code>, <code>ctcssfrom = no</code>.)
+<strong>[Community] <code>simpleusb-tune-menu</code> settings from G1LRO:</strong> I = PTT mode (<code>active LOW</code> in his older guide), J = COS from <code>usbinvert</code>
+(VCOS) or <code>usb</code> (active high; his newer guide uses this with hardware COS), L = CTCSS from <code>no</code>.
+<strong>COS stuck open:</strong> swap <code>usb</code> and <code>usbinvert</code>, or raise the VCOS threshold. <strong>COS never opens:</strong> swap them, or lower the threshold.</li>
+<li>Run <code>radio-tune-menu</code> (usbradio) or <code>simpleusb-tune-menu</code> (simpleusb) to set RX and TX levels: <strong>V</strong> checks COS, <strong>e</strong> runs an echo test,
+<strong>2/3</strong> set the levels, <strong>W</strong> writes. Then restart Asterisk: <code>sudo systemctl restart asterisk</code>.</li>
+<li>Test with the parrot node (<strong>Hubnet Parrot 40894</strong>) or connect to a hub. Use <strong>low power</strong> and a separate antenna setup: RF getting into the USB cable is the most common problem (Section 8).</li>
+</ol>
+<p><strong>Fixes reported on the AllStarLink forum [Community]:</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>asl-menu</code> says it can&#39;t find the audio device</td>
+<td>Uncomment <code>usb_devices = 1209:7388</code> in <code>res_usbradio.conf</code> (M0AWS lost a day on this)</td>
+</tr>
+<tr>
+<td>COS works but <strong>no RX audio</strong></td>
+<td><code>ctcssfrom</code> was set: change it to <code>ctcssfrom = no</code></td>
+</tr>
+<tr>
+<td>Node keys over and over</td>
+<td>Make sure <code>duplex = 1</code> in <code>rpt.conf</code></td>
+</tr>
+<tr>
+<td>PTT stuck on while the node transmits</td>
+<td>RF feedback: use 1 W instead of 5 W, a short USB cable, clip-on ferrites, and the antenna away from the Pi</td>
+</tr>
+<tr>
+<td>Tail of about 3 s or keying by itself</td>
+<td>Check the VCOS hang time and threshold; set the radio&#39;s squelch higher</td>
+</tr>
+<tr>
+<td>Full-duplex repeater</td>
+<td>Two AIOCs and two radios (one RX, one TX) have been shown working (F1FQN video)</td>
+</tr>
+</tbody></table></div>
+<p><strong>HamVOIP / GMRSLive</strong> (older AllStar-based systems) only recognise C-Media IDs. Use the <code>--set-usb 0x0d8c 0x000c</code> option above
+(G1LRO&#39;s <code>aioc.py</code> / <code>aioc-revert.py</code> scripts do the same). On GMRS, follow your local GMRS rules. GMRS is not amateur radio.</p>
+<h3 id="s5-13"><a class="anchor" href="#s5-13" aria-label="Link to this section">#</a>5.13 SvxLink (Linux) and EchoLink (Windows)</h3>
+<h4 id="svxlink-simplex-node-repeater-controller"><a class="anchor" href="#svxlink-simplex-node-repeater-controller" aria-label="Link to this section">#</a>SvxLink — simplex node, repeater controller, EchoLink link</h4>
+<p><span class="tag tag-typical">Typical</span> Use the AIOC HID for both PTT and squelch:</p>
+<div class="code"><pre><code class="language-ini"># /etc/svxlink/svxlink.conf
+[Rx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+SQL_DET=HIDRAW
+HID_DEVICE=/dev/hidraw0
+HID_SQL_PIN=VOL_DN          # AIOC VCOS is on CM108 &quot;Volume Down&quot;; use !VOL_DN if logic is inverted
+# Alternative: SQL_DET=VOX (VOX_FILTER_DEPTH / VOX_THRESH) or CTCSS
+
+[Tx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+PTT_TYPE=Hidraw
+HID_DEVICE=/dev/hidraw0
+HID_PTT_PIN=GPIO3
+# Alternative serial PTT: PTT_TYPE=SerialPin, PTT_PORT=/dev/aioc, PTT_PIN=DTR!RTS
+</code></pre></div>
+<p>For EchoLink, turn on <code>ModuleEchoLink</code> and set the callsign/password in <code>ModuleEchoLink.conf</code>. Forward <strong>UDP 5198–5199</strong> and <strong>TCP 5200</strong> on the router.</p>
+<h4 id="echolink-windows-sysop-mode"><a class="anchor" href="#echolink-windows-sysop-mode" aria-label="Link to this section">#</a>EchoLink (Windows, Sysop mode)</h4>
+<p><span class="tag tag-typical">Typical</span></p>
+<ul>
+<li><em>Tools → Sysop Settings → RX Ctrl</em>: <strong>VOX</strong> (adjust the threshold), or COS via serial isn&#39;t available with the AIOC. VOX is the standard choice.</li>
+<li><em>TX Ctrl</em>: <strong>Serial</strong> keying on the AIOC COM port. EchoLink may assert RTS (or both lines). Set the AIOC PTT source to match (<code>SERIALRTS</code> or <code>SERIALDTR</code>), or simply use <strong>VPTT</strong> (Section 6).</li>
+<li><em>Audio</em>: input/output = AIOC. Needs a validated EchoLink account and UDP 5198–5199 forwarded.</li>
+</ul>
+<h3 id="s5-14"><a class="anchor" href="#s5-14" aria-label="Link to this section">#</a>5.14 Hamlib / scripts / generic PTT</h3>
+<p><span class="tag tag-typical">Typical</span></p>
+<div class="code"><pre><code class="language-bash"># CM108 PTT via HID (Linux)
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 1     # key
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 0     # unkey
+
+# Serial DTR PTT, forcing RTS low
+rigctl -m 1 -p /dev/ttyACM0 -P DTR -C rts_state=OFF T 1
+
+# rigctld for programs that speak to Hamlib over network (port 4532)
+rigctld -m 1 -p /dev/hidraw0 -P CM108
+</code></pre></div>
+<p><strong>aioc-util</strong> can also key directly (fw ≥ 1.3) <span class="tag tag-tool">Tool docs</span>:</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --set-ptt1-state on
+./aioc-util.py --set-ptt1-state off
+</code></pre></div>
+<p>Python with pyserial (default AIOC logic):</p>
+<div class="code"><pre><code class="language-python">import serial, time
+s = serial.Serial(&#39;/dev/ttyACM0&#39;)   # or &#39;COM5&#39;
+s.rts = False; s.dtr = True         # PTT ON  (DTR=1, RTS=0)
+time.sleep(2)
+s.dtr = False                       # PTT OFF
+</code></pre></div>
+<h3 id="s5-15"><a class="anchor" href="#s5-15" aria-label="Link to this section">#</a>5.15 DigiPi (Raspberry Pi all-in-one data station)</h3>
+<p><span class="tag tag-community">Community</span> DigiPi is a ready-made Raspberry Pi image with a web UI for APRS, digipeater/iGate, packet node, Winlink (Pat), SSTV and more.
+Older DigiPi versions don&#39;t support the AIOC directly. Users got it working by editing <strong>every</strong> Direwolf config
+(<code>direwolf.tnc.conf</code>, <code>direwolf.digipeater.conf</code>, <code>direwolf.node.conf</code>, <code>direwolf.winlink.conf</code>, <code>direwolf.tracker.conf</code>, <code>direwolf.tnc300b.conf</code>):</p>
+<div class="code"><pre><code class="language-conf">ADEVICE plughw:0,0 plughw:0,0     # or the AIOC&#39;s card number from arecord -l
+PTT CM108                         # or: PTT /dev/ttyACM0 DTR -RTS   (do NOT add a trailing -3; it inverts PTT)
+# comment out any old DCD line
+</code></pre></div>
+<p>Then <code>sudo remount</code>, edit the files, run <code>sudo ./saveconfigs.sh</code>, and <code>sudo reboot</code>. Put ferrites on <strong>both ends</strong> of the USB cable.
+Check whether newer DigiPi releases support the AIOC natively before you edit anything.</p>
+<h3 id="s5-16"><a class="anchor" href="#s5-16" aria-label="Link to this section">#</a>5.16 iPhone / iPad (RadioMail, Packet Commander)</h3>
+<p><span class="tag tag-community">Community, Dec 2025</span> iOS apps can only use the AIOC as a <strong>USB sound card</strong> (Apple doesn&#39;t let apps reach USB serial or HID).
+The <strong>RadioMail</strong> (Winlink) and <strong>Packet Commander</strong> apps have built-in packet modems that work with the AIOC when you turn on <strong>Virtual PTT</strong>:</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store     # needs AIOC fw 1.4.1 (aioc-util failed on older fw)
+</code></pre></div>
+<p>Use a USB-C iPhone/iPad, or Apple&#39;s Lightning-to-USB camera adapter. Mute all other sounds on the device, because any sound will key the radio.</p>
+<h3 id="s5-17"><a class="anchor" href="#s5-17" aria-label="Link to this section">#</a>5.17 Reticulum (RNS, NomadNet, Sideband, MeshChat) over packet</h3>
+<p><span class="tag tag-typical">Typical</span> Reticulum can use a KISS TNC. Run Direwolf (5.3) and add a TCP KISS interface to <code>~/.reticulum/config</code>:</p>
+<div class="code"><pre><code class="language-ini">[[Direwolf AIOC]]
+  type = TCPClientInterface
+  interface_enabled = True
+  kiss_framing = True
+  target_host = 127.0.0.1
+  target_port = 8001
+</code></pre></div>
+<p>(Or point a <code>KISSInterface</code> at a Direwolf pseudo-terminal created with <code>direwolf -p</code>.) 1200 baud is slow but enough for messages.
+<span class="tag tag-community">Community</span> One user reported trouble linking Reticulum to Direwolf over TCP. If it misbehaves, try the PTY/<code>KISSInterface</code> route.
+Follow your country&#39;s amateur rules: no encryption is a common licence condition. Check how Reticulum is configured before transmitting.</p>
+<h3 id="s5-18"><a class="anchor" href="#s5-18" aria-label="Link to this section">#</a>5.18 Mobile / HF radios (wiring the AIOC to a data or mic port)</h3>
+<p><span class="tag tag-community">Community</span> The AIOC is just a USB sound card, serial port and PTT on a small board, so builders wire it to other radios:</p>
+<ul>
+<li>Take the signals from the pads, or from a K1 socket on a pigtail: audio out to the radio, audio in from the radio, PTT, UART TX/RX and ground (see the pinout in the AIOC README).</li>
+<li><strong>Yaesu FT-817ND / FT-857D / FT-7800R:</strong> working audio, PTT and <strong>CAT</strong> have been shown using cheap CT-39A (data) and CT-62 (CAT) cables (GitHub #137). If CAT doesn&#39;t respond, <strong>swap RX and TX</strong>.</li>
+<li>On <strong>hardware rev 1.0/1.1</strong>, the UART and PTT share one contact, so CAT data can key PTT. Use rev 1.2 and cut the split pad, or leave PTT disconnected and key with CAT.</li>
+<li>For line-level data ports on rev 1.2: <code>--audio-tx-boost on</code> and raise <code>--audio-rx-gain</code>.</li>
+<li>Icom CI-V (single-wire bus) does <strong>not</strong> work without extra circuitry (GitHub #109, unresolved).</li>
+<li>Prefer a ready-made interface for your rig if you aren&#39;t comfortable with soldering. Wrong wiring can damage the radio or the AIOC.</li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s6"><a class="anchor" href="#s6" aria-label="Link to this section">#</a>6. PTT Troubleshooting Flow</h2>
+<div class="code"><pre><code>Radio does not transmit when the software &quot;keys&quot;?
+│
+├─ 1. Is the plug fully seated? Is the radio on, VOX off, not locked, not on a TX-inhibited channel?
+│
+├─ 2. Does the software support CM108 PTT? → use it (Linux: check /dev/hidraw permissions, Section 2.5)
+│
+├─ 3. Using COM-port PTT:
+│     ├─ Software set to &quot;DTR&quot; (RTS off)? → should work with defaults.
+│     ├─ Software sets BOTH DTR and RTS, or RTS stays high (common on Linux, where opening a port raises both)
+│     │      → aioc-util --ptt1 &quot;CM108GPIO3|SERIALDTR&quot; --store
+│     ├─ Software only keys RTS
+│     │      → aioc-util --ptt1 &quot;CM108GPIO3|SERIALRTS&quot; --store
+│     └─ VARA FM → set &quot;Pin: DTR only&quot;
+│
+├─ 4. Software has no PTT at all (APRSdroid, some Mac apps)
+│      → aioc-util --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store
+│
+└─ 5. Radio keys but stays keyed / keys during CHIRP programming
+       → you changed PTT to SERIALDTR/SERIALRTS: put it back to defaults for programming:
+         aioc-util --defaults --store
+       → check the TX audio isn&#39;t triggering VPTT (system sounds, a VPTT threshold that&#39;s too low)
+</code></pre></div>
+<blockquote>
+<p>⚠️ <strong>Note for agents:</strong> after setting PTT to plain <code>SERIALDTR</code> or <code>SERIALRTS</code>, <strong>CHIRP programming may key the radio</strong>,
+because CHIRP toggles those lines. Tell the user to switch back with <code>--defaults --store</code> before programming,
+or to keep a second AIOC for programming.</p>
+</blockquote>
+</section>
+<section class="doc-section"><h2 id="s7"><a class="anchor" href="#s7" aria-label="Link to this section">#</a>7. Configuring the AIOC Itself (aioc-util)</h2>
+<h3 id="s7-1"><a class="anchor" href="#s7-1" aria-label="Link to this section">#</a>7.1 Requirements <span class="tag tag-tool">Tool docs</span></h3>
+<ul>
+<li>AIOC <strong>firmware ≥ 1.3.0</strong> (tested with 1.3 and 1.4.1; 1.2 does <strong>not</strong> work).</li>
+<li><strong>Command line:</strong> <code>aioc-util</code> by Hrafnkell Eiríksson TF3HR — <a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a></li>
+<li><strong>Browser versions (no install, Chrome/Edge on a desktop; on Linux the udev rule must be installed):</strong><ul>
+<li><a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a> (TF3HR&#39;s aioc-util in the browser)</li>
+<li><a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> (G1LRO&#39;s version, with buttons for Hardware/Virtual COS, threshold and timing, then <strong>Apply</strong> → <strong>Store to Flash</strong>; it shows the live &quot;GPIO (Vol−)&quot; COS state) <span class="tag tag-community">Community</span></li>
+<li><strong>Recommend these to non-technical customers</strong>: no Python and no hidapi.dll needed.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Install (Linux/macOS):</strong></p>
+<div class="code"><pre><code class="language-bash">git clone https://github.com/hrafnkelle/aioc-util.git
+cd aioc-util
+python3 -m venv venv &amp;&amp; source venv/bin/activate
+pip install hid
+# Linux: sudo cp udev/rules.d/91-aioc.rules /etc/udev/rules.d/ &amp;&amp; sudo udevadm control --reload &amp;&amp; sudo udevadm trigger
+# Debian/Pi may need: sudo apt install libhidapi-hidraw0 libhidapi-libusb0
+</code></pre></div>
+<p><strong>Windows:</strong> same venv steps in PowerShell (<code>.\venv\Scripts\activate</code>). Download <code>hidapi.dll</code> from the libusb/hidapi releases and put it next to <code>aioc-util.py</code>. Run with <code>python aioc-util.py …</code>.</p>
+<h3 id="s7-2"><a class="anchor" href="#s7-2" aria-label="Link to this section">#</a>7.2 Common commands <span class="tag tag-tool">Tool docs</span></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Show all registers</td>
+<td><code>./aioc-util.py --dump</code></td>
+</tr>
+<tr>
+<td>Factory defaults (and save)</td>
+<td><code>./aioc-util.py --defaults --store</code></td>
+</tr>
+<tr>
+<td>List PTT sources</td>
+<td><code>./aioc-util.py --list-ptt-sources</code></td>
+</tr>
+<tr>
+<td>Set PTT1 source</td>
+<td>`./aioc-util.py --ptt1 &quot;CM108GPIO3</td>
+</tr>
+<tr>
+<td>Virtual PTT on PTT1</td>
+<td><code>./aioc-util.py --ptt1 VPTT --store</code> (or <code>--auto-ptt1</code>)</td>
+</tr>
+<tr>
+<td>Swap PTT1/PTT2 (dual-PTT radios)</td>
+<td><code>./aioc-util.py --swap-ptt --store</code></td>
+</tr>
+<tr>
+<td>VPTT/VCOS threshold and tail</td>
+<td><code>./aioc-util.py --vptt-lvlctrl 0x80 --vptt-timctrl 320 --vcos-lvlctrl 0xff --vcos-timctrl 24000 --store</code> (timing = ms × 16: 320 = 20 ms, 24000 = 1.5 s)</td>
+</tr>
+<tr>
+<td>RX gain (HW rev ≥ 1.2, fw ≥ 1.4)</td>
+<td><code>./aioc-util.py --audio-rx-gain 4x --store</code> (1x/2x/4x/8x/16x)</td>
+</tr>
+<tr>
+<td>TX boost for line-level (HW rev ≥ 1.2)</td>
+<td><code>./aioc-util.py --audio-tx-boost on --store</code></td>
+</tr>
+<tr>
+<td>Show audio settings</td>
+<td><code>./aioc-util.py --audio-get-settings</code></td>
+</tr>
+<tr>
+<td>Hardware COS input (HW rev ≥ 1.2)</td>
+<td><code>./aioc-util.py --enable-hwcos --store</code> (back to VCOS: <code>--enable-vcos</code>)</td>
+</tr>
+<tr>
+<td>Pretend to be a CM108 (HamVOIP etc.)</td>
+<td><code>./aioc-util.py --set-usb 0x0d8c 0x000c --store</code></td>
+</tr>
+<tr>
+<td>Configure after changing USB ID</td>
+<td><code>./aioc-util.py --open-usb 0x0d8c 0x000c --dump</code></td>
+</tr>
+<tr>
+<td>Several AIOCs</td>
+<td><code>--list-devices</code>, then <code>--open-serialnum &lt;SN&gt; …</code></td>
+</tr>
+<tr>
+<td>Reboot</td>
+<td><code>./aioc-util.py --reboot</code></td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>Without <code>--store</code>, changes are lost at the next power cycle. <strong>Flashing firmware erases all stored settings.</strong> <span class="tag tag-official">Official</span></p>
+</blockquote>
+<h3 id="s7-3"><a class="anchor" href="#s7-3" aria-label="Link to this section">#</a>7.3 Register reference (for advanced users and agents) <span class="tag tag-official">Official — firmware settings.h</span></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Reg</th>
+<th>Name</th>
+<th>Purpose</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x00</td>
+<td>MAGIC</td>
+<td>Reads &quot;AIOC&quot;</td>
+<td>—</td>
+</tr>
+<tr>
+<td>0x08</td>
+<td>USBID</td>
+<td>VID (low 16 bits) / PID (high 16 bits)</td>
+<td><code>1209:7388</code></td>
+</tr>
+<tr>
+<td>0x24</td>
+<td>AIOC_IOMUX0</td>
+<td>PTT1 source bitmask</td>
+<td>CM108GPIO3 | SERIALDTRNRTS</td>
+</tr>
+<tr>
+<td>0x25</td>
+<td>AIOC_IOMUX1</td>
+<td>PTT2 source bitmask</td>
+<td>CM108GPIO4</td>
+</tr>
+<tr>
+<td>0x44–0x47</td>
+<td>CM108_IOMUX0–3</td>
+<td>CM108 buttons VolUp / VolDn / PlayMute / RecMute source</td>
+<td>VolUp = IN2, <strong>VolDn = VCOS</strong>, others none</td>
+</tr>
+<tr>
+<td>0x60</td>
+<td>SERIAL_CTRL</td>
+<td>UART lockout while PTT active</td>
+<td>lockout on PTT1</td>
+</tr>
+<tr>
+<td>0x72</td>
+<td>AUDIO_RX</td>
+<td>RX gain 1×–16×</td>
+<td>1×</td>
+</tr>
+<tr>
+<td>0x78</td>
+<td>AUDIO_TX</td>
+<td>TX boost</td>
+<td>off</td>
+</tr>
+<tr>
+<td>0x82 / 0x84</td>
+<td>VPTT_LVLCTRL / TIMCTRL</td>
+<td>Virtual PTT threshold / tail time (ms × 16)</td>
+<td>16 / 0x140 (= 20 ms)</td>
+</tr>
+<tr>
+<td>0x92 / 0x94</td>
+<td>VCOS_LVLCTRL / TIMCTRL</td>
+<td>Virtual COS threshold / tail time (ms × 16)</td>
+<td>256 / 0xC80 (= 200 ms)</td>
+</tr>
+<tr>
+<td>0xA0–0xA5</td>
+<td>FOXHUNT_CTRL, MSG0–3</td>
+<td>Fox-hunt interval, WPM, volume, 16-char message</td>
+<td>disabled</td>
+</tr>
+</tbody></table></div>
+<p>PTT source bits: <code>CM108GPIO1=0x1, GPIO2=0x2, GPIO3=0x4, GPIO4=0x8, SERIALDTR=0x100, SERIALRTS=0x200, SERIALDTRNRTS=0x400, SERIALNDTRRTS=0x800, VPTT=0x1000</code>.
+Button sources: <code>IN1=0x10000, IN2=0x20000, VCOS=0x1000000</code>.
+Commands: <code>WRITESTROBE=0x01, DEFAULTS=0x10, REBOOT=0x20, RECALL=0x40, STORE=0x80</code>.
+Register access uses HID feature reports with the layout <code>&lt;BBBL&gt;</code>: (report 0, command, address, value).</p>
+<h3 id="s7-4"><a class="anchor" href="#s7-4" aria-label="Link to this section">#</a>7.4 Fox-hunt beacon mode (fw ≥ 1.4.0) <span class="tag tag-official">Official + Tool docs</span></h3>
+<p>The AIOC can send a Morse ID on its own, with only USB power (for example from a power bank). No computer is needed once it&#39;s configured.</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --foxhunt-message &quot;DE N0CALL FOX&quot; --foxhunt-wpm 20 --foxhunt-interval 60 --foxhunt-volume 32000 --store
+./aioc-util.py --foxhunt-get-settings --foxhunt-get-message   # check
+./aioc-util.py --foxhunt-interval 0 --store                   # disable
+</code></pre></div>
+<p>Message up to 16 characters · interval 0–255 s (0 = off) · WPM 0–255 · volume 0–65535.
+Users must follow local rules for unattended beacons and station identification.</p>
+</section>
+<section class="doc-section"><h2 id="s8"><a class="anchor" href="#s8" aria-label="Link to this section">#</a>8. Known Issues and Fixes</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>USB disconnects, garbled audio, PC &quot;beeps&quot; or freezes <strong>only while transmitting</strong></td>
+<td><strong>RF feedback.</strong> With a stock (monopole) antenna, the USB cable becomes the radio&#39;s counterpoise (&quot;tiger tail&quot;). <span class="tag tag-official">Official</span></td>
+<td>Lower TX power. Add a <strong>counterpoise/tiger-tail</strong>. Use an <strong>external or balanced antenna</strong> (e.g. a dipole) away from the PC. Put <strong>clip-on ferrites</strong> on the USB cable. Use a short USB cable. <span class="tag tag-community">Community</span> Going from 5 W to <strong>1 W</strong> fixed it for several users. Others moved the AIOC onto a short <strong>pigtail</strong> away from the radio, or used a coax extension so the antenna sits 1 m or more away.</td>
+</tr>
+<tr>
+<td>Radio doesn&#39;t key</td>
+<td>PTT method mismatch</td>
+<td>Section 6</td>
+</tr>
+<tr>
+<td>Radio stays keyed / keys at random</td>
+<td>Linux ModemManager probing the port; PTT source set to DTR/RTS only; system sounds with VPTT</td>
+<td>udev ignore rule (2.5); <code>--defaults --store</code>; don&#39;t make the AIOC the default audio device</td>
+</tr>
+<tr>
+<td>CHIRP: &quot;Radio did not respond&quot;</td>
+<td>Wrong model, plug not seated, radio in a menu, old firmware</td>
+<td>Re-seat, choose the exact model, update the AIOC to ≥ 1.2.0 (for the DTR&amp;!RTS fix)</td>
+</tr>
+<tr>
+<td>Intermittent RX/TX audio, PTT works sometimes</td>
+<td>TRS plug contact / solder joint (on DIY units), or plug not fully inserted</td>
+<td>Re-seat. On DIY builds, re-flow the TRS tab joints while pressing the contact sideways <span class="tag tag-official">Official</span></td>
+</tr>
+<tr>
+<td>Decodes fail, audio sounds distorted</td>
+<td>TX level too high (over-deviation) or RX clipping</td>
+<td>Lower the OS output volume; lower the radio volume; RX gain back to 1×</td>
+</tr>
+<tr>
+<td>Can&#39;t hear anything in software</td>
+<td>Squelch closed / volume zero / wrong input device</td>
+<td>Open squelch, raise the radio volume, choose the AIOC input in the software</td>
+</tr>
+<tr>
+<td>Stuttering TX audio on macOS</td>
+<td>Old firmware</td>
+<td>Update to ≥ v1.4.0 (macOS fix) <span class="tag tag-official">Official</span></td>
+</tr>
+<tr>
+<td>UV-K5 firmware flash fails partway</td>
+<td>Serial buffer limits in old firmware</td>
+<td>Update the AIOC to ≥ v1.4.0 <span class="tag tag-official">Official</span></td>
+</tr>
+<tr>
+<td>Direwolf CM108 warnings</td>
+<td>Upstream Direwolf behaviour</td>
+<td>Harmless; ignore (direwolf issue #448) <span class="tag tag-official">Official</span></td>
+</tr>
+<tr>
+<td>Linux &quot;permission denied&quot; on /dev/ttyACM0 or /dev/hidraw</td>
+<td>User not in dialout/plugdev; no udev rule</td>
+<td>Section 2.5</td>
+</tr>
+<tr>
+<td>aioc-util &quot;Unexpected magic&quot; / can&#39;t open</td>
+<td>fw &lt; 1.3, USB ID was changed, or Windows missing hidapi.dll</td>
+<td>Update firmware; use <code>--open-usb</code>; add hidapi.dll; or use the browser tools (7.1)</td>
+</tr>
+<tr>
+<td>aioc-util <code>module &#39;hid&#39; has no attribute &#39;Device&#39;</code> / <code>No module named &#39;hid&#39;</code></td>
+<td>Wrong Python package (Debian&#39;s <code>python3-hid</code>/<code>hidapi</code>)</td>
+<td>Use a venv and <code>pip install hid</code>; remove the apt package <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td><strong>Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x</strong>, or audio &quot;Code 10&quot; in a Windows VM</td>
+<td>Firmware bug on old hardware (GitHub #120/#138)</td>
+<td>Flash <strong>v1.3.0</strong> <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td>Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting</td>
+<td>Seen on <strong>Android 11</strong> phones; Android 12+ was fine (GitHub #121)</td>
+<td>Try another phone or Android version <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td>APRSdroid ignores the AIOC (works in other apps)</td>
+<td>APRSdroid bug with USB microphones on some phones (aprsdroid #149)</td>
+<td>Try the &quot;Lesser AudioSwitch&quot; app to force USB audio routing <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td>S-meter noise floor rises when the AIOC is plugged in</td>
+<td>Ground loop / PC noise on the USB cable</td>
+<td>Antenna on coax at least 1 m away from the HT, clip-on ferrites, a <strong>USB isolator</strong>, or run from a laptop on battery <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td>HF rig hears S9 noise with the AIOC plugged in</td>
+<td>PC/USB noise; some radios (e.g. RT-950 Pro) are very sensitive</td>
+<td>Ferrites, a USB isolator, a different PC; test with another radio <span class="tag tag-community">Community</span></td>
+</tr>
+<tr>
+<td>Device not seen at all</td>
+<td><strong>Charge-only USB-C cable</strong>, or the board is stuck in DFU mode (no firmware)</td>
+<td>Use a data cable; flash firmware (Section 9) <span class="tag tag-community">Community</span></td>
+</tr>
+</tbody></table></div>
+<p><strong>[Community] Contact/solder fault finder for DIY or repaired units (DL-Nordwest):</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Can&#39;t read or write the radio</td>
+<td>Driver / COM port selection</td>
+</tr>
+<tr>
+<td>Can write but <strong>can&#39;t read</strong> the radio</td>
+<td>Solder joint at the 2.5 mm <strong>ring</strong></td>
+</tr>
+<tr>
+<td>RX audio very quiet</td>
+<td>Solder joint at the 3.5 mm <strong>ring</strong>; PC volume</td>
+</tr>
+<tr>
+<td>No RX audio at all</td>
+<td>2.5 mm <strong>tip</strong> / <strong>sleeve</strong> joints; radio volume; input device</td>
+</tr>
+<tr>
+<td>Radio transmits all the time</td>
+<td>Short between the 2.5 mm and 3.5 mm <strong>sleeves</strong> (or the plugs were soldered the wrong way round)</td>
+</tr>
+<tr>
+<td>Works only when the plug is twisted</td>
+<td>Cracked TRS solder joint: re-flow it while pressing the contact (Section 8)</td>
+</tr>
+</tbody></table></div>
+</section>
+<section class="doc-section"><h2 id="s9"><a class="anchor" href="#s9" aria-label="Link to this section">#</a>9. Firmware Update</h2>
+<h3 id="s9-1"><a class="anchor" href="#s9-1" aria-label="Link to this section">#</a>9.1 Releases <span class="tag tag-official">Official</span></h3>
+<p>Download <code>aioc-fw-x.y.z.bin</code> from <a href="https://github.com/skuep/AIOC/releases">https://github.com/skuep/AIOC/releases</a></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Highlights</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>v1.4.1</strong></td>
+<td>2025-09-27</td>
+<td>Fixes LED blink speed and LED interrupt priority</td>
+</tr>
+<tr>
+<td><strong>v1.4.0</strong></td>
+<td>2025-09-26</td>
+<td>macOS TX stutter fix; bigger serial buffer (HT firmware flashing); HW rev 1.2 support; RX gain 1–16×; TX boost; <strong>Fox-hunt mode</strong></td>
+</tr>
+<tr>
+<td>v1.3.0</td>
+<td>2025-01-02</td>
+<td>HID config system (new protocol; older scripts don&#39;t work); Virtual PTT / Virtual COS; hardware COS input; bigger serial buffer</td>
+</tr>
+<tr>
+<td>v1.2.0</td>
+<td>2023-03-19</td>
+<td><strong>CM108 PTT</strong>; live DFU updates; serial PTT changed to DTR=1 &amp; RTS=0</td>
+</tr>
+</tbody></table></div>
+<p><strong>Hardware rev 1.2 needs firmware ≥ 1.4.0.</strong> <span class="tag tag-official">Official</span></p>
+<h3 id="s9-2"><a class="anchor" href="#s9-2" aria-label="Link to this section">#</a>9.2 Updating firmware that is already ≥ 1.2.0 (no case opening) <span class="tag tag-official">Official</span></h3>
+<div class="code"><pre><code class="language-bash">dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
+</code></pre></div>
+<p>The AIOC reboots into the bootloader, flashes, and restarts on its own.</p>
+<ul>
+<li><strong>Linux/macOS:</strong> install <code>dfu-util</code> (<code>apt install dfu-util</code> / <code>brew install dfu-util</code>). You may need <code>sudo</code> or the <code>plugdev</code> group.</li>
+<li><strong>Windows:</strong> dfu-util needs a <strong>libusb/WinUSB driver</strong> for the DFU interface. Use <strong>Zadig</strong> to install WinUSB for the AIOC DFU interface / &quot;STM32 BOOTLOADER&quot; device. (See the guide linked in the AIOC README: yeswolf.github.io/dfu.)
+<span class="tag tag-community">Community</span> dfu-util on Windows 11 often hangs or reports <code>LIBUSB_ERROR_NOT_SUPPORTED</code> (GitHub #28). Easiest fixes: use a Linux PC or Raspberry Pi, or the browser tool below.</li>
+<li><strong>Browser flashing (WebDFU) [Community, used in G1LRO&#39;s guide]:</strong> put the AIOC in bootloader mode (9.3, step 1), then open
+<a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a> in Chrome/Edge → <strong>Connect</strong> → choose <strong>STM32 Bootloader</strong> → <strong>Internal Flash</strong> → pick the <code>.bin</code> → <strong>Download</strong>. Unplug it when it finishes.</li>
+</ul>
+<h3 id="s9-3"><a class="anchor" href="#s9-3" aria-label="Link to this section">#</a>9.3 First programming / unbricking <span class="tag tag-official">Official</span></h3>
+<ol>
+<li><strong>Short the two outermost pins</strong> of the programming header on the PCB (this is BOOT mode).</li>
+<li>Connect USB-C. The device shows up as the STM32 bootloader.</li>
+<li><code>dfu-util -a 0 -s 0x08000000:leave -D aioc-fw-x.y.z.bin</code></li>
+<li>Remove the short, unplug, and plug back in.</li>
+</ol>
+<p>After any update: <strong>re-apply your aioc-util settings</strong> (they are erased).</p>
+<h3 id="s9-4"><a class="anchor" href="#s9-4" aria-label="Link to this section">#</a>9.4 Which firmware do I have?</h3>
+<p>The USB descriptor doesn&#39;t report the firmware version. Practical checks:</p>
+<ul>
+<li>aioc-util works → ≥ 1.3.0. <code>--audio-get-settings</code> / fox-hunt commands work → ≥ 1.4.0.</li>
+<li>If unsure, just flash the latest release (9.2). That is the recommended fix for most issues.</li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s10"><a class="anchor" href="#s10" aria-label="Link to this section">#</a>10. Ready-Made Answers (FAQ for agents)</h2>
+<p><strong>Q: Do I need drivers?</strong>
+No. Windows 10/11, Linux, and macOS use their built-in USB audio and CDC serial drivers. Only firmware updates on Windows need a WinUSB driver (Zadig).</p>
+<p><strong>Q: Which COM port is it?</strong>
+Unplug the AIOC and plug it back in while watching Device Manager → Ports. The new COMx is the AIOC. Linux: <code>/dev/ttyACM0</code> (or <code>/dev/aioc</code> with the udev rule). macOS: <code>/dev/cu.usbmodem…</code>.</p>
+<p><strong>Q: Can I program and do digital modes with the same cable?</strong>
+Yes. The serial port does programming and the sound card does digital modes. Don&#39;t run both programs at the same time on the same COM port.</p>
+<p><strong>Q: Can I use it with a mobile/base radio?</strong>
+Only if the radio has a K1-type jack or you use an adapter cable to its data/mic port. On HW rev 1.2, turn on <code>--audio-tx-boost on</code> for line-level inputs and raise the RX gain for line-level outputs.</p>
+<p><strong>Q: Does it work on Raspberry Pi?</strong>
+Yes. Direwolf, AllStarLink 3, SvxLink, Pat, QtSoundModem and LinBPQ all run on Raspberry Pi OS. Use the CM108 PTT and the udev rule.</p>
+<p><strong>Q: Does it work with iPhone/iPad?</strong>
+Partly. iOS sees the AIOC only as a sound card. <strong>RadioMail</strong> (Winlink) and <strong>Packet Commander</strong> have shown it working with AIOC fw 1.4.1 and <strong>Virtual PTT</strong> turned on (Section 5.16). CHIRP programming and serial or CM108 PTT are not possible on iOS.</p>
+<p><strong>Q: Can I use voice (talk through the computer)?</strong>
+Yes. Choose the AIOC as microphone/speaker in a VoIP or linking app (AllStarLink, SvxLink, EchoLink, Mumble bridges). Voice PTT needs CM108/serial control or VPTT.</p>
+<p><strong>Q: My radio has two PTTs (dual-band HT)?</strong>
+PTT1 is the CM108 GPIO3/serial default and PTT2 is CM108 GPIO4. Use <code>--swap-ptt</code> or <code>--ptt2</code> to change them.</p>
+<p><strong>Q: Is 9600 baud packet supported?</strong>
+Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM Narrow.</p>
+</section>
+<section class="doc-section"><h2 id="s11"><a class="anchor" href="#s11" aria-label="Link to this section">#</a>11. Reference Links</h2>
+<ul>
+<li>AIOC project (hardware, firmware, README): <a href="https://github.com/skuep/AIOC">https://github.com/skuep/AIOC</a></li>
+<li>AIOC releases: <a href="https://github.com/skuep/AIOC/releases">https://github.com/skuep/AIOC/releases</a></li>
+<li>AIOC Discord: linked from the GitHub README</li>
+<li>aioc-util (CLI): <a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a> · Web version: <a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a></li>
+<li>G1LRO AIOC + ASL3 guide (current): <a href="https://g1lro.uk/?p=1593">https://g1lro.uk/?p=1593</a> · older guide: <a href="https://g1lro.uk/?p=676">https://g1lro.uk/?p=676</a> · scripts: <a href="https://github.com/G1LRO/AIOC-ASL3-Config">https://github.com/G1LRO/AIOC-ASL3-Config</a></li>
+<li>G1LRO browser config tool: <a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> · WebDFU flasher: <a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a></li>
+<li>AllStarLink forum, AIOC as a CM108 alternative: <a href="https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225">https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225</a></li>
+<li>M0AWS AllStar node build with an AIOC: <a href="https://m0aws.co.uk/?cat=408">https://m0aws.co.uk/?cat=408</a></li>
+<li>DL-Nordwest AIOC series (German), part 4 troubleshooting: <a href="https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/">https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/</a></li>
+<li>DigiPi + AIOC fix (Google Group): <a href="https://groups.google.com/g/digipi/c/1NfZeLpsT4M">https://groups.google.com/g/digipi/c/1NfZeLpsT4M</a></li>
+<li>AIOC GitHub issues (search before asking): <a href="https://github.com/skuep/AIOC/issues">https://github.com/skuep/AIOC/issues</a></li>
+<li>Videos: Ham Radio Dude (<a href="https://www.youtube.com/watch?v=xRCmXQYRLE0">https://www.youtube.com/watch?v=xRCmXQYRLE0</a>), Temporarily Offline (<a href="https://www.youtube.com/watch?v=RZjoPNe634o">https://www.youtube.com/watch?v=RZjoPNe634o</a>), AllStar node builds (<a href="https://youtu.be/7LB6D2FLGZk">https://youtu.be/7LB6D2FLGZk</a>, <a href="https://youtu.be/k0iP4dECx6A">https://youtu.be/k0iP4dECx6A</a>)</li>
+<li>German 4-part AIOC article (DL-Nordwest): linked from the AIOC README</li>
+<li>Direwolf: <a href="https://github.com/wb2osz/direwolf">https://github.com/wb2osz/direwolf</a></li>
+<li>CHIRP: <a href="https://chirpmyradio.com">https://chirpmyradio.com</a></li>
+<li>AllStarLink: <a href="https://www.allstarlink.org">https://www.allstarlink.org</a></li>
+<li>Winlink: <a href="https://winlink.org">https://winlink.org</a> · Pat: <a href="https://getpat.io">https://getpat.io</a> · VARA: <a href="https://rosmodem.wordpress.com">https://rosmodem.wordpress.com</a></li>
+<li>APRSdroid: <a href="https://aprsdroid.org">https://aprsdroid.org</a> · YAAC: <a href="https://www.ka2ddo.org/ka2ddo/YAAC.html">https://www.ka2ddo.org/ka2ddo/YAAC.html</a> · Xastir: <a href="https://xastir.org">https://xastir.org</a></li>
+<li>SvxLink: <a href="https://www.svxlink.org">https://www.svxlink.org</a> · fldigi/NBEMS: <a href="http://www.w1hkj.org">http://www.w1hkj.org</a></li>
+<li>Quansheng Dock: <a href="https://github.com/nicsure/QuanshengDock">https://github.com/nicsure/QuanshengDock</a> · Egzumer firmware: <a href="https://github.com/egzumer/uv-k5-firmware-custom">https://github.com/egzumer/uv-k5-firmware-custom</a></li>
+</ul>
+</section>
+  </main>
+</div>
+
+<footer>
+  Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR,
+  guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.
+</footer>
+
+<script type="text/plain" id="md-source"># AIOC (All-In-One-Cable) — Quick Start & Software Configuration Guide
+
+> **Purpose of this document**
+> This is a knowledge base for both people and AI agents. An agent that has
+> this document should be able to answer: *"I have an AIOC and radio X. I want to
+> do Y on computer Z. What software do I install and how do I set it up?"*
+>
+> **Document version:** 2026-10-31 (rev 2, with community research added) · Written for AIOC firmware **v1.4.1**
+> (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
+
+---
+
+## 0. Instructions for AI Agents (read first)
+
+1. **Work out four things first.** Ask only for the ones the user hasn't told you:
+   - **Goal**: what they want to do (programming, APRS, Winlink, SSTV, AllStar node, …).
+   - **OS**: Windows, Linux (including Raspberry Pi), macOS, Android, or iPhone/iPad.
+   - **Radio**: brand and model. The AIOC uses the Kenwood-style **K1** 2-pin plug.
+   - **AIOC firmware version**, if it matters for the task. Features like VPTT and aioc-util need v1.3.0 or newer.
+2. **Use the Decision Table (Section 3)** to pick the software, then go to the recipe for that software.
+3. **PTT is the most common problem.** If the radio doesn't key, use the PTT Troubleshooting Flow (Section 6).
+4. **How sure each statement is.** Statements are tagged:
+   - **[Official]**: from the AIOC GitHub README, the release notes or the firmware source (skuep/AIOC).
+   - **[Tool docs]**: from the aioc-util documentation or the other software's own docs.
+   - **[Community]**: reported by AIOC users in GitHub issues, the AllStarLink forum, the DigiPi group, or published guides (G1LRO, DL-Nordwest, M0AWS). These are real-world results, but not guaranteed for every setup.
+   - **[Typical]**: commonly used settings that are known to work in general. Menu names may differ between software versions, so tell the user to check them on their screen.
+5. **Safety and legal.** Transmitting needs an amateur radio licence. Tell users to transmit into a dummy load, or on low power on a clear simplex frequency, while they test. Never suggest settings that break band plans or ID rules.
+6. **Don't invent menu paths.** If a menu item isn't covered here, describe what the setting does (for example "choose the AIOC as the audio input") instead of guessing its exact name.
+
+---
+
+## 1. What the AIOC Is
+
+The AIOC is a small open-source PCB with a **USB-C** socket. It plugs straight
+into a handheld radio's **Kenwood K1 connector** (3.5 mm + 2.5 mm plugs). It replaces
+three things: a programming cable, a sound-card interface (like a SignaLink or Digirig),
+and a PTT interface. **[Official]**
+
+When plugged into a computer it shows up as a USB composite device with these parts:
+
+| Function | Shows up as | Used for |
+|---|---|---|
+| **USB sound card** | "All-In-One-Cable" / "AIOC Audio" (1 mono input, 1 mono output) | RX audio from the radio to the PC, TX audio from the PC to the radio |
+| **Virtual serial port (CDC-ACM)** | Windows: `COMx` · Linux: `/dev/ttyACMx` · macOS: `/dev/cu.usbmodemXXXX` | Radio programming (CHIRP etc.) **and** serial PTT |
+| **CM108-compatible HID** | Linux: `/dev/hidrawX` | CM108-style PTT (GPIO3) and COS input (fw ≥ 1.2.0); configuration interface (fw ≥ 1.3.0) |
+| **DFU runtime** | — | Firmware updates without opening the case (fw ≥ 1.2.0) |
+
+Key facts **[Official]**:
+
+- **USB VID:PID = `1209:7388`**. In bootloader (DFU) mode it shows up as the STM32 bootloader, `0483:df11`.
+- USB strings: Manufacturer `AIOC`, Product `All-In-One-Cable`.
+- MCU: STM32F302, with the built-in ADC/DAC used as the sound card.
+- Works on **Windows, Linux and macOS** without drivers. Android works through USB OTG for audio.
+- Supported sample rates: **48000 Hz (preferred)**, 32000, 24000, 22050 (for APRSdroid), 16000, 12000, 11025, 8000.
+- Supports **dual-PTT** radios (PTT1 and PTT2 outputs).
+- Default PTT1 sources: **CM108 GPIO3** OR **serial `DTR=1 AND RTS=0`**. Both work at the same time.
+- Default PTT2 source: CM108 GPIO4.
+- Default COS: the **Virtual COS** (VCOS, based on RX audio level) is reported as the CM108 **Volume Down** button.
+
+### Hardware revisions and firmware compatibility
+| Hardware | Firmware | Notes |
+|---|---|---|
+| **rev 1.0 / 1.1** (most units sold 2023–2025) | 1.2.0, **1.3.0 (safest)**, 1.4.x | **[Community]** Some rev 1.0 units on fw 1.4.x **hang with PTT stuck on**, or show audio "Code 10" errors inside Windows VMs (GitHub #120, #138, still open). If that happens, flash **v1.3.0**. |
+| **rev 1.2** (from Sept 2025) | **1.4.0 or newer required** **[Official]** | Adds: external hardware COS input, a split PTT/UART pad (lets you separate CAT serial from PTT), adjustable RX gain 1–16×, TX boost (line level). |
+| **G1LRO "dual-COS" AIOC / URC** | ships with 1.3.0 | **[Community]** Has a solder jumper: **LOGIC COS** (Tidradio H3 new firmware, SA818 modules) or **SPK COS** (Baofeng/Quansheng speaker-based COS). |
+
+> **The hardware revision is printed on the PCB.** Use only the official `aioc-fw-x.y.z.bin` builds for the STM32F302.
+> **[Community]** Boards built with an STM32F373 (it appears in an old BOM) don't enumerate (error -71) and need the MCU replaced (GitHub #122).
+
+### Tested radios **[Official]**
+- Baofeng UV-5R (CHIRP + APRS)
+- Wouxun UV-9D Mate (CHIRP + APRS)
+- BTECH UV-6X2 / 6X2 (CHIRP)
+- Quansheng UV-K5 (stock firmware, Egzumer custom firmware, Quansheng Dock)
+
+**Also reported working [Community]:** Baofeng UV-82, BF-888, Puxing PX-888(D), Wouxun KG-UV9D Plus,
+Retevis RT85, Explorer QRZ-1, Tidradio H3, and the **Kenwood TH-F6A** (set the jack to **SP/MIC** mode: Menu 9).
+Users have also wired the AIOC by hand to mobile and HF radios' data/mic ports: **Yaesu FT-817ND / FT-857D /
+FT-7800R** (audio, PTT and CAT serial), Xiegu G90, and a Radtel RT-950 Pro through a Kenwood adapter. Note that
+CAT serial data could trigger PTT on rev 1.0 boards (GitHub #34). Hardware rev 1.2's split PTT/UART pad fixes this.
+
+**In general [Typical]:** any HT with a Kenwood-style 2-pin K1 jack. That includes most Baofeng
+(UV-5R family, BF-888S, UV-82 *(UV-82 has a dual-PTT variant)*), Quansheng (UV-K5/K6/K5(8)/UV-5R Plus),
+BTECH, Wouxun, TIDRADIO, Radtel, Retevis, Abbree, Puxing and Kenwood HTs with the K1 jack. Radios with
+**other connectors** (Yaesu, Icom, Motorola multi-pin, Baofeng/BTECH "screw-on" UV-5X-style plugs,
+Anytone/Alinco single-plug) **do not fit** without an adapter.
+
+### Limitations (tell users before they buy or try)
+- **Only audio through the mic/speaker jack.** The K1 jack carries filtered, de-emphasised speaker audio
+  and a mic input. So **9600 baud packet, M17, DMR, D-STAR, or any mode that needs "flat"
+  discriminator/modulator audio will not work** through the K1 jack. 1200 baud AFSK packet/APRS, VARA FM
+  (narrow), SSTV, fldigi modes and voice all work well.
+- **SSB digital modes (FT8, JS8, FreeDV)** need an SSB radio. With an FM HT these programs *run*, but
+  they won't reach the normal FT8/JS8 users on HF/SSB.
+- **APRSdroid has no PTT control.** Use the AIOC **Virtual PTT (VPTT)** (fw ≥ 1.3.0) or the radio's VOX.
+- **iPhone/iPad apps can only use the AIOC as a sound card**: iOS doesn't let apps reach the serial or HID parts.
+  Transmitting therefore needs **VPTT**. **[Community]**
+- **Budget HTs switch between TX and RX slowly.** Packet works, but with more retries than on a mobile rig. **[Community]**
+- **Settings are erased when you flash new firmware.** Re-apply your aioc-util settings after an update. **[Official]**
+
+---
+
+## 2. First-Time Setup (every user)
+
+### 2.1 Plug in
+1. **Turn the radio OFF**, then push the AIOC firmly into the K1 jack. Both plugs must go all the way in.
+2. Connect the USB-C cable to the computer, phone or Raspberry Pi.
+3. Turn the radio on and set it to the frequency you want.
+
+### 2.2 Check that the computer sees it
+| OS | How to check |
+|---|---|
+| **Windows** | Device Manager → *Ports (COM & LPT)* shows a new **COMx**. *Sound settings* shows "All-In-One-Cable" as both input (microphone) and output (speaker). |
+| **Linux** | `lsusb` shows `1209:7388`. `arecord -l` / `aplay -l` show the card. `ls /dev/ttyACM*` shows the serial port. `ls /dev/hidraw*` shows the HID. |
+| **macOS** | System Settings → Sound shows "All-In-One-Cable". `ls /dev/cu.usbmodem*` shows the serial port. |
+| **Android** | Needs a USB-C OTG connection. Apps that use the system audio input will use the AIOC once it's connected. |
+
+### 2.3 OS audio settings (important)
+- **Do NOT make the AIOC the default system playback device.** If you do, system sounds (notifications,
+  YouTube, beeps) go out over the radio, and with VPTT turned on they **will key the transmitter**.
+  Keep your normal speakers as the default and pick the AIOC only inside the radio software.
+- **Windows:** in Sound Control Panel → AIOC device → *Properties*:
+  - *Advanced*: set the format to **1 channel, 16 bit, 48000 Hz**.
+  - Turn off "Audio enhancements" and the "Communications → reduce other sounds" ducking.
+  - *Listen* tab: make sure "Listen to this device" is **off**.
+- **Linux (PipeWire/PulseAudio):** use `pavucontrol` to set levels. Many programs (Direwolf, ALSA-based)
+  can talk to ALSA directly (`plughw:CARD,0`). That avoids resampling.
+- **macOS:** Audio MIDI Setup → AIOC → set the format to 48,000 Hz.
+
+### 2.4 Setting audio levels (all digital modes)
+**[Typical]**
+- **RX (radio to PC):** set the **radio's volume knob** to about 30–50% (some VARA FM users go up to about 75%; G1LRO suggests about 50% for AllStar nodes) **[Community]**. Adjust it until the program's level
+  meter shows a strong but un-clipped signal. Direwolf, for example, should show "audio level" around 30–70 on a received packet.
+  On hardware rev 1.2 with fw ≥ 1.4.0, you can also raise the AIOC's internal RX gain (1×–16×) with aioc-util.
+- **TX (PC to radio):** start the **OS output volume for the AIOC at about 30–50%**. Too high causes over-deviation
+  and distortion, and decoders will fail. Listen on a second radio, or check how other stations decode you.
+  On hardware rev 1.2 there is a TX "boost" for line-level inputs (not needed for normal HTs).
+- **Radio settings:** turn **VOX OFF** (unless you are deliberately using VOX). Turn off keypad beeps and
+  roger beeps. Turn **battery save OFF**: it clips the start of incoming packets. **[Community]**
+  **Squelch:** for packet/APRS with Direwolf or Soundmodem, **squelch open (0)** often decodes better, because
+  slow Baofeng squelch cuts off the first part of a packet and the software modem does its own carrier detection. **[Community]**
+  For VOX-style setups (VPTT/VCOS, AllStarLink, SvxLink, EchoLink), squelch must be **closed** when the channel is idle. Set the
+  **TOT (time-out timer)** longer than your longest transmission (SSTV and Winlink can last more than 2 minutes).
+
+### 2.5 Linux permissions (do this once)
+Programs that open `/dev/ttyACM*` or `/dev/hidraw*` need permission to use them:
+
+```bash
+# Serial port access
+sudo usermod -aG dialout $USER     # (Arch/Fedora may use group "uucp")
+# Audio
+sudo usermod -aG audio $USER
+
+# udev rule for the AIOC HID (CM108 PTT / config) + stop ModemManager grabbing the serial port
+sudo tee /etc/udev/rules.d/91-aioc.rules >/dev/null <<'EOF'
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7388", MODE="0666"
+SUBSYSTEM=="tty",    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7388", ENV{ID_MM_DEVICE_IGNORE}="1", SYMLINK+="aioc", MODE="0666"
+EOF
+sudo udevadm control --reload && sudo udevadm trigger
+# log out/in (for group changes), then unplug/replug the AIOC
+```
+After this, the serial port is also available as **`/dev/aioc`**. That name doesn't change when ttyACM numbers do.
+The aioc-util project also ships a ready-made udev rule (`udev/rules.d/91-aioc.rules`). **[Tool docs]**
+
+> **ModemManager** (on Ubuntu, Debian desktop, Fedora) may probe new ttyACM devices and send AT commands
+> to them. That causes programming failures or random PTT. The `ID_MM_DEVICE_IGNORE` rule above prevents it.
+> You can also run `sudo systemctl disable --now ModemManager` if you don't use a cellular modem.
+
+---
+
+## 3. Decision Table — "What software do I need?"
+
+| User wants to… | Windows | Linux / Raspberry Pi | macOS | Android | Section |
+|---|---|---|---|---|---|
+| **Program channels / memories** | CHIRP | CHIRP | CHIRP | — | 5.1 |
+| **Flash custom firmware (Quansheng UV-K5)** | Web flasher (Chrome) / k5prog | Web flasher / k5prog | Web flasher | — | 5.2 |
+| **Send/receive APRS (with a map)** | Direwolf + APRSIS32 / YAAC / PinPoint | Direwolf + YAAC / Xastir | Direwolf + YAAC | APRSdroid (+VPTT) | 5.3–5.5 |
+| **APRS iGate / digipeater** | Direwolf | Direwolf (headless Pi) | Direwolf | — | 5.3 |
+| **Packet TNC (KISS/AGW) for other apps** | Direwolf, UZ7HO Soundmodem | Direwolf, QtSoundModem | Direwolf | — | 5.3, 5.6 |
+| **Packet BBS / node / terminal** | Direwolf + QtTermTCP / EasyTerm / BPQ32 | Direwolf + Paracon / QtTermTCP / LinBPQ / Linpac | Direwolf + QtTermTCP | — | 5.7 |
+| **Winlink email over VHF/UHF** | Winlink Express + VARA FM / packet | Pat + Direwolf (packet) or VARA FM (Wine) | Pat + Direwolf | — | 5.8 |
+| **VARA FM keyboard chat** | VarAC / VARA Chat | VarAC under Wine | — | — | 5.8 |
+| **SSTV (send/receive pictures, ISS SSTV)** | MMSSTV | QSSTV | Black Cat SSTV / MultiScan | Robot36 (RX only) | 5.9 |
+| **Text/forms for ARES/EmComm (NBEMS)** | fldigi + flmsg + flamp | fldigi + flmsg + flamp | fldigi | — | 5.10 |
+| **FT8 / JS8 (non-standard on FM)** | WSJT-X / JS8Call | WSJT-X / JS8Call | WSJT-X / JS8Call | — | 5.11 |
+| **AllStarLink node (HT as node radio)** | — | **AllStarLink 3** (Debian / Pi) | — | — | 5.12 |
+| **EchoLink link / simplex node / repeater controller** | EchoLink (Sysop mode) | **SvxLink** | — | — | 5.13 |
+| **PTT from scripts / generic rig control** | Hamlib (rigctl/rigctld) | Hamlib, aioc-util | Hamlib | — | 5.14 |
+| **All-in-one Pi data station (APRS, Winlink, packet, SSTV in a web UI)** | — | **DigiPi** (Raspberry Pi image) | — | — | 5.15 |
+| **Winlink / packet from an iPhone or iPad** | — | — | — | iOS: RadioMail, Packet Commander (+VPTT) | 5.16 |
+| **Mesh / off-grid networking over packet** | Reticulum via Direwolf KISS | Reticulum (RNS, NomadNet, Sideband) via Direwolf KISS | Reticulum | Sideband | 5.17 |
+| **AllStar-style linking on GMRS** | — | GMRSLive (AllStar-based) | — | — | 5.12 |
+| **Wire to a mobile/HF rig (audio + PTT + CAT)** | WSJT-X/fldigi + CAT | same | same | — | 5.18 |
+| **Fox hunt beacon (no PC)** | aioc-util (to set it up) | aioc-util | aioc-util | — | 7.4 |
+| **Record or monitor RX audio, scanner logging** | Audacity / any recorder | Audacity / arecord / rtl-style tools | Audacity | Any recorder | 2.4 |
+
+---
+
+## 4. PTT Methods (understand this before any recipe)
+
+The AIOC can key the radio (PTT1) in several ways, and they can be combined. **[Official]**
+
+| Method | How software triggers it | Best for | Default? |
+|---|---|---|---|
+| **CM108 HID GPIO3** | Software that supports "CM108 PTT" (Direwolf, AllStarLink, SvxLink, Hamlib `-P CM108`, QtSoundModem on Linux) | Linux; the most reliable method | ✅ on |
+| **Serial `DTR=1 AND RTS=0`** | Software sets DTR high and RTS low on the AIOC COM port | Windows/macOS programs with COM-port PTT | ✅ on |
+| **Serial DTR only** (`SERIALDTR`) | Software that raises DTR but also leaves RTS high | Programs that can't keep RTS low | needs aioc-util |
+| **Serial RTS only** (`SERIALRTS`) | Software that keys with RTS | Programs that only do RTS PTT | needs aioc-util |
+| **Serial NOT-DTR AND RTS** (`SERIALNDTRRTS`) | Reverse logic | Rare | needs aioc-util |
+| **Virtual PTT (VPTT)** | **No PTT control needed.** The AIOC keys whenever the software plays audio above a threshold (like a very fast, clean VOX inside the AIOC) | APRSdroid, any app without PTT | needs aioc-util, fw ≥ 1.3.0 |
+
+> **Before firmware 1.2.0**, PTT was "DTR=1" only. That keyed the radio during CHIRP programming. Firmware ≥ 1.2.0
+> changed it to DTR=1 AND RTS=0. **[Official]**
+>
+> **UART lockout:** by default, while PTT1 is active, serial data from the radio is ignored. This lets the
+> AIOC work as both a programming cable and a sound card. You can change this in the `SERIAL_CTRL` register. **[Official]**
+
+**Rule of thumb for agents:**
+1. If the software offers **CM108 PTT**, use it.
+2. Otherwise use the **COM port with "DTR" PTT** and keep RTS off/low.
+3. If the radio still doesn't key, see Section 6.
+
+---
+
+## 5. Software Recipes
+
+> In the examples, replace `N0CALL` with the user's callsign. Replace `COM5`, `/dev/ttyACM0`, `/dev/hidraw0`, and
+> `plughw:1,0` with the user's actual devices (see Section 2.2).
+
+### 5.1 CHIRP — programming radios (Windows / Linux / macOS)
+**[Official]** CHIRP works the same way it does with a normal programming cable. No driver is needed.
+1. Install **CHIRP-next** from chirpmyradio.com. Linux: pipx/flatpak; macOS: the .app.
+2. Plug the AIOC into the radio and turn the radio on. It must be on a **normal channel/VFO screen** (not in a menu).
+3. CHIRP → **Radio → Download from Radio** → select the AIOC port (`COMx`, `/dev/ttyACM0`, or
+   `/dev/cu.usbmodem…`) → choose Vendor/Model → OK.
+4. Edit the channels → **Radio → Upload to Radio**.
+
+Tips **[Typical]**:
+- Always **download first and save a backup `.img`** before uploading.
+- Quansheng UV-K5 on **stock firmware**: use the "Quansheng UV-K5" driver. On **Egzumer/other custom firmware**: use the
+  matching CHIRP driver module that the firmware author provides (in CHIRP: *Help → Developer mode → File → Load module*),
+  or use the driver that comes with newer CHIRP builds if it lists that firmware.
+- **[Community] Windows: radio stays transmitting after a CHIRP read.** Early firmware (before 1.2.0) did this because Windows changes
+  DTR/RTS when the port closes. Update the AIOC to ≥ 1.2.0. If the red LED stays on, unplug and replug the USB.
+- **[Community]** If a read fails once, try again. The first attempt after plugging in sometimes fails, and wiggling the plug fixes it (contact problem).
+- If you get "radio did not respond": re-seat the plug, check the radio is on, choose the exact model (e.g. UV-5R vs.
+  UV-5R Plus / UV-5RM are different radios), try lower volume, and turn VOX off.
+- Baofeng **UV-5RM / UV-5R Mini / UV-17** and similar newer models may need a specific CHIRP model or the vendor's own
+  software. The AIOC still works as the cable for them.
+- **Vendor programming software** (Baofeng/BTECH/Radtel/TIDRADIO tools) works too: choose the AIOC COM port.
+  **RT Systems** software may only work with RT Systems' own cables.
+
+### 5.2 Quansheng UV-K5 firmware flashing
+**[Official]** Firmware v1.4.0 doubled the serial buffer, specifically to fix problems flashing firmware on some HTs.
+Make sure the AIOC is on v1.4.x before you start.
+
+**[Typical]**
+1. Turn the radio off. **Hold PTT while turning it on** to enter bootloader mode (the flashlight LED turns on, the screen stays blank).
+2. Use a web flasher in Chrome/Edge (Web Serial). The Egzumer project links to one. You can also use a command-line tool such as `k5prog`/`uvk5` tools.
+3. Choose the AIOC serial port, load the `.bin`, and flash.
+4. Warn the user: **flashing custom firmware is at their own risk.** They should keep a backup of the stock firmware and calibration (CHIRP/K5 tools can dump calibration).
+
+### 5.3 Direwolf — APRS, packet TNC, iGate, digipeater (Windows / Linux / macOS)
+Direwolf is the core "software TNC". Most APRS and packet programs connect to it through **AGW (port 8000)** or **KISS-TCP (port 8001)**.
+
+**Install [Typical]:** Linux `sudo apt install direwolf`. Windows: zip from GitHub releases (wb2osz/direwolf). macOS: `brew install direwolf`.
+
+**Find the audio device:**
+- Linux: `arecord -l`, e.g. `card 1: AllInOneCable [All-In-One-Cable], device 0` → `plughw:1,0` (or by name `plughw:CARD=AllInOneCable,DEV=0`; check the exact card ID in `arecord -l`).
+- Windows: start Direwolf once. It lists the audio devices with numbers; use the AIOC's number.
+
+**Minimal `direwolf.conf` [Official settings + Typical extras]:**
+```conf
+# --- Audio ---
+ADEVICE plughw:1,0        # Linux  (Windows: ADEVICE 3 3   <- the AIOC input/output numbers Direwolf lists)
+ARATE 48000
+ACHANNELS 1
+
+# --- Channel 0 ---
+CHANNEL 0
+MYCALL N0CALL-10
+MODEM 1200
+
+# --- PTT: pick ONE ---
+PTT CM108                 # Linux: CM108 HID PTT (recommended). Auto-detects; or "PTT CM108 /dev/hidraw0"
+#PTT /dev/ttyACM0 DTR -RTS  # Linux serial PTT
+#PTT COM5 DTR -RTS          # Windows serial PTT
+#PTT /dev/cu.usbmodem1101 DTR -RTS   # macOS serial PTT
+
+# --- Ports for client apps ---
+AGWPORT 8000
+KISSPORT 8001
+```
+**[Official]** Direwolf may print **warnings when using CM108 PTT with the AIOC**. They are harmless (see direwolf issue #448).
+
+**Add-ons [Typical]:**
+```conf
+# Position beacon (every 30 min, path WIDE1-1,WIDE2-1). Use your own lat/long.
+PBEACON delay=1 every=30 overlay=S symbol="digi" lat=42^37.14N long=071^20.83W power=5 height=20 gain=3 comment="AIOC + HT" via=WIDE1-1,WIDE2-1
+
+# RX-only iGate (needs internet + APRS-IS passcode)
+IGSERVER noam.aprs2.net        # euro.aprs2.net / asia.aprs2.net / aunz.aprs2.net
+IGLOGIN N0CALL-10 12345
+
+# Fill-in digipeater (WIDE1-1 only) — only if appropriate locally
+DIGIPEAT 0 0 ^WIDE1-1$ ^WIDE1-1$
+```
+**[Community] Direwolf gotchas reported by AIOC users:**
+- `PTT CM108 3 -3`: the trailing `-3` **inverts** the PTT, so the radio stays keyed. Use `PTT CM108` or `PTT CM108 3`.
+- If you use CM108 PTT, comment out any old `DCD` line that points at the same device.
+- Serial form that works on a Raspberry Pi: `PTT /dev/ttyACM0 DTR -RTS` (the order `-RTS DTR` works too).
+- Windows "pre filter size" warnings at 48000 Hz: harmless. You can also try `ARATE 24000`, or Direwolf 1.6 instead of a development build.
+- PTT that **stays on** after the first transmission, or a "crashing" AIOC while transmitting, is almost always RF feedback (Section 8).
+
+Start it with: `direwolf -c direwolf.conf` (add `-t 0` to turn off colours in logs).
+Test: `direwolf` shows decoded packets with the audio level. Send a beacon and check it on aprs.fi.
+
+**APRS frequencies [Typical]:** 144.390 MHz (North America), 144.800 MHz (Europe/Africa), 145.175 MHz (Australia),
+144.640 MHz (China), 144.660 MHz (Japan), 145.825 MHz (ISS digipeater, worldwide). Users must check their local band plan.
+
+### 5.4 APRS client programs (use Direwolf as the modem)
+All of these connect to a Direwolf running on the same machine. Direwolf does the audio and PTT.
+
+| Program | OS | Connection setting **[Typical]** |
+|---|---|---|
+| **YAAC** (Java) | Win/Linux/macOS | *File → Configure → Expert mode → Ports → Add → "AGWPE"*, host `localhost`, port `8000` (or "KISS over TCP" `8001`) |
+| **Xastir** | Linux/macOS | *Interface → Interface Control → Add → "Networked AGWPE"*, host `localhost`, port `8000` |
+| **APRSIS32** | Windows (runs in Wine) | *Configure → Ports → New Port → type "AGW"*, `127.0.0.1:8000` (or KISS TCP `8001`) |
+| **PinPoint APRS** | Windows | TNC type "AGWPE", `127.0.0.1:8000` |
+| **UI-View32** (legacy) | Windows | AGWPE mode via Direwolf AGW port |
+| **APRS Messenger / others** | Windows | AGW or KISS-TCP to Direwolf |
+
+YAAC also has its own built-in sound-card modem. Direwolf decodes better and handles AIOC PTT more reliably, so it is the recommended choice.
+
+### 5.5 APRSdroid — APRS on Android
+**[Official]** The AIOC supports the fixed **22050 Hz** sample rate that APRSdroid needs (the actual rate is 22052 Hz, an error of about 90 ppm, which doesn't matter for APRS).
+APRSdroid has **no PTT control**, so for transmitting **turn on Virtual PTT** in the AIOC first (one-time setup on a PC with fw ≥ 1.3.0):
+```bash
+./aioc-util.py --ptt1 VPTT --store
+# keep CM108 + serial PTT working too:
+./aioc-util.py --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store
+```
+APRSdroid setup **[Typical]**:
+1. Connect the AIOC to the phone with a USB-C OTG cable/adapter.
+2. APRSdroid → *Preferences → Connection Protocol: "AFSK"* (audio modem). Set the callsign/SSID and passcode (passcode only needed for APRS-IS).
+3. Turn off "high-quality demodulator" if the phone is slow. Keep the phone's media volume moderate.
+4. Make sure no other app plays sound (with VPTT on, any sound will key the radio). Turn on Do Not Disturb.
+
+Other Android apps **[Typical]**: **Robot36** (SSTV RX), **DroidSSTV**, and any voice recorder. Apps need to use the USB audio input. Most do automatically once the AIOC is connected.
+
+### 5.6 UZ7HO Soundmodem (Windows) / QtSoundModem (Linux, Windows)
+A software modem like Direwolf (AFSK 1200, and others). It provides AGW (8000) and KISS (8100) ports.
+**[Typical]**
+- *Settings → Devices*: Input device = AIOC microphone, Output device = AIOC speakers.
+  **UZ7HO Soundmodem doesn't accept sample rates above 12000. Use 12000**, which the AIOC supports. **[Community]**
+- PTT: *PTT Port* = the AIOC COM port. **Tick "Swap COM pins for PTT"**: Soundmodem keys RTS by default, and swapping makes it use DTR, which matches the AIOC. Leave "Dual PTT" unticked. **[Community, GitHub #11]**
+  - If it still doesn't key, change the AIOC PTT source to `SERIALDTR` (Section 6), or to `VPTT`.
+- QtSoundModem on Linux can also use **CM108 PTT** (choose the hidraw device / CM108 option if your version has it).
+- Modem: AFSK AX.25 1200bd for normal VHF packet/APRS.
+
+### 5.7 Packet BBS, nodes and terminals
+All of these use a Direwolf (or Soundmodem) TNC through AGW or KISS. **[Typical]**
+
+| Program | OS | Notes |
+|---|---|---|
+| **QtTermTCP** | Win/Linux/macOS | Setup → AGW: host 127.0.0.1, port 8000. Connect to BBSes/nodes. |
+| **Paracon** | Win/Linux/macOS (Python) | AGWPE client, 127.0.0.1:8000. Simple multi-session packet terminal. |
+| **EasyTerm / Outpost** | Windows | Outpost (used by EmComm/ARES packet messaging) can use AGWPE or KISS. |
+| **BPQ32 / LinBPQ** | Win / Linux | Node + BBS + chat. `PORT` block with `DRIVER=UZ7HO` (AGW to Direwolf/Soundmodem) or KISS over TCP (`TYPE=ASYNC`, `PROTOCOL=KISS`, `IPADDR=127.0.0.1`, `TCPPORT=8001`). |
+| **Linux AX.25 stack + Linpac / JNOS** | Linux | `kissattach` to the Direwolf pseudo-terminal (`direwolf -p` creates `/tmp/kisstnc`), or use `tncattach`. |
+
+### 5.8 Winlink email — Winlink Express, Pat, VARA FM, packet
+#### 5.8.1 Winlink Express (Windows) with VARA FM
+**[Official]** In VARA FM, set **PTT pin to "DTR only"** so that VARA produces the DTR/RTS pattern the AIOC expects.
+
+**[Typical] Setup:**
+1. Install **Winlink Express** and **VARA FM** (from the Rosmodem site; the free mode is speed-limited, a paid licence unlocks full speed).
+2. Open VARA FM → *Settings → SoundCard*: Device Input = AIOC microphone, Device Output = AIOC speakers.
+3. VARA FM → *Settings → PTT*: **COM port** = AIOC COM, **Pin = DTR only**.
+4. Choose **Narrow** (VARA FM 1200) for most HTs. Wide (9600) usually won't work through K1 audio (see Limitations).
+5. Adjust the RX level so VARA's meter sits in the green. Adjust TX drive (VARA → *Tune*, plus Windows output volume) to the lowest level that gives reliable connections.
+6. Winlink Express → *Open Session: "VARA FM Winlink"* → *Settings* → leave host 127.0.0.1, ports 8300/8301 → find a gateway with *Channel Selection* → *Start*.
+7. Set the radio's **TOT** to the maximum or turn it off. Use low or medium power to keep the HT cool.
+
+#### 5.8.2 Winlink Express with packet (1200 baud)
+**[Typical]** Run Direwolf (5.3) or UZ7HO Soundmodem → Winlink Express → *Open Session: "Packet Winlink"* →
+*Settings*: TNC type **KISS**, connection **TCP**, host `127.0.0.1`, port `8001` (Direwolf KISS) / `8100` (UZ7HO).
+
+#### 5.8.3 Pat (Linux, macOS, Windows, Raspberry Pi)
+**[Typical]** Pat is a Winlink client in a single program with a web UI.
+```bash
+pat configure        # set mycall, secure_login_password, locator
+```
+- **Packet through Direwolf (AGWPE):** in `config.json` set `"ax25": {"engine": "agwpe", ...}` and `"agwpe": {"addr": "localhost:8000"}`.
+  Connect: `pat connect ax25:///GATEWAYCALL-10` (or use the web UI: `pat http`, then open http://localhost:8080).
+- **Linux kernel AX.25 instead:** `kissattach` the Direwolf PTY, then `"engine": "linux"` with `"port": "wl2k"`.
+- **VARA FM:** run VARA FM under Wine (with the AIOC as the sound card and COM PTT "DTR only"), then in Pat set
+  `"varafm": {"addr": "localhost:8300"}` and connect with `pat connect varafm:///GATEWAYCALL`.
+
+#### 5.8.4 VarAC / VARA Chat (keyboard chat over VARA)
+**[Typical]** Install VARA FM first and set it up as in 5.8.1. In VarAC (or VARA Chat), choose **VARA FM** as the modem.
+VarAC connects to VARA's TCP ports. PTT stays inside VARA (DTR only). VarAC can also do its own PTT/CAT, but leave that **off** so VARA does the keying.
+
+### 5.9 SSTV — slow-scan TV pictures
+**[Typical]**
+| Program | OS | Audio | PTT |
+|---|---|---|---|
+| **MMSSTV** | Windows | *Option → Setup → Misc → Sound card*: AIOC in/out | *Setup → TX → PTT port*: AIOC COM. If it doesn't key, change the AIOC to `SERIALDTR`/`SERIALRTS` or `VPTT` (Section 6). |
+| **QSSTV** | Linux | *Options → Configuration → Sound*: ALSA/PulseAudio AIOC | *CAT* tab: Hamlib "Dummy" with PTT via serial **DTR** on `/dev/ttyACM0`, or Hamlib CM108 if offered; otherwise VPTT. |
+| **Black Cat SSTV / MultiScan 3B** | macOS | Choose AIOC in/out | Use AIOC VPTT (simplest) |
+| **Robot36** | Android | USB audio | RX only |
+
+Tips: RX-only use (for example **ISS SSTV events on 145.800 MHz FM**) needs no PTT setup at all. Turn squelch **off**
+or set it low for weak satellite signals. Watch for HT overheating on long transmissions, and set TOT ≥ 3 minutes.
+
+### 5.10 fldigi / flmsg / flamp — NBEMS EmComm text and forms over FM
+**[Typical]**
+1. *Configure → Sound card → Audio → Devices*: PortAudio (or PulseAudio) → Capture **and** Playback = AIOC. Sample rate: Native/48000.
+2. PTT, choose one:
+   - *Configure → Rig Control → **CM108 / C-Media PTT*** (newer fldigi versions): choose the AIOC HID, **GPIO 3**.
+   - *Configure → Rig Control → **GPIO / Hardware PTT***: "Use separate serial port PTT", device = AIOC COM/ttyACM, check **Use DTR** (DTR = +V), leave **RTS unchecked**. Click *Initialize*.
+     If it doesn't key: set the AIOC source to `SERIALDTR` (Section 6).
+   - Or use Hamlib with `ptt_type=CM108`.
+3. Common FM modes: **MT63-2000L** (the usual ARES/NBEMS FM mode), **8PSK**, **Olivia**. Use the waterfall to centre the signal at about 1500 Hz.
+4. **flmsg** (ICS-213 and other forms) and **flamp** (multicast files) work through fldigi. Set their "fldigi" connection to the defaults (XML-RPC 127.0.0.1:7362).
+
+### 5.11 WSJT-X / JS8Call (FT8, FT4, JS8 — non-standard on FM)
+**[Typical]** These are normally SSB modes. On an FM HT they work only between stations that also use FM
+(for example local 2 m FM experiments). Setup:
+- *Settings → Radio*: Rig **None**. **PTT Method: DTR**. Port: the AIOC COM/ttyACM.
+  (If it doesn't key, use `SERIALDTR` on the AIOC, or choose PTT "VOX" with AIOC VPTT turned on.)
+- *Settings → Audio*: Input/Output = AIOC, mono.
+- Keep TX audio low (a clean single tone). FM capture effect works against weak signals.
+
+### 5.12 AllStarLink 3 (ASL3) — HT as an AllStar node radio
+**[Official + Tool docs]** The AIOC emulates a CM108, so ASL3 can drive PTT and read COS from it directly.
+ASL3 recognises the AIOC's own USB ID `1209:7388`. You only need to **uncomment it** in `res_usbradio.conf`.
+
+**Steps:**
+1. Install ASL3 (Debian 12 / Raspberry Pi OS image from allstarlink.org). Set up your node number and password with `asl-menu`.
+2. Install the AIOC udev rule (Section 2.5) so Asterisk can open the HID.
+3. Allow the AIOC USB ID:
+   ```ini
+   ; /etc/asterisk/res_usbradio.conf
+   [general]
+   usb_devices = 1209:7388    ; AIOC (all in one cable)
+   ```
+   *(Alternative: change the AIOC to look like a C-Media CM108 with `./aioc-util.py --set-usb 0x0d8c 0x000c --store`. You then need `--open-usb 0x0d8c 0x000c` to configure it later.)*
+4. Set the Virtual COS (squelch detection from RX audio) hang time. **The timing registers count in 1/16 ms: value = milliseconds × 16**
+   (confirmed from the firmware defaults and G1LRO's script, where 1500 ms = `0x5DC0`). **[Official + Community]**
+   ```bash
+   ./aioc-util.py --vcos-timctrl 24000 --store      # 1500 ms hang time (G1LRO's recommendation)
+   ```
+   *(The aioc-util README example `--vcos-timctrl 1500` sets about 94 ms.)* If speech drops out between words, raise it.
+   If the COS opens on noise, raise the threshold (`--vcos-lvlctrl`, default 256). G1LRO suggests a threshold of about 1500 for noisy radios.
+   Make sure the radio's **squelch is closed** when the channel is idle. VCOS opens on audio level.
+   **Better: hardware COS.** Rev 1.2 or G1LRO dual-COS boards can read the radio's real squelch: `./aioc-util.py --enable-hwcos --store`.
+   **The easy way [Community]:** G1LRO's script does steps 3–6 for you (it edits `res_usbradio.conf`, `simpleusb.conf` and `rpt.conf`, and backs them up first):
+   ```bash
+   wget -O customize.sh https://raw.githubusercontent.com/G1LRO/AIOC-ASL3-Config/main/customize.sh
+   sudo bash customize.sh
+   ```
+5. In `asl-menu` **[Official example]**:
+   - Device type: `usbradio` (menu 2 > A1 > N4 > I2) (or `simpleusb`, which also works well for HT nodes)
+   - Duplex type: `1` (menu 2 > A1 > N5)
+6. Edit `usbradio.conf` (menu 6 > H). The official example is for a Puxing PX-888; it suits most HTs as a starting point:
+   ```ini
+   rxboost = 0
+   rxsqhyst = 500
+   carrierfrom = usbinvert
+   ctcssfrom = no
+   rxdemod = speaker
+   txprelim = no
+   invertptt = no
+   ```
+   (For `simpleusb.conf`, the equivalents are `carrierfrom = usbinvert`, `ctcssfrom = no`.)
+   **[Community] `simpleusb-tune-menu` settings from G1LRO:** I = PTT mode (`active LOW` in his older guide), J = COS from `usbinvert`
+   (VCOS) or `usb` (active high; his newer guide uses this with hardware COS), L = CTCSS from `no`.
+   **COS stuck open:** swap `usb` and `usbinvert`, or raise the VCOS threshold. **COS never opens:** swap them, or lower the threshold.
+7. Run `radio-tune-menu` (usbradio) or `simpleusb-tune-menu` (simpleusb) to set RX and TX levels: **V** checks COS, **e** runs an echo test,
+   **2/3** set the levels, **W** writes. Then restart Asterisk: `sudo systemctl restart asterisk`.
+8. Test with the parrot node (**Hubnet Parrot 40894**) or connect to a hub. Use **low power** and a separate antenna setup: RF getting into the USB cable is the most common problem (Section 8).
+
+**Fixes reported on the AllStarLink forum [Community]:**
+| Symptom | Fix |
+|---|---|
+| `asl-menu` says it can't find the audio device | Uncomment `usb_devices = 1209:7388` in `res_usbradio.conf` (M0AWS lost a day on this) |
+| COS works but **no RX audio** | `ctcssfrom` was set: change it to `ctcssfrom = no` |
+| Node keys over and over | Make sure `duplex = 1` in `rpt.conf` |
+| PTT stuck on while the node transmits | RF feedback: use 1 W instead of 5 W, a short USB cable, clip-on ferrites, and the antenna away from the Pi |
+| Tail of about 3 s or keying by itself | Check the VCOS hang time and threshold; set the radio's squelch higher |
+| Full-duplex repeater | Two AIOCs and two radios (one RX, one TX) have been shown working (F1FQN video) |
+
+**HamVOIP / GMRSLive** (older AllStar-based systems) only recognise C-Media IDs. Use the `--set-usb 0x0d8c 0x000c` option above
+(G1LRO's `aioc.py` / `aioc-revert.py` scripts do the same). On GMRS, follow your local GMRS rules. GMRS is not amateur radio.
+
+### 5.13 SvxLink (Linux) and EchoLink (Windows)
+#### SvxLink — simplex node, repeater controller, EchoLink link
+**[Typical]** Use the AIOC HID for both PTT and squelch:
+```ini
+# /etc/svxlink/svxlink.conf
+[Rx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+SQL_DET=HIDRAW
+HID_DEVICE=/dev/hidraw0
+HID_SQL_PIN=VOL_DN          # AIOC VCOS is on CM108 "Volume Down"; use !VOL_DN if logic is inverted
+# Alternative: SQL_DET=VOX (VOX_FILTER_DEPTH / VOX_THRESH) or CTCSS
+
+[Tx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+PTT_TYPE=Hidraw
+HID_DEVICE=/dev/hidraw0
+HID_PTT_PIN=GPIO3
+# Alternative serial PTT: PTT_TYPE=SerialPin, PTT_PORT=/dev/aioc, PTT_PIN=DTR!RTS
+```
+For EchoLink, turn on `ModuleEchoLink` and set the callsign/password in `ModuleEchoLink.conf`. Forward **UDP 5198–5199** and **TCP 5200** on the router.
+
+#### EchoLink (Windows, Sysop mode)
+**[Typical]**
+- *Tools → Sysop Settings → RX Ctrl*: **VOX** (adjust the threshold), or COS via serial isn't available with the AIOC. VOX is the standard choice.
+- *TX Ctrl*: **Serial** keying on the AIOC COM port. EchoLink may assert RTS (or both lines). Set the AIOC PTT source to match (`SERIALRTS` or `SERIALDTR`), or simply use **VPTT** (Section 6).
+- *Audio*: input/output = AIOC. Needs a validated EchoLink account and UDP 5198–5199 forwarded.
+
+### 5.14 Hamlib / scripts / generic PTT
+**[Typical]**
+```bash
+# CM108 PTT via HID (Linux)
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 1     # key
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 0     # unkey
+
+# Serial DTR PTT, forcing RTS low
+rigctl -m 1 -p /dev/ttyACM0 -P DTR -C rts_state=OFF T 1
+
+# rigctld for programs that speak to Hamlib over network (port 4532)
+rigctld -m 1 -p /dev/hidraw0 -P CM108
+```
+**aioc-util** can also key directly (fw ≥ 1.3) **[Tool docs]**:
+```bash
+./aioc-util.py --set-ptt1-state on
+./aioc-util.py --set-ptt1-state off
+```
+Python with pyserial (default AIOC logic):
+```python
+import serial, time
+s = serial.Serial('/dev/ttyACM0')   # or 'COM5'
+s.rts = False; s.dtr = True         # PTT ON  (DTR=1, RTS=0)
+time.sleep(2)
+s.dtr = False                       # PTT OFF
+```
+
+### 5.15 DigiPi (Raspberry Pi all-in-one data station)
+**[Community]** DigiPi is a ready-made Raspberry Pi image with a web UI for APRS, digipeater/iGate, packet node, Winlink (Pat), SSTV and more.
+Older DigiPi versions don't support the AIOC directly. Users got it working by editing **every** Direwolf config
+(`direwolf.tnc.conf`, `direwolf.digipeater.conf`, `direwolf.node.conf`, `direwolf.winlink.conf`, `direwolf.tracker.conf`, `direwolf.tnc300b.conf`):
+```conf
+ADEVICE plughw:0,0 plughw:0,0     # or the AIOC's card number from arecord -l
+PTT CM108                         # or: PTT /dev/ttyACM0 DTR -RTS   (do NOT add a trailing -3; it inverts PTT)
+# comment out any old DCD line
+```
+Then `sudo remount`, edit the files, run `sudo ./saveconfigs.sh`, and `sudo reboot`. Put ferrites on **both ends** of the USB cable.
+Check whether newer DigiPi releases support the AIOC natively before you edit anything.
+
+### 5.16 iPhone / iPad (RadioMail, Packet Commander)
+**[Community, Dec 2025]** iOS apps can only use the AIOC as a **USB sound card** (Apple doesn't let apps reach USB serial or HID).
+The **RadioMail** (Winlink) and **Packet Commander** apps have built-in packet modems that work with the AIOC when you turn on **Virtual PTT**:
+```bash
+./aioc-util.py --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store     # needs AIOC fw 1.4.1 (aioc-util failed on older fw)
+```
+Use a USB-C iPhone/iPad, or Apple's Lightning-to-USB camera adapter. Mute all other sounds on the device, because any sound will key the radio.
+
+### 5.17 Reticulum (RNS, NomadNet, Sideband, MeshChat) over packet
+**[Typical]** Reticulum can use a KISS TNC. Run Direwolf (5.3) and add a TCP KISS interface to `~/.reticulum/config`:
+```ini
+[[Direwolf AIOC]]
+  type = TCPClientInterface
+  interface_enabled = True
+  kiss_framing = True
+  target_host = 127.0.0.1
+  target_port = 8001
+```
+(Or point a `KISSInterface` at a Direwolf pseudo-terminal created with `direwolf -p`.) 1200 baud is slow but enough for messages.
+**[Community]** One user reported trouble linking Reticulum to Direwolf over TCP. If it misbehaves, try the PTY/`KISSInterface` route.
+Follow your country's amateur rules: no encryption is a common licence condition. Check how Reticulum is configured before transmitting.
+
+### 5.18 Mobile / HF radios (wiring the AIOC to a data or mic port)
+**[Community]** The AIOC is just a USB sound card, serial port and PTT on a small board, so builders wire it to other radios:
+- Take the signals from the pads, or from a K1 socket on a pigtail: audio out to the radio, audio in from the radio, PTT, UART TX/RX and ground (see the pinout in the AIOC README).
+- **Yaesu FT-817ND / FT-857D / FT-7800R:** working audio, PTT and **CAT** have been shown using cheap CT-39A (data) and CT-62 (CAT) cables (GitHub #137). If CAT doesn't respond, **swap RX and TX**.
+- On **hardware rev 1.0/1.1**, the UART and PTT share one contact, so CAT data can key PTT. Use rev 1.2 and cut the split pad, or leave PTT disconnected and key with CAT.
+- For line-level data ports on rev 1.2: `--audio-tx-boost on` and raise `--audio-rx-gain`.
+- Icom CI-V (single-wire bus) does **not** work without extra circuitry (GitHub #109, unresolved).
+- Prefer a ready-made interface for your rig if you aren't comfortable with soldering. Wrong wiring can damage the radio or the AIOC.
+
+---
+
+## 6. PTT Troubleshooting Flow
+
+```
+Radio does not transmit when the software "keys"?
+│
+├─ 1. Is the plug fully seated? Is the radio on, VOX off, not locked, not on a TX-inhibited channel?
+│
+├─ 2. Does the software support CM108 PTT? → use it (Linux: check /dev/hidraw permissions, Section 2.5)
+│
+├─ 3. Using COM-port PTT:
+│     ├─ Software set to "DTR" (RTS off)? → should work with defaults.
+│     ├─ Software sets BOTH DTR and RTS, or RTS stays high (common on Linux, where opening a port raises both)
+│     │      → aioc-util --ptt1 "CM108GPIO3|SERIALDTR" --store
+│     ├─ Software only keys RTS
+│     │      → aioc-util --ptt1 "CM108GPIO3|SERIALRTS" --store
+│     └─ VARA FM → set "Pin: DTR only"
+│
+├─ 4. Software has no PTT at all (APRSdroid, some Mac apps)
+│      → aioc-util --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store
+│
+└─ 5. Radio keys but stays keyed / keys during CHIRP programming
+       → you changed PTT to SERIALDTR/SERIALRTS: put it back to defaults for programming:
+         aioc-util --defaults --store
+       → check the TX audio isn't triggering VPTT (system sounds, a VPTT threshold that's too low)
+```
+
+> ⚠️ **Note for agents:** after setting PTT to plain `SERIALDTR` or `SERIALRTS`, **CHIRP programming may key the radio**,
+> because CHIRP toggles those lines. Tell the user to switch back with `--defaults --store` before programming,
+> or to keep a second AIOC for programming.
+
+---
+
+## 7. Configuring the AIOC Itself (aioc-util)
+
+### 7.1 Requirements **[Tool docs]**
+- AIOC **firmware ≥ 1.3.0** (tested with 1.3 and 1.4.1; 1.2 does **not** work).
+- **Command line:** `aioc-util` by Hrafnkell Eiríksson TF3HR — https://github.com/hrafnkelle/aioc-util
+- **Browser versions (no install, Chrome/Edge on a desktop; on Linux the udev rule must be installed):**
+  - https://aioc-util.tf3hr.net/ (TF3HR's aioc-util in the browser)
+  - https://g1lro.github.io/aioc-util/ (G1LRO's version, with buttons for Hardware/Virtual COS, threshold and timing, then **Apply** → **Store to Flash**; it shows the live "GPIO (Vol−)" COS state) **[Community]**
+  - **Recommend these to non-technical customers**: no Python and no hidapi.dll needed.
+
+**Install (Linux/macOS):**
+```bash
+git clone https://github.com/hrafnkelle/aioc-util.git
+cd aioc-util
+python3 -m venv venv && source venv/bin/activate
+pip install hid
+# Linux: sudo cp udev/rules.d/91-aioc.rules /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+# Debian/Pi may need: sudo apt install libhidapi-hidraw0 libhidapi-libusb0
+```
+**Windows:** same venv steps in PowerShell (`.\venv\Scripts\activate`). Download `hidapi.dll` from the libusb/hidapi releases and put it next to `aioc-util.py`. Run with `python aioc-util.py …`.
+
+### 7.2 Common commands **[Tool docs]**
+| Task | Command |
+|---|---|
+| Show all registers | `./aioc-util.py --dump` |
+| Factory defaults (and save) | `./aioc-util.py --defaults --store` |
+| List PTT sources | `./aioc-util.py --list-ptt-sources` |
+| Set PTT1 source | `./aioc-util.py --ptt1 "CM108GPIO3|SERIALDTR" --store` |
+| Virtual PTT on PTT1 | `./aioc-util.py --ptt1 VPTT --store` (or `--auto-ptt1`) |
+| Swap PTT1/PTT2 (dual-PTT radios) | `./aioc-util.py --swap-ptt --store` |
+| VPTT/VCOS threshold and tail | `./aioc-util.py --vptt-lvlctrl 0x80 --vptt-timctrl 320 --vcos-lvlctrl 0xff --vcos-timctrl 24000 --store` (timing = ms × 16: 320 = 20 ms, 24000 = 1.5 s) |
+| RX gain (HW rev ≥ 1.2, fw ≥ 1.4) | `./aioc-util.py --audio-rx-gain 4x --store` (1x/2x/4x/8x/16x) |
+| TX boost for line-level (HW rev ≥ 1.2) | `./aioc-util.py --audio-tx-boost on --store` |
+| Show audio settings | `./aioc-util.py --audio-get-settings` |
+| Hardware COS input (HW rev ≥ 1.2) | `./aioc-util.py --enable-hwcos --store` (back to VCOS: `--enable-vcos`) |
+| Pretend to be a CM108 (HamVOIP etc.) | `./aioc-util.py --set-usb 0x0d8c 0x000c --store` |
+| Configure after changing USB ID | `./aioc-util.py --open-usb 0x0d8c 0x000c --dump` |
+| Several AIOCs | `--list-devices`, then `--open-serialnum <SN> …` |
+| Reboot | `./aioc-util.py --reboot` |
+
+> Without `--store`, changes are lost at the next power cycle. **Flashing firmware erases all stored settings.** **[Official]**
+
+### 7.3 Register reference (for advanced users and agents) **[Official — firmware settings.h]**
+| Reg | Name | Purpose | Default |
+|---|---|---|---|
+| 0x00 | MAGIC | Reads "AIOC" | — |
+| 0x08 | USBID | VID (low 16 bits) / PID (high 16 bits) | `1209:7388` |
+| 0x24 | AIOC_IOMUX0 | PTT1 source bitmask | CM108GPIO3 \| SERIALDTRNRTS |
+| 0x25 | AIOC_IOMUX1 | PTT2 source bitmask | CM108GPIO4 |
+| 0x44–0x47 | CM108_IOMUX0–3 | CM108 buttons VolUp / VolDn / PlayMute / RecMute source | VolUp = IN2, **VolDn = VCOS**, others none |
+| 0x60 | SERIAL_CTRL | UART lockout while PTT active | lockout on PTT1 |
+| 0x72 | AUDIO_RX | RX gain 1×–16× | 1× |
+| 0x78 | AUDIO_TX | TX boost | off |
+| 0x82 / 0x84 | VPTT_LVLCTRL / TIMCTRL | Virtual PTT threshold / tail time (ms × 16) | 16 / 0x140 (= 20 ms) |
+| 0x92 / 0x94 | VCOS_LVLCTRL / TIMCTRL | Virtual COS threshold / tail time (ms × 16) | 256 / 0xC80 (= 200 ms) |
+| 0xA0–0xA5 | FOXHUNT_CTRL, MSG0–3 | Fox-hunt interval, WPM, volume, 16-char message | disabled |
+
+PTT source bits: `CM108GPIO1=0x1, GPIO2=0x2, GPIO3=0x4, GPIO4=0x8, SERIALDTR=0x100, SERIALRTS=0x200, SERIALDTRNRTS=0x400, SERIALNDTRRTS=0x800, VPTT=0x1000`.
+Button sources: `IN1=0x10000, IN2=0x20000, VCOS=0x1000000`.
+Commands: `WRITESTROBE=0x01, DEFAULTS=0x10, REBOOT=0x20, RECALL=0x40, STORE=0x80`.
+Register access uses HID feature reports with the layout `<BBBL>`: (report 0, command, address, value).
+
+### 7.4 Fox-hunt beacon mode (fw ≥ 1.4.0) **[Official + Tool docs]**
+The AIOC can send a Morse ID on its own, with only USB power (for example from a power bank). No computer is needed once it's configured.
+```bash
+./aioc-util.py --foxhunt-message "DE N0CALL FOX" --foxhunt-wpm 20 --foxhunt-interval 60 --foxhunt-volume 32000 --store
+./aioc-util.py --foxhunt-get-settings --foxhunt-get-message   # check
+./aioc-util.py --foxhunt-interval 0 --store                   # disable
+```
+Message up to 16 characters · interval 0–255 s (0 = off) · WPM 0–255 · volume 0–65535.
+Users must follow local rules for unattended beacons and station identification.
+
+---
+
+## 8. Known Issues and Fixes
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| USB disconnects, garbled audio, PC "beeps" or freezes **only while transmitting** | **RF feedback.** With a stock (monopole) antenna, the USB cable becomes the radio's counterpoise ("tiger tail"). **[Official]** | Lower TX power. Add a **counterpoise/tiger-tail**. Use an **external or balanced antenna** (e.g. a dipole) away from the PC. Put **clip-on ferrites** on the USB cable. Use a short USB cable. **[Community]** Going from 5 W to **1 W** fixed it for several users. Others moved the AIOC onto a short **pigtail** away from the radio, or used a coax extension so the antenna sits 1 m or more away. |
+| Radio doesn't key | PTT method mismatch | Section 6 |
+| Radio stays keyed / keys at random | Linux ModemManager probing the port; PTT source set to DTR/RTS only; system sounds with VPTT | udev ignore rule (2.5); `--defaults --store`; don't make the AIOC the default audio device |
+| CHIRP: "Radio did not respond" | Wrong model, plug not seated, radio in a menu, old firmware | Re-seat, choose the exact model, update the AIOC to ≥ 1.2.0 (for the DTR&!RTS fix) |
+| Intermittent RX/TX audio, PTT works sometimes | TRS plug contact / solder joint (on DIY units), or plug not fully inserted | Re-seat. On DIY builds, re-flow the TRS tab joints while pressing the contact sideways **[Official]** |
+| Decodes fail, audio sounds distorted | TX level too high (over-deviation) or RX clipping | Lower the OS output volume; lower the radio volume; RX gain back to 1× |
+| Can't hear anything in software | Squelch closed / volume zero / wrong input device | Open squelch, raise the radio volume, choose the AIOC input in the software |
+| Stuttering TX audio on macOS | Old firmware | Update to ≥ v1.4.0 (macOS fix) **[Official]** |
+| UV-K5 firmware flash fails partway | Serial buffer limits in old firmware | Update the AIOC to ≥ v1.4.0 **[Official]** |
+| Direwolf CM108 warnings | Upstream Direwolf behaviour | Harmless; ignore (direwolf issue #448) **[Official]** |
+| Linux "permission denied" on /dev/ttyACM0 or /dev/hidraw | User not in dialout/plugdev; no udev rule | Section 2.5 |
+| aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the browser tools (7.1) |
+| aioc-util `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Wrong Python package (Debian's `python3-hid`/`hidapi`) | Use a venv and `pip install hid`; remove the apt package **[Community]** |
+| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]** |
+| Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting | Seen on **Android 11** phones; Android 12+ was fine (GitHub #121) | Try another phone or Android version **[Community]** |
+| APRSdroid ignores the AIOC (works in other apps) | APRSdroid bug with USB microphones on some phones (aprsdroid #149) | Try the "Lesser AudioSwitch" app to force USB audio routing **[Community]** |
+| S-meter noise floor rises when the AIOC is plugged in | Ground loop / PC noise on the USB cable | Antenna on coax at least 1 m away from the HT, clip-on ferrites, a **USB isolator**, or run from a laptop on battery **[Community]** |
+| HF rig hears S9 noise with the AIOC plugged in | PC/USB noise; some radios (e.g. RT-950 Pro) are very sensitive | Ferrites, a USB isolator, a different PC; test with another radio **[Community]** |
+| Device not seen at all | **Charge-only USB-C cable**, or the board is stuck in DFU mode (no firmware) | Use a data cable; flash firmware (Section 9) **[Community]** |
+
+**[Community] Contact/solder fault finder for DIY or repaired units (DL-Nordwest):**
+| Symptom | Check |
+|---|---|
+| Can't read or write the radio | Driver / COM port selection |
+| Can write but **can't read** the radio | Solder joint at the 2.5 mm **ring** |
+| RX audio very quiet | Solder joint at the 3.5 mm **ring**; PC volume |
+| No RX audio at all | 2.5 mm **tip** / **sleeve** joints; radio volume; input device |
+| Radio transmits all the time | Short between the 2.5 mm and 3.5 mm **sleeves** (or the plugs were soldered the wrong way round) |
+| Works only when the plug is twisted | Cracked TRS solder joint: re-flow it while pressing the contact (Section 8) |
+
+---
+
+## 9. Firmware Update
+
+### 9.1 Releases **[Official]**
+Download `aioc-fw-x.y.z.bin` from https://github.com/skuep/AIOC/releases
+| Version | Date | Highlights |
+|---|---|---|
+| **v1.4.1** | 2025-09-27 | Fixes LED blink speed and LED interrupt priority |
+| **v1.4.0** | 2025-09-26 | macOS TX stutter fix; bigger serial buffer (HT firmware flashing); HW rev 1.2 support; RX gain 1–16×; TX boost; **Fox-hunt mode** |
+| v1.3.0 | 2025-01-02 | HID config system (new protocol; older scripts don't work); Virtual PTT / Virtual COS; hardware COS input; bigger serial buffer |
+| v1.2.0 | 2023-03-19 | **CM108 PTT**; live DFU updates; serial PTT changed to DTR=1 & RTS=0 |
+
+**Hardware rev 1.2 needs firmware ≥ 1.4.0.** **[Official]**
+
+### 9.2 Updating firmware that is already ≥ 1.2.0 (no case opening) **[Official]**
+```bash
+dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
+```
+The AIOC reboots into the bootloader, flashes, and restarts on its own.
+- **Linux/macOS:** install `dfu-util` (`apt install dfu-util` / `brew install dfu-util`). You may need `sudo` or the `plugdev` group.
+- **Windows:** dfu-util needs a **libusb/WinUSB driver** for the DFU interface. Use **Zadig** to install WinUSB for the AIOC DFU interface / "STM32 BOOTLOADER" device. (See the guide linked in the AIOC README: yeswolf.github.io/dfu.)
+  **[Community]** dfu-util on Windows 11 often hangs or reports `LIBUSB_ERROR_NOT_SUPPORTED` (GitHub #28). Easiest fixes: use a Linux PC or Raspberry Pi, or the browser tool below.
+- **Browser flashing (WebDFU) [Community, used in G1LRO's guide]:** put the AIOC in bootloader mode (9.3, step 1), then open
+  https://devanlai.github.io/webdfu/dfu-util/ in Chrome/Edge → **Connect** → choose **STM32 Bootloader** → **Internal Flash** → pick the `.bin` → **Download**. Unplug it when it finishes.
+
+### 9.3 First programming / unbricking **[Official]**
+1. **Short the two outermost pins** of the programming header on the PCB (this is BOOT mode).
+2. Connect USB-C. The device shows up as the STM32 bootloader.
+3. `dfu-util -a 0 -s 0x08000000:leave -D aioc-fw-x.y.z.bin`
+4. Remove the short, unplug, and plug back in.
+
+After any update: **re-apply your aioc-util settings** (they are erased).
+
+### 9.4 Which firmware do I have?
+The USB descriptor doesn't report the firmware version. Practical checks:
+- aioc-util works → ≥ 1.3.0. `--audio-get-settings` / fox-hunt commands work → ≥ 1.4.0.
+- If unsure, just flash the latest release (9.2). That is the recommended fix for most issues.
+
+---
+
+## 10. Ready-Made Answers (FAQ for agents)
+
+**Q: Do I need drivers?**
+No. Windows 10/11, Linux, and macOS use their built-in USB audio and CDC serial drivers. Only firmware updates on Windows need a WinUSB driver (Zadig).
+
+**Q: Which COM port is it?**
+Unplug the AIOC and plug it back in while watching Device Manager → Ports. The new COMx is the AIOC. Linux: `/dev/ttyACM0` (or `/dev/aioc` with the udev rule). macOS: `/dev/cu.usbmodem…`.
+
+**Q: Can I program and do digital modes with the same cable?**
+Yes. The serial port does programming and the sound card does digital modes. Don't run both programs at the same time on the same COM port.
+
+**Q: Can I use it with a mobile/base radio?**
+Only if the radio has a K1-type jack or you use an adapter cable to its data/mic port. On HW rev 1.2, turn on `--audio-tx-boost on` for line-level inputs and raise the RX gain for line-level outputs.
+
+**Q: Does it work on Raspberry Pi?**
+Yes. Direwolf, AllStarLink 3, SvxLink, Pat, QtSoundModem and LinBPQ all run on Raspberry Pi OS. Use the CM108 PTT and the udev rule.
+
+**Q: Does it work with iPhone/iPad?**
+Partly. iOS sees the AIOC only as a sound card. **RadioMail** (Winlink) and **Packet Commander** have shown it working with AIOC fw 1.4.1 and **Virtual PTT** turned on (Section 5.16). CHIRP programming and serial or CM108 PTT are not possible on iOS.
+
+**Q: Can I use voice (talk through the computer)?**
+Yes. Choose the AIOC as microphone/speaker in a VoIP or linking app (AllStarLink, SvxLink, EchoLink, Mumble bridges). Voice PTT needs CM108/serial control or VPTT.
+
+**Q: My radio has two PTTs (dual-band HT)?**
+PTT1 is the CM108 GPIO3/serial default and PTT2 is CM108 GPIO4. Use `--swap-ptt` or `--ptt2` to change them.
+
+**Q: Is 9600 baud packet supported?**
+Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM Narrow.
+
+---
+
+## 11. Reference Links
+- AIOC project (hardware, firmware, README): https://github.com/skuep/AIOC
+- AIOC releases: https://github.com/skuep/AIOC/releases
+- AIOC Discord: linked from the GitHub README
+- aioc-util (CLI): https://github.com/hrafnkelle/aioc-util · Web version: https://aioc-util.tf3hr.net/
+- G1LRO AIOC + ASL3 guide (current): https://g1lro.uk/?p=1593 · older guide: https://g1lro.uk/?p=676 · scripts: https://github.com/G1LRO/AIOC-ASL3-Config
+- G1LRO browser config tool: https://g1lro.github.io/aioc-util/ · WebDFU flasher: https://devanlai.github.io/webdfu/dfu-util/
+- AllStarLink forum, AIOC as a CM108 alternative: https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225
+- M0AWS AllStar node build with an AIOC: https://m0aws.co.uk/?cat=408
+- DL-Nordwest AIOC series (German), part 4 troubleshooting: https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/
+- DigiPi + AIOC fix (Google Group): https://groups.google.com/g/digipi/c/1NfZeLpsT4M
+- AIOC GitHub issues (search before asking): https://github.com/skuep/AIOC/issues
+- Videos: Ham Radio Dude (https://www.youtube.com/watch?v=xRCmXQYRLE0), Temporarily Offline (https://www.youtube.com/watch?v=RZjoPNe634o), AllStar node builds (https://youtu.be/7LB6D2FLGZk, https://youtu.be/k0iP4dECx6A)
+- German 4-part AIOC article (DL-Nordwest): linked from the AIOC README
+- Direwolf: https://github.com/wb2osz/direwolf
+- CHIRP: https://chirpmyradio.com
+- AllStarLink: https://www.allstarlink.org
+- Winlink: https://winlink.org · Pat: https://getpat.io · VARA: https://rosmodem.wordpress.com
+- APRSdroid: https://aprsdroid.org · YAAC: https://www.ka2ddo.org/ka2ddo/YAAC.html · Xastir: https://xastir.org
+- SvxLink: https://www.svxlink.org · fldigi/NBEMS: http://www.w1hkj.org
+- Quansheng Dock: https://github.com/nicsure/QuanshengDock · Egzumer firmware: https://github.com/egzumer/uv-k5-firmware-custom
+
+</script>
+<script>
+(function () {
+  // ---------- Setup finder data ----------
+  var OS = [
+    { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
+    { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+  ];
+  var NO_PHONE = 'Not available on phones. Use a computer.';
+  var GOALS = [
+    { id: 'program', label: 'Program channels', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Not needed. Choose the AIOC serial port in CHIRP.', tip: 'Download from the radio and save a backup before uploading.', sec: [['s5-1', 'CHIRP steps']] },
+    { id: 'k5', label: 'Flash UV-K5 firmware', sw: { win: 'Web flasher in Chrome/Edge, or k5prog', linux: 'Web flasher in Chrome/Edge, or k5prog', mac: 'Web flasher in Chrome/Edge', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Not needed. Hold PTT while switching the radio on to enter bootloader mode.', tip: 'Update the AIOC to v1.4.x first: it has the larger serial buffer.', sec: [['s5-2', 'UV-K5 flashing']] },
+    { id: 'aprs', label: 'APRS', sw: { win: 'Direwolf + APRSIS32, YAAC or PinPoint', linux: 'Direwolf + YAAC or Xastir', mac: 'Direwolf + YAAC', android: 'APRSdroid (turn on AIOC Virtual PTT)', ios: 'No tested APRS app yet' },
+      ptt: { win: 'Direwolf: PTT COMx DTR -RTS', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT /dev/cu.usbmodem… DTR -RTS', android: 'Virtual PTT: aioc-util --ptt1 VPTT --store', ios: '—' },
+      tip: 'APRS is 144.390 MHz in North America, 144.800 MHz in Europe.', sec: [['s5-3', 'Direwolf'], ['s5-4', 'APRS map programs'], ['s5-5', 'APRSdroid']] },
+    { id: 'igate', label: 'iGate / digipeater', sw: { win: 'Direwolf', linux: 'Direwolf (headless Pi), or DigiPi', mac: 'Direwolf', android: NO_PHONE, ios: NO_PHONE },
+      ptt: { win: 'PTT COMx DTR -RTS', linux: 'PTT CM108', mac: 'PTT /dev/cu.usbmodem… DTR -RTS', android: '—', ios: '—' },
+      tip: 'Needs an APRS-IS passcode for iGate. Run at 1 W with a proper antenna to avoid RF lock-ups.', sec: [['s5-3', 'Direwolf'], ['s5-15', 'DigiPi']] },
+    { id: 'winlink', label: 'Winlink email', sw: { win: 'Winlink Express + VARA FM (or packet via Direwolf/Soundmodem)', linux: 'Pat + Direwolf (packet), or VARA FM under Wine', mac: 'Pat + Direwolf (packet)', android: 'No tested app', ios: 'RadioMail (turn on AIOC Virtual PTT)' },
+      ptt: { win: 'VARA FM: PTT pin "DTR only"', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT … DTR -RTS', android: '—', ios: 'Virtual PTT (fw 1.4.1)' },
+      tip: 'Use VARA FM Narrow. Set the radio time-out timer to its maximum.', sec: [['s5-8', 'Winlink'], ['s5-16', 'iPhone / iPad']] },
+    { id: 'packet', label: 'Packet BBS / terminal', sw: { win: 'Direwolf or UZ7HO Soundmodem + QtTermTCP, Outpost or BPQ32', linux: 'Direwolf + Paracon, QtTermTCP or LinBPQ', mac: 'Direwolf + QtTermTCP', android: 'No tested app', ios: 'Packet Commander (turn on AIOC Virtual PTT)' },
+      ptt: { win: 'Soundmodem: tick "Swap COM pins for PTT", 12000 Hz', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT … DTR -RTS', android: '—', ios: 'Virtual PTT' },
+      tip: 'Squelch open and battery save off help budget HTs catch the start of each packet.', sec: [['s5-6', 'Soundmodem'], ['s5-7', 'BBS and terminals']] },
+    { id: 'varac', label: 'VARA keyboard chat', sw: { win: 'VarAC or VARA Chat with VARA FM', linux: 'VarAC + VARA FM under Wine', mac: 'Not tested', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Let VARA FM key the radio (PTT pin "DTR only"); leave VarAC PTT off.', tip: '', sec: [['s5-8', 'VARA FM setup']] },
+    { id: 'sstv', label: 'SSTV pictures', sw: { win: 'MMSSTV', linux: 'QSSTV', mac: 'Black Cat SSTV or MultiScan', android: 'Robot36 (receive only)', ios: 'Not tested' },
+      ptt: 'COM port DTR, or AIOC Virtual PTT if the program can’t key. Receive-only needs no PTT.', tip: 'ISS SSTV events are on 145.800 MHz FM.', sec: [['s5-9', 'SSTV']] },
+    { id: 'nbems', label: 'EmComm text & forms', sw: { win: 'fldigi + flmsg + flamp', linux: 'fldigi + flmsg + flamp', mac: 'fldigi + flmsg', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'fldigi CM108 PTT on GPIO 3, or serial PTT with "Use DTR" only.', tip: 'MT63-2000L is the usual FM mode for ARES nets.', sec: [['s5-10', 'fldigi / NBEMS']] },
+    { id: 'ft8', label: 'FT8 / JS8 (FM)', sw: { win: 'WSJT-X or JS8Call', linux: 'WSJT-X or JS8Call', mac: 'WSJT-X or JS8Call', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT method DTR on the AIOC port, rig "None".', tip: 'These are SSB modes. On an FM HT you only reach other FM stations.', sec: [['s5-11', 'WSJT-X / JS8Call']] },
+    { id: 'allstar', label: 'AllStarLink node', sw: { win: 'Runs on Linux only', linux: 'AllStarLink 3 (Raspberry Pi or Debian)', mac: 'Runs on Linux only', android: 'Runs on Linux only', ios: 'Runs on Linux only' },
+      ptt: 'Built in: AllStar uses the AIOC as a CM108. Uncomment usb_devices = 1209:7388.', tip: 'Set the VCOS hang time (ms × 16) or use hardware COS on rev 1.2.', sec: [['s5-12', 'AllStarLink 3']] },
+    { id: 'echolink', label: 'EchoLink / SvxLink', sw: { win: 'EchoLink (Sysop mode)', linux: 'SvxLink', mac: 'Not tested', android: NO_PHONE, ios: NO_PHONE },
+      ptt: { win: 'Serial keying, or AIOC Virtual PTT', linux: 'SvxLink: PTT_TYPE=Hidraw, HID_PTT_PIN=GPIO3', mac: '—', android: '—', ios: '—' },
+      tip: 'Forward UDP 5198–5199 and TCP 5200 on your router.', sec: [['s5-13', 'SvxLink / EchoLink']] },
+    { id: 'mesh', label: 'Reticulum mesh', sw: { win: 'Reticulum + Direwolf (KISS)', linux: 'Reticulum (NomadNet, MeshChat) + Direwolf', mac: 'Reticulum + Direwolf', android: 'Sideband, via a computer running Direwolf', ios: 'Not tested' },
+      ptt: 'Direwolf does the PTT.', tip: 'Check your licence rules on encryption first.', sec: [['s5-17', 'Reticulum']] },
+    { id: 'rig', label: 'Mobile / HF rig', sw: { win: 'Hand-wired AIOC + WSJT-X, fldigi, VARA', linux: 'Hand-wired AIOC + WSJT-X, fldigi, Direwolf', mac: 'Hand-wired AIOC + WSJT-X, fldigi', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'AIOC PTT, or CAT PTT over the AIOC serial port.', tip: 'Hardware rev 1.2 separates PTT from serial data. Icom CI-V does not work.', sec: [['s5-18', 'Wiring to other radios']] },
+    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'aioc-util, or the browser tool in Chrome/Edge', linux: 'aioc-util, or the browser tool', mac: 'aioc-util, or the browser tool', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
+      ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
+    { id: 'config', label: 'Change AIOC settings', sw: { win: 'Browser tool (Chrome/Edge), or aioc-util + hidapi.dll', linux: 'aioc-util, or the browser tool (install the udev rule)', mac: 'aioc-util, or the browser tool', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'Always finish with Store to flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+    { id: 'firmware', label: 'Update firmware', sw: { win: 'WebDFU in Chrome/Edge (easiest), or dfu-util + Zadig', linux: 'dfu-util', mac: 'dfu-util (Homebrew), or WebDFU', android: NO_PHONE, ios: NO_PHONE },
+      ptt: '—', tip: 'Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
+  ];
+
+  var state = { goal: 'aprs', os: 'win' };
+  try {
+    var saved = JSON.parse(localStorage.getItem('aioc-finder') || 'null');
+    if (saved && saved.goal && saved.os) state = saved;
+  } catch (e) {}
+
+  function el(tag, attrs, text) {
+    var n = document.createElement(tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function chips(container, list, key) {
+    list.forEach(function (item) {
+      var b = el('button', { type: 'button', class: 'chip', 'data-id': item.id, 'aria-pressed': String(state[key] === item.id) }, item.label);
+      b.addEventListener('click', function () { state[key] = item.id; render(); });
+      container.appendChild(b);
+    });
+  }
+  chips(document.getElementById('goals'), GOALS, 'goal');
+  chips(document.getElementById('oses'), OS, 'os');
+
+  function render() {
+    document.querySelectorAll('#goals .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.goal)); });
+    document.querySelectorAll('#oses .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.os)); });
+    try { localStorage.setItem('aioc-finder', JSON.stringify(state)); } catch (e) {}
+    var g = GOALS.filter(function (x) { return x.id === state.goal; })[0];
+    var osLabel = OS.filter(function (x) { return x.id === state.os; })[0].label;
+    var sw = g.sw[state.os];
+    var ptt = typeof g.ptt === 'string' ? g.ptt : g.ptt[state.os];
+    var unavailable = /^(Not |No tested|Runs on Linux only)/.test(sw);
+    var r = document.getElementById('result');
+    r.innerHTML = '';
+    r.appendChild(el('h3', {}, g.label + ' on ' + osLabel));
+    var dl = el('dl', {});
+    dl.appendChild(el('dt', {}, 'Software'));
+    dl.appendChild(el('dd', unavailable ? { class: 'na' } : {}, sw));
+    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, 'PTT')); dl.appendChild(el('dd', {}, ptt)); }
+    if (g.tip) { dl.appendChild(el('dt', {}, 'Tip')); dl.appendChild(el('dd', {}, g.tip)); }
+    r.appendChild(dl);
+    var links = el('div', { class: 'links' });
+    g.sec.forEach(function (s) {
+      if (document.getElementById(s[0])) links.appendChild(el('a', { href: '#' + s[0] }, 'Open: ' + s[1] + ' →'));
+    });
+    r.appendChild(links);
+  }
+  render();
+
+  // ---------- Copy buttons ----------
+  function copyText(text, onDone) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { onDone(true); }, function () { onDone(fallbackCopy(text)); });
+    } else { onDone(fallbackCopy(text)); }
+  }
+  function fallbackCopy(text) {
+    var ta = el('textarea', { readonly: '', style: 'position:fixed;top:-1000px' });
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove(); return ok;
+  }
+  document.querySelectorAll('.code').forEach(function (block) {
+    var b = el('button', { type: 'button', class: 'copy-btn' }, 'Copy');
+    b.addEventListener('click', function () {
+      copyText(block.querySelector('pre').innerText, function (ok) {
+        b.textContent = ok ? 'Copied' : 'Select and copy manually';
+        setTimeout(function () { b.textContent = 'Copy'; }, 1800);
+      });
+    });
+    block.appendChild(b);
+  });
+  document.getElementById('copy-md').addEventListener('click', function () {
+    var md = document.getElementById('md-source').textContent;
+    var status = document.getElementById('copy-status');
+    copyText(md, function (ok) {
+      status.textContent = ok ? 'Copied ' + Math.round(md.length / 1024) + ' KB of Markdown. Paste it into your AI assistant.' : 'Copy was blocked by the browser.';
+    });
+  });
+
+  // ---------- Search ----------
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.doc-section'));
+  var tocItems = Array.prototype.slice.call(document.querySelectorAll('#toc li'));
+  var search = document.getElementById('search');
+  var note = document.getElementById('search-note');
+  function clearMarks() {
+    document.querySelectorAll('main mark').forEach(function (m) { m.replaceWith(document.createTextNode(m.textContent)); });
+    sections.forEach(function (s) { s.normalize(); });
+  }
+  function markIn(root, q) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, ql = q.toLowerCase();
+    while ((n = walker.nextNode())) if (n.nodeValue.toLowerCase().indexOf(ql) !== -1) nodes.push(n);
+    nodes.slice(0, 200).forEach(function (t) {
+      var i = t.nodeValue.toLowerCase().indexOf(ql);
+      var after = t.splitText(i); after.splitText(q.length);
+      var m = document.createElement('mark'); m.textContent = after.nodeValue; after.replaceWith(m);
+    });
+  }
+  var timer;
+  search.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      var q = search.value.trim();
+      clearMarks();
+      if (q.length < 2) {
+        sections.forEach(function (s) { s.classList.remove('hidden'); });
+        tocItems.forEach(function (li) { li.classList.remove('hidden'); });
+        note.textContent = ''; return;
+      }
+      var ql = q.toLowerCase(), hits = 0;
+      sections.forEach(function (s) {
+        var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
+        s.classList.toggle('hidden', !match);
+        if (match) { hits++; markIn(s, q); }
+      });
+      tocItems.forEach(function (li) {
+        var id = li.querySelector('a').getAttribute('href').slice(1);
+        var target = document.getElementById(id);
+        var sec = target && target.closest('.doc-section');
+        li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
+      });
+      note.textContent = hits ? hits + ' chapter' + (hits > 1 ? 's' : '') + ' mention "' + q + '"' : 'No matches for "' + q + '"';
+    }, 160);
+  });
+})();
+</script>
+</body>
+</html>

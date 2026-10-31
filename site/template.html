@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AIOC Quick Start Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a radio-shack field manual. Sticky index on the left, the manual on the right,
+   a "find your setup" selector up top that points into the manual. Signal-amber accent = PTT/TX. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --ink: #15212c;
+  --muted: #566573;
+  --line: #d5dce3;
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe9df;
+  --code-bg: #f4f6f9;
+  --lcd: #1c2a35;
+  --lcd-ink: #ffb26b;
+  --t-official: #0f6b5c; --t-official-bg: #dcf1ec;
+  --t-tool: #3b4fa8;     --t-tool-bg: #e2e7fa;
+  --t-community: #8a4a00; --t-community-bg: #fdecd2;
+  --t-typical: #4f5b66;  --t-typical-bg: #e7ebef;
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e141a; --surface: #151e27; --ink: #e3eaf0; --muted: #94a3b1; --line: #26333f;
+    --accent: #f28a4b; --accent-ink: #1a0d05; --accent-soft: #3a2316; --code-bg: #101820;
+    --lcd: #0a1016; --lcd-ink: #ffb26b;
+    --t-official: #6fd6c0; --t-official-bg: #123a33;
+    --t-tool: #a9b6f5;     --t-tool-bg: #1f2850;
+    --t-community: #f3c27e; --t-community-bg: #3d2a10;
+    --t-typical: #b3bfca;  --t-typical-bg: #24303b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e141a; --surface: #151e27; --ink: #e3eaf0; --muted: #94a3b1; --line: #26333f;
+  --accent: #f28a4b; --accent-ink: #1a0d05; --accent-soft: #3a2316; --code-bg: #101820;
+  --lcd: #0a1016; --lcd-ink: #ffb26b;
+  --t-official: #6fd6c0; --t-official-bg: #123a33;
+  --t-tool: #a9b6f5;     --t-tool-bg: #1f2850;
+  --t-community: #f3c27e; --t-community-bg: #3d2a10;
+  --t-typical: #b3bfca;  --t-typical-bg: #24303b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-body); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; }
+code, pre { font-family: var(--font-mono); font-size: 0.86em; }
+
+/* ---------- Header ---------- */
+.masthead { background: var(--lcd); color: #e9eef2; }
+.masthead-inner { max-width: 1240px; margin: 0 auto; padding: 28px 24px 24px; display: grid; gap: 18px; grid-template-columns: 1fr auto; align-items: end; }
+.kicker { font: 600 13px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lcd-ink); margin: 0 0 10px; }
+.masthead h1 { font-size: clamp(30px, 4.4vw, 46px); margin: 0 0 8px; font-weight: 700; color: #fff; }
+.masthead p.lede { margin: 0; max-width: 62ch; color: #b9c6d1; }
+.readout { display: grid; grid-template-columns: repeat(2, minmax(150px, auto)); gap: 1px; background: #2c3c49; border: 1px solid #2c3c49; border-radius: var(--radius); overflow: hidden; font-family: var(--font-mono); }
+.readout div { background: #111b23; padding: 8px 12px; }
+.readout dt { font-size: 11px; color: #8597a6; text-transform: uppercase; letter-spacing: .06em; }
+.readout dd { margin: 2px 0 0; color: var(--lcd-ink); font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.actions { max-width: 1240px; margin: 0 auto; padding: 0 24px 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 600 14px/1 var(--font-body); padding: 10px 14px; border-radius: var(--radius); border: 1px solid transparent; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { background: transparent; color: #e9eef2; border-color: #3b4e5d; }
+.btn-ghost:hover { border-color: #6c8395; }
+.copy-status { font: 13px var(--font-mono); color: var(--lcd-ink); align-self: center; min-height: 1em; }
+
+/* ---------- Setup finder ---------- */
+.finder { max-width: 1240px; margin: 24px auto 0; padding: 0 24px; }
+.finder-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; display: grid; gap: 16px; }
+.finder-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; }
+.finder-head h2 { margin: 0; font-size: 24px; }
+.finder-head p { margin: 0; color: var(--muted); font-size: 14px; }
+.field-label { font: 600 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; display: block; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 14px/1.2 var(--font-body); padding: 7px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.result { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--radius) var(--radius) 0; padding: 14px 18px; display: grid; gap: 8px; }
+.result h3 { margin: 0; font-size: 20px; }
+.result dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.result dt { font: 600 12px/1.9 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.result dd { margin: 0; }
+.result .na { color: var(--muted); font-style: italic; }
+.result .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.result .links a { font-weight: 600; }
+
+/* ---------- Main layout ---------- */
+.layout { max-width: 1240px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 28px; align-items: start; }
+nav.index { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 10px 14px 14px; }
+.search { width: 100%; font: 14px var(--font-body); padding: 9px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink); }
+.search-note { font: 12px var(--font-mono); color: var(--muted); margin: 6px 2px 10px; min-height: 1.2em; }
+nav.index ul { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+nav.index li a { display: block; padding: 4px 6px; color: var(--ink); text-decoration: none; border-radius: 4px; line-height: 1.35; }
+nav.index li a:hover { background: var(--bg); }
+nav.index li.l2 { margin-top: 8px; }
+nav.index li.l2 > a { font-weight: 600; font-family: var(--font-display); font-size: 15px; }
+nav.index li.l3 a { padding-left: 16px; color: var(--muted); font-size: 13.5px; }
+nav.index li.l4 { display: none; }
+nav.index li.hidden { display: none; }
+
+/* ---------- Guide content ---------- */
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+main.guide { min-width: 0; }
+.doc-section { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 32px 24px; margin-bottom: 20px; }
+.doc-section.hidden { display: none; }
+.guide h2 { font-size: 30px; margin: 22px 0 10px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+.guide h3 { font-size: 21px; margin: 34px 0 8px; }
+.guide h4 { font-size: 17px; margin: 24px 0 6px; }
+.guide h2, .guide h3, .guide h4 { position: relative; }
+.anchor { position: absolute; left: -22px; color: var(--muted); text-decoration: none; opacity: 0; font-weight: 400; }
+h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1; }
+.guide p, .guide li { max-width: 78ch; }
+.guide ul, .guide ol { padding-left: 1.4em; }
+.guide li { margin: 3px 0; }
+.guide blockquote { margin: 14px 0; padding: 10px 16px; border-left: 4px solid var(--t-community); background: var(--t-community-bg); border-radius: 0 var(--radius) var(--radius) 0; }
+.guide blockquote p { margin: 6px 0; }
+.guide :not(pre) > code { background: var(--code-bg); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.code { position: relative; margin: 12px 0; }
+.code pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; overflow-x: auto; line-height: 1.5; margin: 0; }
+.copy-btn { position: absolute; top: 8px; right: 8px; font: 600 12px var(--font-mono); padding: 5px 9px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.copy-btn:hover { color: var(--ink); border-color: var(--muted); }
+.table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: var(--radius); }
+.guide table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+.guide th, .guide td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.guide th { background: var(--bg); font-family: var(--font-display); font-size: 14px; letter-spacing: .02em; }
+.guide tr:last-child td { border-bottom: 0; }
+.guide td code { white-space: nowrap; }
+.tag { display: inline-block; font: 600 11px/1.5 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; vertical-align: 1px; white-space: nowrap; }
+.tag-official { color: var(--t-official); background: var(--t-official-bg); }
+.tag-tool { color: var(--t-tool); background: var(--t-tool-bg); }
+.tag-community { color: var(--t-community); background: var(--t-community-bg); }
+.tag-typical { color: var(--t-typical); background: var(--t-typical-bg); }
+mark { background: var(--accent-soft); color: inherit; outline: 1px solid var(--accent); border-radius: 2px; }
+footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(--muted); font-size: 13.5px; }
+
+@media (max-width: 900px) {
+  .masthead-inner { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; }
+  nav.index { position: static; max-height: 340px; }
+  .doc-section { padding: 4px 18px 18px; }
+  .anchor { display: none; }
+}
+@media (max-width: 420px) {
+  .readout { grid-template-columns: 1fr 1fr; }
+  .masthead-inner, .actions, .finder, .layout, footer { padding-left: 16px; padding-right: 16px; }
+  .result dl { grid-template-columns: 1fr; gap: 2px; }
+  .result dt { margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <p class="kicker">Ham radio · All-In-One-Cable</p>
+      <h1>AIOC Quick Start Guide</h1>
+      <p class="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
+        Pick what you want to do below to see the software and settings, or read the full guide.</p>
+    </div>
+    <dl class="readout" aria-label="AIOC key facts">
+      <div><dt>USB ID</dt><dd>1209:7388</dd></div>
+      <div><dt>Firmware</dt><dd>v1.4.1</dd></div>
+      <div><dt>Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
+      <div><dt>CM108 PTT</dt><dd>GPIO3</dd></div>
+      <div><dt>Audio</dt><dd>48 kHz mono</dd></div>
+      <div><dt>Radio plug</dt><dd>Kenwood K1</dd></div>
+    </dl>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" id="copy-md" type="button">Copy guide for your AI assistant</button>
+    <a class="btn btn-ghost" href="#s6">Radio won't transmit?</a>
+    <a class="btn btn-ghost" href="#s8">Known issues</a>
+    <a class="btn btn-ghost" href="#s9">Update firmware</a>
+    <span class="copy-status" id="copy-status" role="status"></span>
+  </div>
+</header>
+
+<section class="finder" aria-labelledby="finder-title">
+  <div class="finder-card">
+    <div class="finder-head">
+      <h2 id="finder-title">Find your setup</h2>
+      <p>Choose a task and your device. The answer links to the step-by-step section.</p>
+    </div>
+    <div>
+      <span class="field-label" id="goal-label">I want to</span>
+      <div class="chips" id="goals" role="group" aria-labelledby="goal-label"></div>
+    </div>
+    <div>
+      <span class="field-label" id="os-label">On</span>
+      <div class="chips" id="oses" role="group" aria-labelledby="os-label"></div>
+    </div>
+    <div class="result" id="result" aria-live="polite"></div>
+  </div>
+</section>
+
+<div class="layout">
+  <nav class="index" aria-label="Guide contents">
+    <label class="field-label" for="search">Search the guide</label>
+    <input class="search" id="search" type="search" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
+    <p class="search-note" id="search-note"></p>
+    <ul id="toc">
+<!--TOC-->
+    </ul>
+  </nav>
+
+  <main class="guide" id="guide">
+    <div class="legend" aria-label="Source labels">
+      <span>Where each statement comes from:</span>
+      <span class="tag tag-official">Official</span><span>AIOC project</span>
+      <span class="tag tag-tool">Tool docs</span><span>software docs</span>
+      <span class="tag tag-community">Community</span><span>user reports</span>
+      <span class="tag tag-typical">Typical</span><span>common settings, check your screen</span>
+    </div>
+<!--GUIDE-->
+  </main>
+</div>
+
+<footer>
+  Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR,
+  guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.
+</footer>
+
+<script type="text/plain" id="md-source"><!--MD--></script>
+<script>
+(function () {
+  // ---------- Setup finder data ----------
+  var OS = [
+    { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
+    { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+  ];
+  var NO_PHONE = 'Not available on phones. Use a computer.';
+  var GOALS = [
+    { id: 'program', label: 'Program channels', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Not needed. Choose the AIOC serial port in CHIRP.', tip: 'Download from the radio and save a backup before uploading.', sec: [['s5-1', 'CHIRP steps']] },
+    { id: 'k5', label: 'Flash UV-K5 firmware', sw: { win: 'Web flasher in Chrome/Edge, or k5prog', linux: 'Web flasher in Chrome/Edge, or k5prog', mac: 'Web flasher in Chrome/Edge', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Not needed. Hold PTT while switching the radio on to enter bootloader mode.', tip: 'Update the AIOC to v1.4.x first: it has the larger serial buffer.', sec: [['s5-2', 'UV-K5 flashing']] },
+    { id: 'aprs', label: 'APRS', sw: { win: 'Direwolf + APRSIS32, YAAC or PinPoint', linux: 'Direwolf + YAAC or Xastir', mac: 'Direwolf + YAAC', android: 'APRSdroid (turn on AIOC Virtual PTT)', ios: 'No tested APRS app yet' },
+      ptt: { win: 'Direwolf: PTT COMx DTR -RTS', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT /dev/cu.usbmodem… DTR -RTS', android: 'Virtual PTT: aioc-util --ptt1 VPTT --store', ios: '—' },
+      tip: 'APRS is 144.390 MHz in North America, 144.800 MHz in Europe.', sec: [['s5-3', 'Direwolf'], ['s5-4', 'APRS map programs'], ['s5-5', 'APRSdroid']] },
+    { id: 'igate', label: 'iGate / digipeater', sw: { win: 'Direwolf', linux: 'Direwolf (headless Pi), or DigiPi', mac: 'Direwolf', android: NO_PHONE, ios: NO_PHONE },
+      ptt: { win: 'PTT COMx DTR -RTS', linux: 'PTT CM108', mac: 'PTT /dev/cu.usbmodem… DTR -RTS', android: '—', ios: '—' },
+      tip: 'Needs an APRS-IS passcode for iGate. Run at 1 W with a proper antenna to avoid RF lock-ups.', sec: [['s5-3', 'Direwolf'], ['s5-15', 'DigiPi']] },
+    { id: 'winlink', label: 'Winlink email', sw: { win: 'Winlink Express + VARA FM (or packet via Direwolf/Soundmodem)', linux: 'Pat + Direwolf (packet), or VARA FM under Wine', mac: 'Pat + Direwolf (packet)', android: 'No tested app', ios: 'RadioMail (turn on AIOC Virtual PTT)' },
+      ptt: { win: 'VARA FM: PTT pin "DTR only"', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT … DTR -RTS', android: '—', ios: 'Virtual PTT (fw 1.4.1)' },
+      tip: 'Use VARA FM Narrow. Set the radio time-out timer to its maximum.', sec: [['s5-8', 'Winlink'], ['s5-16', 'iPhone / iPad']] },
+    { id: 'packet', label: 'Packet BBS / terminal', sw: { win: 'Direwolf or UZ7HO Soundmodem + QtTermTCP, Outpost or BPQ32', linux: 'Direwolf + Paracon, QtTermTCP or LinBPQ', mac: 'Direwolf + QtTermTCP', android: 'No tested app', ios: 'Packet Commander (turn on AIOC Virtual PTT)' },
+      ptt: { win: 'Soundmodem: tick "Swap COM pins for PTT", 12000 Hz', linux: 'Direwolf: PTT CM108', mac: 'Direwolf: PTT … DTR -RTS', android: '—', ios: 'Virtual PTT' },
+      tip: 'Squelch open and battery save off help budget HTs catch the start of each packet.', sec: [['s5-6', 'Soundmodem'], ['s5-7', 'BBS and terminals']] },
+    { id: 'varac', label: 'VARA keyboard chat', sw: { win: 'VarAC or VARA Chat with VARA FM', linux: 'VarAC + VARA FM under Wine', mac: 'Not tested', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Let VARA FM key the radio (PTT pin "DTR only"); leave VarAC PTT off.', tip: '', sec: [['s5-8', 'VARA FM setup']] },
+    { id: 'sstv', label: 'SSTV pictures', sw: { win: 'MMSSTV', linux: 'QSSTV', mac: 'Black Cat SSTV or MultiScan', android: 'Robot36 (receive only)', ios: 'Not tested' },
+      ptt: 'COM port DTR, or AIOC Virtual PTT if the program can’t key. Receive-only needs no PTT.', tip: 'ISS SSTV events are on 145.800 MHz FM.', sec: [['s5-9', 'SSTV']] },
+    { id: 'nbems', label: 'EmComm text & forms', sw: { win: 'fldigi + flmsg + flamp', linux: 'fldigi + flmsg + flamp', mac: 'fldigi + flmsg', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'fldigi CM108 PTT on GPIO 3, or serial PTT with "Use DTR" only.', tip: 'MT63-2000L is the usual FM mode for ARES nets.', sec: [['s5-10', 'fldigi / NBEMS']] },
+    { id: 'ft8', label: 'FT8 / JS8 (FM)', sw: { win: 'WSJT-X or JS8Call', linux: 'WSJT-X or JS8Call', mac: 'WSJT-X or JS8Call', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT method DTR on the AIOC port, rig "None".', tip: 'These are SSB modes. On an FM HT you only reach other FM stations.', sec: [['s5-11', 'WSJT-X / JS8Call']] },
+    { id: 'allstar', label: 'AllStarLink node', sw: { win: 'Runs on Linux only', linux: 'AllStarLink 3 (Raspberry Pi or Debian)', mac: 'Runs on Linux only', android: 'Runs on Linux only', ios: 'Runs on Linux only' },
+      ptt: 'Built in: AllStar uses the AIOC as a CM108. Uncomment usb_devices = 1209:7388.', tip: 'Set the VCOS hang time (ms × 16) or use hardware COS on rev 1.2.', sec: [['s5-12', 'AllStarLink 3']] },
+    { id: 'echolink', label: 'EchoLink / SvxLink', sw: { win: 'EchoLink (Sysop mode)', linux: 'SvxLink', mac: 'Not tested', android: NO_PHONE, ios: NO_PHONE },
+      ptt: { win: 'Serial keying, or AIOC Virtual PTT', linux: 'SvxLink: PTT_TYPE=Hidraw, HID_PTT_PIN=GPIO3', mac: '—', android: '—', ios: '—' },
+      tip: 'Forward UDP 5198–5199 and TCP 5200 on your router.', sec: [['s5-13', 'SvxLink / EchoLink']] },
+    { id: 'mesh', label: 'Reticulum mesh', sw: { win: 'Reticulum + Direwolf (KISS)', linux: 'Reticulum (NomadNet, MeshChat) + Direwolf', mac: 'Reticulum + Direwolf', android: 'Sideband, via a computer running Direwolf', ios: 'Not tested' },
+      ptt: 'Direwolf does the PTT.', tip: 'Check your licence rules on encryption first.', sec: [['s5-17', 'Reticulum']] },
+    { id: 'rig', label: 'Mobile / HF rig', sw: { win: 'Hand-wired AIOC + WSJT-X, fldigi, VARA', linux: 'Hand-wired AIOC + WSJT-X, fldigi, Direwolf', mac: 'Hand-wired AIOC + WSJT-X, fldigi', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'AIOC PTT, or CAT PTT over the AIOC serial port.', tip: 'Hardware rev 1.2 separates PTT from serial data. Icom CI-V does not work.', sec: [['s5-18', 'Wiring to other radios']] },
+    { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'aioc-util, or the browser tool in Chrome/Edge', linux: 'aioc-util, or the browser tool', mac: 'aioc-util, or the browser tool', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
+      ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
+    { id: 'config', label: 'Change AIOC settings', sw: { win: 'Browser tool (Chrome/Edge), or aioc-util + hidapi.dll', linux: 'aioc-util, or the browser tool (install the udev rule)', mac: 'aioc-util, or the browser tool', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'Always finish with Store to flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+    { id: 'firmware', label: 'Update firmware', sw: { win: 'WebDFU in Chrome/Edge (easiest), or dfu-util + Zadig', linux: 'dfu-util', mac: 'dfu-util (Homebrew), or WebDFU', android: NO_PHONE, ios: NO_PHONE },
+      ptt: '—', tip: 'Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
+  ];
+
+  var state = { goal: 'aprs', os: 'win' };
+  try {
+    var saved = JSON.parse(localStorage.getItem('aioc-finder') || 'null');
+    if (saved && saved.goal && saved.os) state = saved;
+  } catch (e) {}
+
+  function el(tag, attrs, text) {
+    var n = document.createElement(tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function chips(container, list, key) {
+    list.forEach(function (item) {
+      var b = el('button', { type: 'button', class: 'chip', 'data-id': item.id, 'aria-pressed': String(state[key] === item.id) }, item.label);
+      b.addEventListener('click', function () { state[key] = item.id; render(); });
+      container.appendChild(b);
+    });
+  }
+  chips(document.getElementById('goals'), GOALS, 'goal');
+  chips(document.getElementById('oses'), OS, 'os');
+
+  function render() {
+    document.querySelectorAll('#goals .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.goal)); });
+    document.querySelectorAll('#oses .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.os)); });
+    try { localStorage.setItem('aioc-finder', JSON.stringify(state)); } catch (e) {}
+    var g = GOALS.filter(function (x) { return x.id === state.goal; })[0];
+    var osLabel = OS.filter(function (x) { return x.id === state.os; })[0].label;
+    var sw = g.sw[state.os];
+    var ptt = typeof g.ptt === 'string' ? g.ptt : g.ptt[state.os];
+    var unavailable = /^(Not |No tested|Runs on Linux only)/.test(sw);
+    var r = document.getElementById('result');
+    r.innerHTML = '';
+    r.appendChild(el('h3', {}, g.label + ' on ' + osLabel));
+    var dl = el('dl', {});
+    dl.appendChild(el('dt', {}, 'Software'));
+    dl.appendChild(el('dd', unavailable ? { class: 'na' } : {}, sw));
+    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, 'PTT')); dl.appendChild(el('dd', {}, ptt)); }
+    if (g.tip) { dl.appendChild(el('dt', {}, 'Tip')); dl.appendChild(el('dd', {}, g.tip)); }
+    r.appendChild(dl);
+    var links = el('div', { class: 'links' });
+    g.sec.forEach(function (s) {
+      if (document.getElementById(s[0])) links.appendChild(el('a', { href: '#' + s[0] }, 'Open: ' + s[1] + ' →'));
+    });
+    r.appendChild(links);
+  }
+  render();
+
+  // ---------- Copy buttons ----------
+  function copyText(text, onDone) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { onDone(true); }, function () { onDone(fallbackCopy(text)); });
+    } else { onDone(fallbackCopy(text)); }
+  }
+  function fallbackCopy(text) {
+    var ta = el('textarea', { readonly: '', style: 'position:fixed;top:-1000px' });
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove(); return ok;
+  }
+  document.querySelectorAll('.code').forEach(function (block) {
+    var b = el('button', { type: 'button', class: 'copy-btn' }, 'Copy');
+    b.addEventListener('click', function () {
+      copyText(block.querySelector('pre').innerText, function (ok) {
+        b.textContent = ok ? 'Copied' : 'Select and copy manually';
+        setTimeout(function () { b.textContent = 'Copy'; }, 1800);
+      });
+    });
+    block.appendChild(b);
+  });
+  document.getElementById('copy-md').addEventListener('click', function () {
+    var md = document.getElementById('md-source').textContent;
+    var status = document.getElementById('copy-status');
+    copyText(md, function (ok) {
+      status.textContent = ok ? 'Copied ' + Math.round(md.length / 1024) + ' KB of Markdown. Paste it into your AI assistant.' : 'Copy was blocked by the browser.';
+    });
+  });
+
+  // ---------- Search ----------
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.doc-section'));
+  var tocItems = Array.prototype.slice.call(document.querySelectorAll('#toc li'));
+  var search = document.getElementById('search');
+  var note = document.getElementById('search-note');
+  function clearMarks() {
+    document.querySelectorAll('main mark').forEach(function (m) { m.replaceWith(document.createTextNode(m.textContent)); });
+    sections.forEach(function (s) { s.normalize(); });
+  }
+  function markIn(root, q) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n, ql = q.toLowerCase();
+    while ((n = walker.nextNode())) if (n.nodeValue.toLowerCase().indexOf(ql) !== -1) nodes.push(n);
+    nodes.slice(0, 200).forEach(function (t) {
+      var i = t.nodeValue.toLowerCase().indexOf(ql);
+      var after = t.splitText(i); after.splitText(q.length);
+      var m = document.createElement('mark'); m.textContent = after.nodeValue; after.replaceWith(m);
+    });
+  }
+  var timer;
+  search.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      var q = search.value.trim();
+      clearMarks();
+      if (q.length < 2) {
+        sections.forEach(function (s) { s.classList.remove('hidden'); });
+        tocItems.forEach(function (li) { li.classList.remove('hidden'); });
+        note.textContent = ''; return;
+      }
+      var ql = q.toLowerCase(), hits = 0;
+      sections.forEach(function (s) {
+        var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
+        s.classList.toggle('hidden', !match);
+        if (match) { hits++; markIn(s, q); }
+      });
+      tocItems.forEach(function (li) {
+        var id = li.querySelector('a').getAttribute('href').slice(1);
+        var target = document.getElementById(id);
+        var sec = target && target.closest('.doc-section');
+        li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
+      });
+      note.textContent = hits ? hits + ' chapter' + (hits > 1 ? 's' : '') + ' mention "' + q + '"' : 'No matches for "' + q + '"';
+    }, 160);
+  });
+})();
+</script>
+</body>
+</html>

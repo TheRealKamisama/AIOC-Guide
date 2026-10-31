@@ -1,0 +1,13 @@
+{
+  "name": "aioc-guide-site",
+  "version": "1.0.0",
+  "description": "Builds the AIOC Quick Start Guide web page from the Markdown guide",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "marked": "12.0.2"
+  },
+  "private": true
+}
