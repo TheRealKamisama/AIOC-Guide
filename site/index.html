@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AIOC Quick Start Guide</title>
+<meta name="description" content="AIOC (ham radio All-In-One-Cable) quick start guide in English and Simplified Chinese / AIOC 快速入门指南（英文、简体中文）">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: a radio-shack field manual. Sticky index on the left, the manual on the right,
    a "find your setup" selector up top that points into the manual. Signal-amber accent = PTT/TX. */
@@ -26,8 +27,8 @@
   --t-tool: #3b4fa8;     --t-tool-bg: #e2e7fa;
   --t-community: #8a4a00; --t-community-bg: #fdecd2;
   --t-typical: #4f5b66;  --t-typical-bg: #e7ebef;
-  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "IBM Plex Sans Condensed", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --radius: 6px;
   color-scheme: light;
@@ -163,6 +164,18 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
   .result dl { grid-template-columns: 1fr; gap: 2px; }
   .result dt { margin-top: 6px; }
 }
+
+/* ---------- Language ---------- */
+[hidden] { display: none !important; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.topbar .kicker { margin: 0; }
+.lang-switch { display: inline-flex; border: 1px solid #3b4e5d; border-radius: 999px; padding: 2px; background: #111b23; }
+.lang-switch button { font: 600 13px/1 var(--font-body); color: #b9c6d1; background: transparent; border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.lang-switch button[aria-pressed="true"] { background: var(--lcd-ink); color: #1a0d05; }
+.lang-switch button:hover:not([aria-pressed="true"]) { color: #fff; }
+:lang(zh) body, body:lang(zh) { line-height: 1.75; }
+:lang(zh) .kicker, :lang(zh) .field-label, :lang(zh) .readout dt, :lang(zh) .result dt { letter-spacing: .04em; }
+:lang(zh) .guide p, :lang(zh) .guide li { max-width: 46em; }
 </style>
 </head>
 <body>
@@ -170,25 +183,31 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <header class="masthead">
   <div class="masthead-inner">
     <div>
-      <p class="kicker">Ham radio · All-In-One-Cable</p>
-      <h1>AIOC Quick Start Guide</h1>
-      <p class="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
+      <div class="topbar">
+        <p class="kicker" data-i18n="kicker">Ham radio · All-In-One-Cable</p>
+        <div class="lang-switch" role="group" aria-label="Language / 语言">
+          <button type="button" data-set-lang="en" lang="en" aria-pressed="true">English</button>
+          <button type="button" data-set-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+        </div>
+      </div>
+      <h1 data-i18n="title">AIOC Quick Start Guide</h1>
+      <p class="lede" data-i18n="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
         Pick what you want to do below to see the software and settings, or read the full guide.</p>
     </div>
-    <dl class="readout" aria-label="AIOC key facts">
+    <dl class="readout" data-i18n-attr="aria-label:factsLabel" aria-label="AIOC key facts">
       <div><dt>USB ID</dt><dd>1209:7388</dd></div>
-      <div><dt>Firmware</dt><dd>v1.4.1</dd></div>
-      <div><dt>Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
+      <div><dt data-i18n="fFirmware">Firmware</dt><dd>v1.4.1</dd></div>
+      <div><dt data-i18n="fSerial">Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
       <div><dt>CM108 PTT</dt><dd>GPIO3</dd></div>
-      <div><dt>Audio</dt><dd>48 kHz mono</dd></div>
-      <div><dt>Radio plug</dt><dd>Kenwood K1</dd></div>
+      <div><dt data-i18n="fAudio">Audio</dt><dd data-i18n="fAudioVal">48 kHz mono</dd></div>
+      <div><dt data-i18n="fPlug">Radio plug</dt><dd data-i18n="fPlugVal">Kenwood K1</dd></div>
     </dl>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="copy-md" type="button">Copy guide for your AI assistant</button>
-    <a class="btn btn-ghost" href="#s6">Radio won't transmit?</a>
-    <a class="btn btn-ghost" href="#s8">Known issues</a>
-    <a class="btn btn-ghost" href="#s9">Update firmware</a>
+    <button class="btn btn-primary" id="copy-md" type="button" data-i18n="copyMd">Copy guide for your AI assistant</button>
+    <a class="btn btn-ghost" href="#s6" data-sec="s6" data-i18n="btnPtt">Radio won't transmit?</a>
+    <a class="btn btn-ghost" href="#s8" data-sec="s8" data-i18n="btnIssues">Known issues</a>
+    <a class="btn btn-ghost" href="#s9" data-sec="s9" data-i18n="btnFw">Update firmware</a>
     <span class="copy-status" id="copy-status" role="status"></span>
   </div>
 </header>
@@ -196,15 +215,15 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <section class="finder" aria-labelledby="finder-title">
   <div class="finder-card">
     <div class="finder-head">
-      <h2 id="finder-title">Find your setup</h2>
-      <p>Choose a task and your device. The answer links to the step-by-step section.</p>
+      <h2 id="finder-title" data-i18n="finderTitle">Find your setup</h2>
+      <p data-i18n="finderHint">Choose a task and your device. The answer links to the step-by-step section.</p>
     </div>
     <div>
-      <span class="field-label" id="goal-label">I want to</span>
+      <span class="field-label" id="goal-label" data-i18n="iWant">I want to</span>
       <div class="chips" id="goals" role="group" aria-labelledby="goal-label"></div>
     </div>
     <div>
-      <span class="field-label" id="os-label">On</span>
+      <span class="field-label" id="os-label" data-i18n="on">On</span>
       <div class="chips" id="oses" role="group" aria-labelledby="os-label"></div>
     </div>
     <div class="result" id="result" aria-live="polite"></div>
@@ -212,16 +231,16 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 </section>
 
 <div class="layout">
-  <nav class="index" aria-label="Guide contents">
-    <label class="field-label" for="search">Search the guide</label>
-    <input class="search" id="search" type="search" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
+  <nav class="index" data-i18n-attr="aria-label:tocLabel" aria-label="Guide contents">
+    <label class="field-label" for="search" data-i18n="searchLabel">Search the guide</label>
+    <input class="search" id="search" type="search" data-i18n-attr="placeholder:searchPh" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
     <p class="search-note" id="search-note"></p>
-    <ul id="toc">
+    <ul class="toc" data-lang="en" lang="en">
 <li class="l2"><a href="#s0">0. Instructions for AI Agents (read first)</a></li>
 <li class="l2"><a href="#s1">1. What the AIOC Is</a></li>
-<li class="l3"><a href="#hardware-revisions-and-firmware-compatib">Hardware revisions and firmware compatibility</a></li>
-<li class="l3"><a href="#tested-radios-official">Tested radios</a></li>
-<li class="l3"><a href="#limitations-tell-users-before-they-buy-o">Limitations (tell users before they buy or try)</a></li>
+<li class="l3"><a href="#s1-a">Hardware revisions and firmware compatibility</a></li>
+<li class="l3"><a href="#s1-b">Tested radios</a></li>
+<li class="l3"><a href="#s1-c">Limitations (tell users before they buy or try)</a></li>
 <li class="l2"><a href="#s2">2. First-Time Setup (every user)</a></li>
 <li class="l3"><a href="#s2-1">2.1 Plug in</a></li>
 <li class="l3"><a href="#s2-2">2.2 Check that the computer sees it</a></li>
@@ -264,16 +283,65 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <li class="l2"><a href="#s10">10. Ready-Made Answers (FAQ for agents)</a></li>
 <li class="l2"><a href="#s11">11. Reference Links</a></li>
     </ul>
+    <ul class="toc" data-lang="zh" lang="zh-CN" hidden>
+<li class="l2"><a href="#s0-zh">0. 给 AI 助手的说明（请先读）</a></li>
+<li class="l2"><a href="#s1-zh">1. AIOC 是什么</a></li>
+<li class="l3"><a href="#s1-a-zh">硬件版本与固件兼容性</a></li>
+<li class="l3"><a href="#s1-b-zh">已测试的电台</a></li>
+<li class="l3"><a href="#s1-c-zh">局限（购买或尝试前请告知用户）</a></li>
+<li class="l2"><a href="#s2-zh">2. 首次设置（所有用户）</a></li>
+<li class="l3"><a href="#s2-1-zh">2.1 连接</a></li>
+<li class="l3"><a href="#s2-2-zh">2.2 确认电脑已识别</a></li>
+<li class="l3"><a href="#s2-3-zh">2.3 系统音频设置（重要）</a></li>
+<li class="l3"><a href="#s2-4-zh">2.4 调整音频电平（所有数字模式）</a></li>
+<li class="l3"><a href="#s2-5-zh">2.5 Linux 权限（只需设置一次）</a></li>
+<li class="l2"><a href="#s3-zh">3. 决策表：“我需要什么软件？”</a></li>
+<li class="l2"><a href="#s4-zh">4. PTT 方式（看任何配置步骤之前请先理解）</a></li>
+<li class="l2"><a href="#s5-zh">5. 软件配置步骤</a></li>
+<li class="l3"><a href="#s5-1-zh">5.1 CHIRP：给电台写频（Windows / Linux / macOS）</a></li>
+<li class="l3"><a href="#s5-2-zh">5.2 泉盛 UV-K5 刷固件</a></li>
+<li class="l3"><a href="#s5-3-zh">5.3 Direwolf：APRS、分组 TNC、iGate、数字中继（Windows / Linux / macOS）</a></li>
+<li class="l3"><a href="#s5-4-zh">5.4 APRS 客户端软件（用 Direwolf 作调制解调器）</a></li>
+<li class="l3"><a href="#s5-5-zh">5.5 APRSdroid：在 Android 上玩 APRS</a></li>
+<li class="l3"><a href="#s5-6-zh">5.6 UZ7HO Soundmodem（Windows）/ QtSoundModem（Linux、Windows）</a></li>
+<li class="l3"><a href="#s5-7-zh">5.7 分组 BBS、节点和终端</a></li>
+<li class="l3"><a href="#s5-8-zh">5.8 Winlink 邮件：Winlink Express、Pat、VARA FM、分组</a></li>
+<li class="l3"><a href="#s5-9-zh">5.9 SSTV：慢扫描电视图片</a></li>
+<li class="l3"><a href="#s5-10-zh">5.10 fldigi / flmsg / flamp：通过 FM 传应急通信文本和表单（NBEMS）</a></li>
+<li class="l3"><a href="#s5-11-zh">5.11 WSJT-X / JS8Call（FT8、FT4、JS8：在 FM 上属非标准用法）</a></li>
+<li class="l3"><a href="#s5-12-zh">5.12 AllStarLink 3（ASL3）：手台作 AllStar 节点电台</a></li>
+<li class="l3"><a href="#s5-13-zh">5.13 SvxLink（Linux）和 EchoLink（Windows）</a></li>
+<li class="l3"><a href="#s5-14-zh">5.14 Hamlib / 脚本 / 通用 PTT</a></li>
+<li class="l3"><a href="#s5-15-zh">5.15 DigiPi（树莓派一体化数据站）</a></li>
+<li class="l3"><a href="#s5-16-zh">5.16 iPhone / iPad（RadioMail、Packet Commander）</a></li>
+<li class="l3"><a href="#s5-17-zh">5.17 通过分组运行 Reticulum（RNS、NomadNet、Sideband、MeshChat）</a></li>
+<li class="l3"><a href="#s5-18-zh">5.18 车台 / 短波电台（把 AIOC 接到数据口或话筒口）</a></li>
+<li class="l2"><a href="#s6-zh">6. PTT 故障排查流程</a></li>
+<li class="l2"><a href="#s7-zh">7. 配置 AIOC 本身（AIOC Toolkit / aioc-util）</a></li>
+<li class="l3"><a href="#s7-1-zh">7.1 使用条件</a></li>
+<li class="l3"><a href="#s7-2-zh">7.2 常用命令</a></li>
+<li class="l3"><a href="#s7-3-zh">7.3 寄存器参考（供高级用户和 AI 助手使用）</a></li>
+<li class="l3"><a href="#s7-4-zh">7.4 猎狐信标模式（固件 ≥ 1.4.0）</a></li>
+<li class="l2"><a href="#s8-zh">8. 已知问题与解决办法</a></li>
+<li class="l2"><a href="#s9-zh">9. 固件升级</a></li>
+<li class="l3"><a href="#s9-1-zh">9.1 版本</a></li>
+<li class="l3"><a href="#s9-2-zh">9.2 升级已是 ≥ 1.2.0 的固件（不用拆壳）</a></li>
+<li class="l3"><a href="#s9-3-zh">9.3 首次刷写 / 救砖</a></li>
+<li class="l3"><a href="#s9-4-zh">9.4 怎么知道我的固件版本？</a></li>
+<li class="l2"><a href="#s10-zh">10. 常见问题（供 AI 助手直接使用）</a></li>
+<li class="l2"><a href="#s11-zh">11. 参考链接</a></li>
+    </ul>
   </nav>
 
   <main class="guide" id="guide">
-    <div class="legend" aria-label="Source labels">
-      <span>Where each statement comes from:</span>
-      <span class="tag tag-official">Official</span><span>AIOC project</span>
-      <span class="tag tag-tool">Tool docs</span><span>software docs</span>
-      <span class="tag tag-community">Community</span><span>user reports</span>
-      <span class="tag tag-typical">Typical</span><span>common settings, check your screen</span>
+    <div class="legend" data-i18n-attr="aria-label:legendLabel" aria-label="Source labels">
+      <span data-i18n="legendIntro">Where each statement comes from:</span>
+      <span class="tag tag-official" data-i18n="tOfficial">Official</span><span data-i18n="tOfficialD">AIOC project</span>
+      <span class="tag tag-tool" data-i18n="tTool">Tool docs</span><span data-i18n="tToolD">software docs</span>
+      <span class="tag tag-community" data-i18n="tCommunity">Community</span><span data-i18n="tCommunityD">user reports</span>
+      <span class="tag tag-typical" data-i18n="tTypical">Typical</span><span data-i18n="tTypicalD">common settings, check your screen</span>
     </div>
+    <div class="guide-body" data-lang="en" lang="en">
 <section class="doc-section"><h2 id="s0"><a class="anchor" href="#s0" aria-label="Link to this section">#</a>0. Instructions for AI Agents (read first)</h2>
 <ol>
 <li><strong>Work out four things first.</strong> Ask only for the ones the user hasn&#39;t told you:<ul>
@@ -343,7 +411,7 @@ and a PTT interface. <span class="tag tag-official">Official</span></p>
 <li>Default PTT2 source: CM108 GPIO4.</li>
 <li>Default COS: the <strong>Virtual COS</strong> (VCOS, based on RX audio level) is reported as the CM108 <strong>Volume Down</strong> button.</li>
 </ul>
-<h3 id="hardware-revisions-and-firmware-compatib"><a class="anchor" href="#hardware-revisions-and-firmware-compatib" aria-label="Link to this section">#</a>Hardware revisions and firmware compatibility</h3>
+<h3 id="s1-a"><a class="anchor" href="#s1-a" aria-label="Link to this section">#</a>Hardware revisions and firmware compatibility</h3>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -372,7 +440,7 @@ and a PTT interface. <span class="tag tag-official">Official</span></p>
 <p><strong>The hardware revision is printed on the PCB.</strong> Use only the official <code>aioc-fw-x.y.z.bin</code> builds for the STM32F302.
 <span class="tag tag-community">Community</span> Boards built with an STM32F373 (it appears in an old BOM) don&#39;t enumerate (error -71) and need the MCU replaced (GitHub #122).</p>
 </blockquote>
-<h3 id="tested-radios-official"><a class="anchor" href="#tested-radios-official" aria-label="Link to this section">#</a>Tested radios <span class="tag tag-official">Official</span></h3>
+<h3 id="s1-b"><a class="anchor" href="#s1-b" aria-label="Link to this section">#</a>Tested radios <span class="tag tag-official">Official</span></h3>
 <ul>
 <li>Baofeng UV-5R (CHIRP + APRS)</li>
 <li>Wouxun UV-9D Mate (CHIRP + APRS)</li>
@@ -389,7 +457,7 @@ CAT serial data could trigger PTT on rev 1.0 boards (GitHub #34). Hardware rev 1
 BTECH, Wouxun, TIDRADIO, Radtel, Retevis, Abbree, Puxing and Kenwood HTs with the K1 jack. Radios with
 <strong>other connectors</strong> (Yaesu, Icom, Motorola multi-pin, Baofeng/BTECH &quot;screw-on&quot; UV-5X-style plugs,
 Anytone/Alinco single-plug) <strong>do not fit</strong> without an adapter.</p>
-<h3 id="limitations-tell-users-before-they-buy-o"><a class="anchor" href="#limitations-tell-users-before-they-buy-o" aria-label="Link to this section">#</a>Limitations (tell users before they buy or try)</h3>
+<h3 id="s1-c"><a class="anchor" href="#s1-c" aria-label="Link to this section">#</a>Limitations (tell users before they buy or try)</h3>
 <ul>
 <li><strong>Only audio through the mic/speaker jack.</strong> The K1 jack carries filtered, de-emphasised speaker audio
 and a mic input. So <strong>9600 baud packet, M17, DMR, D-STAR, or any mode that needs &quot;flat&quot;
@@ -1119,7 +1187,7 @@ invertptt = no
 <p><strong>HamVOIP / GMRSLive</strong> (older AllStar-based systems) only recognise C-Media IDs. Use the <code>--set-usb 0x0d8c 0x000c</code> option above
 (G1LRO&#39;s <code>aioc.py</code> / <code>aioc-revert.py</code> scripts do the same). On GMRS, follow your local GMRS rules. GMRS is not amateur radio.</p>
 <h3 id="s5-13"><a class="anchor" href="#s5-13" aria-label="Link to this section">#</a>5.13 SvxLink (Linux) and EchoLink (Windows)</h3>
-<h4 id="svxlink-simplex-node-repeater-controller"><a class="anchor" href="#svxlink-simplex-node-repeater-controller" aria-label="Link to this section">#</a>SvxLink — simplex node, repeater controller, EchoLink link</h4>
+<h4 id="s5-13-a"><a class="anchor" href="#s5-13-a" aria-label="Link to this section">#</a>SvxLink — simplex node, repeater controller, EchoLink link</h4>
 <p><span class="tag tag-typical">Typical</span> Use the AIOC HID for both PTT and squelch:</p>
 <div class="code"><pre><code class="language-ini"># /etc/svxlink/svxlink.conf
 [Rx1]
@@ -1141,7 +1209,7 @@ HID_PTT_PIN=GPIO3
 # Alternative serial PTT: PTT_TYPE=SerialPin, PTT_PORT=/dev/aioc, PTT_PIN=DTR!RTS
 </code></pre></div>
 <p>For EchoLink, turn on <code>ModuleEchoLink</code> and set the callsign/password in <code>ModuleEchoLink.conf</code>. Forward <strong>UDP 5198–5199</strong> and <strong>TCP 5200</strong> on the router.</p>
-<h4 id="echolink-windows-sysop-mode"><a class="anchor" href="#echolink-windows-sysop-mode" aria-label="Link to this section">#</a>EchoLink (Windows, Sysop mode)</h4>
+<h4 id="s5-13-b"><a class="anchor" href="#s5-13-b" aria-label="Link to this section">#</a>EchoLink (Windows, Sysop mode)</h4>
 <p><span class="tag tag-typical">Typical</span></p>
 <ul>
 <li><em>Tools → Sysop Settings → RX Ctrl</em>: <strong>VOX</strong> (adjust the threshold), or COS via serial isn&#39;t available with the AIOC. VOX is the standard choice.</li>
@@ -1693,15 +1761,1397 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 <li>Quansheng Dock: <a href="https://github.com/nicsure/QuanshengDock">https://github.com/nicsure/QuanshengDock</a> · Egzumer firmware: <a href="https://github.com/egzumer/uv-k5-firmware-custom">https://github.com/egzumer/uv-k5-firmware-custom</a></li>
 </ul>
 </section>
+    </div>
+    <div class="guide-body" data-lang="zh" lang="zh-CN" hidden>
+<section class="doc-section"><h2 id="s0-zh"><a class="anchor" href="#s0-zh" aria-label="本节链接">#</a>0. 给 AI 助手的说明（请先读）</h2>
+<ol>
+<li><strong>先弄清四件事。</strong> 只问用户还没告诉你的：<ul>
+<li><strong>目标</strong>：想做什么（写频、APRS、Winlink、SSTV、AllStar 节点……）。</li>
+<li><strong>系统</strong>：Windows、Linux（含树莓派）、macOS、Android，或 iPhone/iPad。</li>
+<li><strong>电台</strong>：品牌和型号。AIOC 使用建伍（Kenwood）式 <strong>K1</strong> 两针插头。</li>
+<li><strong>AIOC 固件版本</strong>（如果和任务有关）。VPTT、aioc-util 等功能需要 v1.3.0 或更新版本。</li>
+</ul>
+</li>
+<li><strong>用决策表（第 3 节）</strong> 选软件，再去看该软件的配置步骤。</li>
+<li><strong>PTT 是最常见的问题。</strong> 电台不发射时，按 PTT 故障排查流程（第 6 节）处理。</li>
+<li><strong>每条信息的可信程度。</strong> 文中用标签标注来源：<ul>
+<li><span class="tag tag-official">官方</span> ：来自 AIOC 的 GitHub README、发布说明或固件源码（skuep/AIOC）。</li>
+<li><span class="tag tag-tool">工具文档</span> ：来自 aioc-util 文档或其他软件自己的文档。</li>
+<li><span class="tag tag-community">社区</span> ：AIOC 用户在 GitHub issues、AllStarLink 论坛、DigiPi 群组或公开教程（G1LRO、DL-Nordwest、M0AWS）中的报告。这些是真实使用结果，但不保证适用于所有环境。</li>
+<li><span class="tag tag-typical">常规</span> ：通常可用的常见设置。不同软件版本的菜单名称可能不同，请让用户对照自己的屏幕确认。</li>
+</ul>
+</li>
+<li><strong>安全与合规。</strong> 发射需要业余无线电执照（在中国为业余无线电台执照及相应操作证书）。测试时请让用户接假负载，或在空闲的直频频率上用小功率发射。不要建议违反频率规划或呼号识别规定的设置。</li>
+<li><strong>不要编造菜单路径。</strong> 本文没写到的菜单项，请描述这个设置的作用（例如“把 AIOC 选为音频输入”），不要猜它的确切名称。</li>
+</ol>
+</section>
+<section class="doc-section"><h2 id="s1-zh"><a class="anchor" href="#s1-zh" aria-label="本节链接">#</a>1. AIOC 是什么</h2>
+<p>AIOC 是一块带 <strong>USB-C</strong> 接口的小型开源电路板，直接插在手台的 <strong>建伍 K1 接口</strong>（3.5 mm + 2.5 mm 双插头）上。它一个顶三个：写频线、声卡接口（类似 SignaLink 或 Digirig）和 PTT 接口。 <span class="tag tag-official">官方</span></p>
+<p>插到电脑上后，它会被识别为一个包含以下部分的 USB 复合设备：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>显示为</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>USB 声卡</strong></td>
+<td>“All-In-One-Cable” / “AIOC Audio”（1 路单声道输入，1 路单声道输出）</td>
+<td>电台接收音频送到电脑，电脑发射音频送到电台</td>
+</tr>
+<tr>
+<td><strong>虚拟串口（CDC-ACM）</strong></td>
+<td>Windows：<code>COMx</code> · Linux：<code>/dev/ttyACMx</code> · macOS：<code>/dev/cu.usbmodemXXXX</code></td>
+<td>电台写频（CHIRP 等） <strong>以及</strong> 串口 PTT</td>
+</tr>
+<tr>
+<td><strong>CM108 兼容 HID</strong></td>
+<td>Linux：<code>/dev/hidrawX</code></td>
+<td>CM108 式 PTT（GPIO3）和 COS 输入（固件 ≥ 1.2.0）；配置接口（固件 ≥ 1.3.0）</td>
+</tr>
+<tr>
+<td><strong>DFU 运行时</strong></td>
+<td>—</td>
+<td>不拆壳即可升级固件（固件 ≥ 1.2.0）</td>
+</tr>
+</tbody></table></div>
+<p>关键参数 <span class="tag tag-official">官方</span> ：</p>
+<ul>
+<li><strong>USB VID:PID =</strong> <code>1209:7388</code>。在引导（DFU）模式下显示为 STM32 引导程序 <code>0483:df11</code>。</li>
+<li>USB 字符串：厂商 <code>AIOC</code>，产品 <code>All-In-One-Cable</code>。</li>
+<li>主控：STM32F302，用其内置 ADC/DAC 做声卡。</li>
+<li>在 <strong>Windows、Linux 和 macOS</strong> 上免驱。Android 可通过 USB OTG 使用音频功能。</li>
+<li>支持的采样率：<strong>48000 Hz（推荐）</strong>、32000、24000、22050（供 APRSdroid 使用）、16000、12000、11025、8000。</li>
+<li>支持 <strong>双 PTT</strong> 电台（PTT1 和 PTT2 两路输出）。</li>
+<li>PTT1 默认触发源：<strong>CM108 GPIO3</strong> 或 <strong>串口</strong> <code>DTR=1 且 RTS=0</code>，两者同时有效。</li>
+<li>PTT2 默认触发源：CM108 GPIO4。</li>
+<li>默认 COS：<strong>虚拟 COS</strong>（VCOS，根据接收音频电平判断）通过 CM108 的 <strong>音量减（Volume Down）</strong> 按键上报。</li>
+</ul>
+<h3 id="s1-a-zh"><a class="anchor" href="#s1-a-zh" aria-label="本节链接">#</a>硬件版本与固件兼容性</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>硬件</th>
+<th>固件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>rev 1.0 / 1.1</strong>（2023–2025 年售出的大多数）</td>
+<td>1.2.0、<strong>1.3.0（最稳妥）</strong>、1.4.x</td>
+<td><span class="tag tag-community">社区</span> 部分 rev 1.0 板子升级到 1.4.x 后会 <strong>卡死且 PTT 一直按下</strong>，或在 Windows 虚拟机中出现音频“代码 10”错误（GitHub #120、#138，尚未解决）。遇到这种情况请刷回 <strong>v1.3.0</strong>。</td>
+</tr>
+<tr>
+<td><strong>rev 1.2</strong>（2025 年 9 月起）</td>
+<td><strong>必须 1.4.0 或更新</strong> <span class="tag tag-official">官方</span></td>
+<td>新增：外部硬件 COS 输入、可切断的 PTT/UART 分离焊盘（可把 CAT 串口与 PTT 分开）、接收增益 1–16× 可调、发射增强（线路电平）。</td>
+</tr>
+<tr>
+<td><strong>G1LRO “双 COS” AIOC / URC</strong></td>
+<td>出厂 1.3.0</td>
+<td><span class="tag tag-community">社区</span> 板上有焊接跳线：<strong>LOGIC COS</strong>（Tidradio H3 新固件、SA818 模块）或 <strong>SPK COS</strong>（宝锋/泉盛这类通过喇叭音频判断的 COS）。</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p><strong>硬件版本印在电路板上。</strong> 只能使用为 STM32F302 编译的官方 <code>aioc-fw-x.y.z.bin</code> 固件。
+<span class="tag tag-community">社区</span> 用 STM32F373 焊出来的板子（旧版物料清单里出现过）无法枚举（错误 -71），需要更换主控芯片（GitHub #122）。</p>
+</blockquote>
+<h3 id="s1-b-zh"><a class="anchor" href="#s1-b-zh" aria-label="本节链接">#</a>已测试的电台 <span class="tag tag-official">官方</span></h3>
+<ul>
+<li>宝锋 Baofeng UV-5R（CHIRP + APRS）</li>
+<li>欧讯 Wouxun UV-9D Mate（CHIRP + APRS）</li>
+<li>BTECH UV-6X2 / 6X2（CHIRP）</li>
+<li>泉盛 Quansheng UV-K5（原厂固件、Egzumer 第三方固件、Quansheng Dock）</li>
+</ul>
+<p><strong>用户报告可用的其他机型</strong> <span class="tag tag-community">社区</span> ：宝锋 UV-82、BF-888、普星 Puxing PX-888(D)、欧讯 KG-UV9D Plus、
+Retevis RT85、Explorer QRZ-1、Tidradio H3，以及 <strong>建伍 TH-F6A</strong>（需把接口设为 <strong>SP/MIC</strong> 模式：菜单 9）。
+也有用户把 AIOC 手工接到车台和短波电台的数据/话筒口上：<strong>八重洲 Yaesu FT-817ND / FT-857D / FT-7800R</strong>（音频、PTT 和 CAT 串口）、协谷 Xiegu G90，以及通过建伍转接头连接的 Radtel RT-950 Pro。注意：在 rev 1.0 板子上，CAT 串口数据可能触发 PTT（GitHub #34），硬件 rev 1.2 的 PTT/UART 分离焊盘可解决此问题。</p>
+<p><strong>一般来说</strong> <span class="tag tag-typical">常规</span> ：任何带建伍式两针 K1 接口的手台都可以。包括大多数宝锋
+（UV-5R 系列、BF-888S、UV-82 <em>（UV-82 有双 PTT 版本）</em>）、泉盛（UV-K5/K6/K5(8)/UV-5R Plus）、
+BTECH、欧讯、TIDRADIO、Radtel、Retevis、Abbree、普星以及带 K1 接口的建伍手台。使用 <strong>其他接口</strong> 的电台
+（八重洲、艾可慕 Icom、摩托罗拉多针接口、宝锋/BTECH 螺纹式 UV-5X 插头、Anytone/Alinco 单插头）<strong>无法直接插上</strong>，需要转接头。</p>
+<h3 id="s1-c-zh"><a class="anchor" href="#s1-c-zh" aria-label="本节链接">#</a>局限（购买或尝试前请告知用户）</h3>
+<ul>
+<li><strong>只能通过话筒/喇叭接口传音频。</strong> K1 接口传的是经过滤波和去加重的喇叭音频以及话筒输入。因此 <strong>9600 波特分组、M17、DMR、D-STAR，或任何需要“平坦”鉴频器/调制器音频的模式都无法</strong> 通过 K1 接口工作。1200 波特 AFSK 分组/APRS、VARA FM（窄带）、SSTV、fldigi 各模式和语音都能很好地工作。</li>
+<li><strong>SSB 数字模式（FT8、JS8、FreeDV）</strong> 需要 SSB 电台。用 FM 手台时这些软件 <em>能运行</em>，但联系不到短波 SSB 上的普通 FT8/JS8 用户。</li>
+<li><strong>APRSdroid 没有 PTT 控制。</strong> 请使用 AIOC 的 <strong>虚拟 PTT（VPTT）</strong>（固件 ≥ 1.3.0）或电台的声控（VOX）。</li>
+<li><strong>iPhone/iPad 应用只能把 AIOC 当声卡用</strong>：iOS 不允许应用访问串口和 HID 部分，所以发射必须用 <strong>VPTT</strong>。 <span class="tag tag-community">社区</span></li>
+<li><strong>廉价手台收发切换慢。</strong> 分组通信可以用，但重传比车台多。 <span class="tag tag-community">社区</span></li>
+<li><strong>刷新固件会清除设置。</strong> 升级后请重新应用你的 aioc-util 设置。 <span class="tag tag-official">官方</span></li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s2-zh"><a class="anchor" href="#s2-zh" aria-label="本节链接">#</a>2. 首次设置（所有用户）</h2>
+<h3 id="s2-1-zh"><a class="anchor" href="#s2-1-zh" aria-label="本节链接">#</a>2.1 连接</h3>
+<ol>
+<li><strong>先关闭电台</strong>，再把 AIOC 用力插进 K1 接口，两个插头都要插到底。</li>
+<li>用 USB-C 线连接电脑、手机或树莓派。</li>
+<li>打开电台，调到要用的频率。</li>
+</ol>
+<h3 id="s2-2-zh"><a class="anchor" href="#s2-2-zh" aria-label="本节链接">#</a>2.2 确认电脑已识别</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>系统</th>
+<th>检查方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Windows</strong></td>
+<td>设备管理器 → <em>端口（COM 和 LPT）</em> 出现一个新的 <strong>COMx</strong>。<em>声音设置</em> 里输入（麦克风）和输出（扬声器）都有“All-In-One-Cable”。</td>
+</tr>
+<tr>
+<td><strong>Linux</strong></td>
+<td><code>lsusb</code> 显示 <code>1209:7388</code>。<code>arecord -l</code> / <code>aplay -l</code> 显示声卡。<code>ls /dev/ttyACM*</code> 显示串口。<code>ls /dev/hidraw*</code> 显示 HID。</td>
+</tr>
+<tr>
+<td><strong>macOS</strong></td>
+<td>系统设置 → 声音 中有“All-In-One-Cable”。<code>ls /dev/cu.usbmodem*</code> 显示串口。</td>
+</tr>
+<tr>
+<td><strong>Android</strong></td>
+<td>需要 USB-C OTG 连接。连接后，使用系统音频输入的应用会自动使用 AIOC。</td>
+</tr>
+</tbody></table></div>
+<h3 id="s2-3-zh"><a class="anchor" href="#s2-3-zh" aria-label="本节链接">#</a>2.3 系统音频设置（重要）</h3>
+<ul>
+<li><strong>不要把 AIOC 设为系统默认播放设备。</strong> 否则系统声音（通知、视频、提示音）都会从电台发出去；如果开了 VPTT，它们 <strong>会让电台发射</strong>。请保留你平时的扬声器为默认设备，只在电台软件里选择 AIOC。</li>
+<li><strong>Windows：</strong> 声音控制面板 → AIOC 设备 → <em>属性</em>：<ul>
+<li><em>高级</em>：格式设为 <strong>1 声道、16 位、48000 Hz</strong>。</li>
+<li>关闭“音频增强”，以及“通信 → 降低其他声音”的自动闪避。</li>
+<li><em>侦听</em> 选项卡：确认“侦听此设备” <strong>未勾选</strong>。</li>
+</ul>
+</li>
+<li><strong>Linux（PipeWire/PulseAudio）：</strong> 用 <code>pavucontrol</code> 调电平。很多程序（Direwolf 及基于 ALSA 的程序）可直接使用 ALSA（<code>plughw:CARD,0</code>），可避免重采样。</li>
+<li><strong>macOS：</strong> 音频 MIDI 设置 → AIOC → 格式设为 48,000 Hz。</li>
+</ul>
+<h3 id="s2-4-zh"><a class="anchor" href="#s2-4-zh" aria-label="本节链接">#</a>2.4 调整音频电平（所有数字模式）</h3>
+<p><span class="tag tag-typical">常规</span></p>
+<ul>
+<li><strong>接收（电台 → 电脑）：</strong> 把 <strong>电台音量旋钮</strong> 开到大约 30–50%（部分 VARA FM 用户开到约 75%；G1LRO 建议 AllStar 节点用约 50%） <span class="tag tag-community">社区</span> 。调到软件电平表显示信号强但不削波为止。例如 Direwolf 收到一包数据时，“audio level”应在 30–70 左右。
+在硬件 rev 1.2 且固件 ≥ 1.4.0 时，还可以用 aioc-util 提高 AIOC 内部接收增益（1×–16×）。</li>
+<li><strong>发射（电脑 → 电台）：</strong> 系统里 AIOC 的 <strong>输出音量先设为约 30–50%</strong>。太大会频偏过大、失真，对方解不出来。可用另一台电台监听，或看其他电台能否解码你的信号。
+硬件 rev 1.2 有发射“增强”（boost）功能，用于线路电平输入（普通手台不需要）。</li>
+<li><strong>电台设置：</strong> 关闭 <strong>声控 VOX</strong>（除非你有意使用 VOX）。关闭按键音和尾音。关闭 <strong>省电模式</strong>：它会截掉收到数据包的开头。 <span class="tag tag-community">社区</span>
+<strong>静噪：</strong> 用 Direwolf 或 Soundmodem 收分组/APRS 时，<strong>静噪全开（0 级）</strong> 往往解码更好，因为宝锋的静噪打开慢，会切掉数据包开头，而软件调制解调器本身会做载波检测。 <span class="tag tag-community">社区</span>
+对类似 VOX 的方案（VPTT/VCOS、AllStarLink、SvxLink、EchoLink），信道空闲时静噪必须是 <strong>关闭</strong> 的（无信号时静音）。把 <strong>发射限时（TOT）</strong> 设得比你最长的一次发射更长（SSTV 和 Winlink 可能超过 2 分钟）。</li>
+</ul>
+<h3 id="s2-5-zh"><a class="anchor" href="#s2-5-zh" aria-label="本节链接">#</a>2.5 Linux 权限（只需设置一次）</h3>
+<p>打开 <code>/dev/ttyACM*</code> 或 <code>/dev/hidraw*</code> 的程序需要权限：</p>
+<div class="code"><pre><code class="language-bash"># 串口权限
+sudo usermod -aG dialout $USER     # (Arch/Fedora 可能是 &quot;uucp&quot; 组)
+# 音频
+sudo usermod -aG audio $USER
+
+# AIOC HID 的 udev 规则（CM108 PTT / 配置）+ 防止 ModemManager 占用串口
+sudo tee /etc/udev/rules.d/91-aioc.rules &gt;/dev/null &lt;&lt;&#39;EOF&#39;
+SUBSYSTEM==&quot;hidraw&quot;, ATTRS{idVendor}==&quot;1209&quot;, ATTRS{idProduct}==&quot;7388&quot;, MODE=&quot;0666&quot;
+SUBSYSTEM==&quot;tty&quot;,    ATTRS{idVendor}==&quot;1209&quot;, ATTRS{idProduct}==&quot;7388&quot;, ENV{ID_MM_DEVICE_IGNORE}=&quot;1&quot;, SYMLINK+=&quot;aioc&quot;, MODE=&quot;0666&quot;
+EOF
+sudo udevadm control --reload &amp;&amp; sudo udevadm trigger
+# 注销并重新登录（使组生效），然后拔插 AIOC
+</code></pre></div>
+<p>设置后，串口还可以用 <strong><code>/dev/aioc</code></strong> 访问。ttyACM 编号变化时这个名字不变。
+aioc-util 项目也自带现成的 udev 规则（<code>udev/rules.d/91-aioc.rules</code>）。 <span class="tag tag-tool">工具文档</span></p>
+<blockquote>
+<p><strong>ModemManager</strong>（Ubuntu、Debian 桌面版、Fedora 上常见）可能会探测新的 ttyACM 设备并向其发送 AT 指令，导致写频失败或随机触发 PTT。上面的 <code>ID_MM_DEVICE_IGNORE</code> 规则可以避免。
+如果你不用蜂窝网络调制解调器，也可以运行 <code>sudo systemctl disable --now ModemManager</code>。</p>
+</blockquote>
+</section>
+<section class="doc-section"><h2 id="s3-zh"><a class="anchor" href="#s3-zh" aria-label="本节链接">#</a>3. 决策表：“我需要什么软件？”</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>用户想要……</th>
+<th>Windows</th>
+<th>Linux / 树莓派</th>
+<th>macOS</th>
+<th>Android</th>
+<th>章节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>写频（频道/存储）</strong></td>
+<td>CHIRP</td>
+<td>CHIRP</td>
+<td>CHIRP</td>
+<td>—</td>
+<td>5.1</td>
+</tr>
+<tr>
+<td><strong>刷第三方固件（泉盛 UV-K5）</strong></td>
+<td>网页刷机工具（Chrome）/ k5prog</td>
+<td>网页刷机工具 / k5prog</td>
+<td>网页刷机工具</td>
+<td>—</td>
+<td>5.2</td>
+</tr>
+<tr>
+<td><strong>收发 APRS（带地图）</strong></td>
+<td>Direwolf + APRSIS32 / YAAC / PinPoint</td>
+<td>Direwolf + YAAC / Xastir</td>
+<td>Direwolf + YAAC</td>
+<td>APRSdroid（+VPTT）</td>
+<td>5.3–5.5</td>
+</tr>
+<tr>
+<td><strong>APRS iGate 网关 / 数字中继</strong></td>
+<td>Direwolf</td>
+<td>Direwolf（无界面树莓派）</td>
+<td>Direwolf</td>
+<td>—</td>
+<td>5.3</td>
+</tr>
+<tr>
+<td><strong>给其他软件用的分组 TNC（KISS/AGW）</strong></td>
+<td>Direwolf、UZ7HO Soundmodem</td>
+<td>Direwolf、QtSoundModem</td>
+<td>Direwolf</td>
+<td>—</td>
+<td>5.3、5.6</td>
+</tr>
+<tr>
+<td><strong>分组 BBS / 节点 / 终端</strong></td>
+<td>Direwolf + QtTermTCP / EasyTerm / BPQ32</td>
+<td>Direwolf + Paracon / QtTermTCP / LinBPQ / Linpac</td>
+<td>Direwolf + QtTermTCP</td>
+<td>—</td>
+<td>5.7</td>
+</tr>
+<tr>
+<td><strong>在 VHF/UHF 上收发 Winlink 邮件</strong></td>
+<td>Winlink Express + VARA FM / 分组</td>
+<td>Pat + Direwolf（分组）或 VARA FM（Wine）</td>
+<td>Pat + Direwolf</td>
+<td>—</td>
+<td>5.8</td>
+</tr>
+<tr>
+<td><strong>VARA FM 键盘聊天</strong></td>
+<td>VarAC / VARA Chat</td>
+<td>Wine 下运行 VarAC</td>
+<td>—</td>
+<td>—</td>
+<td>5.8</td>
+</tr>
+<tr>
+<td><strong>SSTV（收发图片、国际空间站 SSTV）</strong></td>
+<td>MMSSTV</td>
+<td>QSSTV</td>
+<td>Black Cat SSTV / MultiScan</td>
+<td>Robot36（仅接收）</td>
+<td>5.9</td>
+</tr>
+<tr>
+<td><strong>应急通信文本/表单（NBEMS）</strong></td>
+<td>fldigi + flmsg + flamp</td>
+<td>fldigi + flmsg + flamp</td>
+<td>fldigi</td>
+<td>—</td>
+<td>5.10</td>
+</tr>
+<tr>
+<td><strong>FT8 / JS8（FM 上非标准用法）</strong></td>
+<td>WSJT-X / JS8Call</td>
+<td>WSJT-X / JS8Call</td>
+<td>WSJT-X / JS8Call</td>
+<td>—</td>
+<td>5.11</td>
+</tr>
+<tr>
+<td><strong>AllStarLink 节点（手台作节点电台）</strong></td>
+<td>—</td>
+<td><strong>AllStarLink 3</strong>（Debian / 树莓派）</td>
+<td>—</td>
+<td>—</td>
+<td>5.12</td>
+</tr>
+<tr>
+<td><strong>EchoLink 链路 / 直频节点 / 中继控制器</strong></td>
+<td>EchoLink（Sysop 模式）</td>
+<td><strong>SvxLink</strong></td>
+<td>—</td>
+<td>—</td>
+<td>5.13</td>
+</tr>
+<tr>
+<td><strong>用脚本控制 PTT / 通用电台控制</strong></td>
+<td>Hamlib（rigctl/rigctld）</td>
+<td>Hamlib、aioc-util</td>
+<td>Hamlib</td>
+<td>—</td>
+<td>5.14</td>
+</tr>
+<tr>
+<td><strong>树莓派一体化数据站（网页界面里做 APRS、Winlink、分组、SSTV）</strong></td>
+<td>—</td>
+<td><strong>DigiPi</strong>（树莓派镜像）</td>
+<td>—</td>
+<td>—</td>
+<td>5.15</td>
+</tr>
+<tr>
+<td><strong>用 iPhone 或 iPad 收发 Winlink / 分组</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>iOS：RadioMail、Packet Commander（+VPTT）</td>
+<td>5.16</td>
+</tr>
+<tr>
+<td><strong>基于分组的 Mesh / 离网组网</strong></td>
+<td>Reticulum，经 Direwolf KISS</td>
+<td>Reticulum（RNS、NomadNet、Sideband），经 Direwolf KISS</td>
+<td>Reticulum</td>
+<td>Sideband</td>
+<td>5.17</td>
+</tr>
+<tr>
+<td><strong>GMRS 上的 AllStar 式联网</strong></td>
+<td>—</td>
+<td>GMRSLive（基于 AllStar）</td>
+<td>—</td>
+<td>—</td>
+<td>5.12</td>
+</tr>
+<tr>
+<td><strong>接车台/短波电台（音频 + PTT + CAT）</strong></td>
+<td>WSJT-X/fldigi + CAT</td>
+<td>同左</td>
+<td>同左</td>
+<td>—</td>
+<td>5.18</td>
+</tr>
+<tr>
+<td><strong>猎狐信标（无需电脑）</strong></td>
+<td>AIOC Toolkit 或 aioc-util（用于设置）</td>
+<td>同左</td>
+<td>同左</td>
+<td>—</td>
+<td>7.4</td>
+</tr>
+<tr>
+<td><strong>修改 AIOC 设置（PTT 源、VPTT/VCOS、增益）</strong></td>
+<td><strong>AIOC Toolkit</strong>（Chrome/Edge）</td>
+<td>AIOC Toolkit 或 aioc-util</td>
+<td>AIOC Toolkit 或 aioc-util</td>
+<td>—</td>
+<td>7</td>
+</tr>
+<tr>
+<td><strong>升级 AIOC 固件</strong></td>
+<td><strong>AIOC Toolkit</strong>（Flash Firmware 选项卡）</td>
+<td>dfu-util 或 AIOC Toolkit</td>
+<td>dfu-util 或 AIOC Toolkit</td>
+<td>—</td>
+<td>9</td>
+</tr>
+<tr>
+<td><strong>录制或监听接收音频、扫描记录</strong></td>
+<td>Audacity / 任意录音软件</td>
+<td>Audacity / arecord / rtl 类工具</td>
+<td>Audacity</td>
+<td>任意录音应用</td>
+<td>2.4</td>
+</tr>
+</tbody></table></div>
+</section>
+<section class="doc-section"><h2 id="s4-zh"><a class="anchor" href="#s4-zh" aria-label="本节链接">#</a>4. PTT 方式（看任何配置步骤之前请先理解）</h2>
+<p>AIOC 可以用多种方式让电台发射（PTT1），这些方式可以组合使用。 <span class="tag tag-official">官方</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>软件如何触发</th>
+<th>适合</th>
+<th>默认？</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CM108 HID GPIO3</strong></td>
+<td>支持“CM108 PTT”的软件（Direwolf、AllStarLink、SvxLink、Hamlib <code>-P CM108</code>、Linux 上的 QtSoundModem）</td>
+<td>Linux；最可靠的方式</td>
+<td>✅ 开启</td>
+</tr>
+<tr>
+<td><strong>串口</strong> <code>DTR=1 且 RTS=0</code></td>
+<td>软件在 AIOC 的 COM 口上把 DTR 置高、RTS 置低</td>
+<td>用 COM 口 PTT 的 Windows/macOS 软件</td>
+<td>✅ 开启</td>
+</tr>
+<tr>
+<td><strong>仅串口 DTR</strong>（<code>SERIALDTR</code>）</td>
+<td>软件拉高 DTR，但 RTS 也保持高电平</td>
+<td>无法保持 RTS 为低的软件</td>
+<td>需用 aioc-util 设置</td>
+</tr>
+<tr>
+<td><strong>仅串口 RTS</strong>（<code>SERIALRTS</code>）</td>
+<td>软件用 RTS 控制发射</td>
+<td>只支持 RTS PTT 的软件</td>
+<td>需用 aioc-util 设置</td>
+</tr>
+<tr>
+<td><strong>串口 非DTR 且 RTS</strong>（<code>SERIALNDTRRTS</code>）</td>
+<td>反向逻辑</td>
+<td>很少用到</td>
+<td>需用 aioc-util 设置</td>
+</tr>
+<tr>
+<td><strong>虚拟 PTT（VPTT）</strong></td>
+<td><strong>软件无需 PTT 控制。</strong> 只要软件播放的音频超过阈值，AIOC 就让电台发射（相当于 AIOC 内部一个非常快、干净的声控）</td>
+<td>APRSdroid，任何没有 PTT 的应用</td>
+<td>需用 aioc-util 设置，固件 ≥ 1.3.0</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p><strong>固件 1.2.0 之前</strong>，PTT 只看“DTR=1”，导致 CHIRP 写频时电台会发射。固件 ≥ 1.2.0 改为 DTR=1 且 RTS=0。 <span class="tag tag-official">官方</span></p>
+<p><strong>UART 锁定：</strong> 默认情况下，PTT1 有效期间会忽略电台发来的串口数据，这样 AIOC 能同时当写频线和声卡用。可在 <code>SERIAL_CTRL</code> 寄存器中修改。 <span class="tag tag-official">官方</span></p>
+</blockquote>
+<p><strong>给 AI 助手的经验法则：</strong></p>
+<ol>
+<li>软件支持 <strong>CM108 PTT</strong> 就用它。</li>
+<li>否则用 <strong>COM 口的“DTR”PTT</strong>，并保持 RTS 关闭/为低。</li>
+<li>电台还是不发射，看第 6 节。</li>
+</ol>
+</section>
+<section class="doc-section"><h2 id="s5-zh"><a class="anchor" href="#s5-zh" aria-label="本节链接">#</a>5. 软件配置步骤</h2>
+<blockquote>
+<p>示例中请把 <code>N0CALL</code> 换成用户的呼号，把 <code>COM5</code>、<code>/dev/ttyACM0</code>、<code>/dev/hidraw0</code> 和 <code>plughw:1,0</code> 换成用户实际的设备（见 2.2 节）。</p>
+</blockquote>
+<h3 id="s5-1-zh"><a class="anchor" href="#s5-1-zh" aria-label="本节链接">#</a>5.1 CHIRP：给电台写频（Windows / Linux / macOS）</h3>
+<p><span class="tag tag-official">官方</span> CHIRP 的用法和普通写频线完全一样，不需要驱动。</p>
+<ol>
+<li>从 chirpmyradio.com 安装 <strong>CHIRP-next</strong>。Linux：pipx/flatpak；macOS：.app 安装包。</li>
+<li>把 AIOC 插到电台上并开机。电台要停在 <strong>普通的信道/频率界面</strong>（不要停在菜单里）。</li>
+<li>CHIRP → <strong>Radio → Download from Radio</strong>（从电台读取）→ 选择 AIOC 的端口（<code>COMx</code>、<code>/dev/ttyACM0</code> 或 <code>/dev/cu.usbmodem…</code>）→ 选择厂商/型号 → OK。</li>
+<li>编辑信道 → <strong>Radio → Upload to Radio</strong>（写入电台）。</li>
+</ol>
+<p>提示 <span class="tag tag-typical">常规</span> ：</p>
+<ul>
+<li>写入之前，一定 <strong>先读取并保存一份备份</strong> <code>.img</code>。</li>
+<li>泉盛 UV-K5 <strong>原厂固件</strong>：用“Quansheng UV-K5”驱动。<strong>Egzumer 或其他第三方固件</strong>：用固件作者提供的对应 CHIRP 驱动模块（在 CHIRP 中：<em>Help → Developer mode → File → Load module</em>），或在较新的 CHIRP 里选择列出该固件的驱动。</li>
+<li><span class="tag tag-community">社区</span> <strong>Windows：CHIRP 读频后电台一直在发射。</strong> 早期固件（1.2.0 之前）会这样，因为 Windows 关闭端口时会改变 DTR/RTS。请把 AIOC 升级到 ≥ 1.2.0。如果红灯一直亮，拔插一下 USB。</li>
+<li><span class="tag tag-community">社区</span> 读频失败一次就再试一次。刚插上后的第一次偶尔会失败，晃一下插头就好（接触问题）。</li>
+<li>如果提示“radio did not respond”（电台无响应）：重新插好插头、确认电台已开机、选择准确的型号（例如 UV-5R 与 UV-5R Plus / UV-5RM 是不同的电台）、调低音量、关闭 VOX。</li>
+<li>宝锋 <strong>UV-5RM / UV-5R Mini / UV-17</strong> 等较新型号可能需要特定的 CHIRP 型号或厂家自己的写频软件。AIOC 仍然可以当它们的写频线。</li>
+<li><strong>厂家写频软件</strong>（宝锋/BTECH/Radtel/TIDRADIO 的工具）也能用：选择 AIOC 的 COM 口即可。<strong>RT Systems</strong> 软件可能只认 RT Systems 自家的线。</li>
+</ul>
+<h3 id="s5-2-zh"><a class="anchor" href="#s5-2-zh" aria-label="本节链接">#</a>5.2 泉盛 UV-K5 刷固件</h3>
+<p><span class="tag tag-official">官方</span> 固件 v1.4.0 把串口缓冲区加倍，专门解决部分手台刷固件失败的问题。开始前请确认 AIOC 已是 v1.4.x。</p>
+<p><span class="tag tag-typical">常规</span></p>
+<ol>
+<li>关闭电台。<strong>按住 PTT 再开机</strong> 进入引导模式（手电灯亮，屏幕不亮）。</li>
+<li>在 Chrome/Edge 中使用网页刷机工具（Web Serial）。Egzumer 项目里有链接。也可以用 <code>k5prog</code>/<code>uvk5</code> 等命令行工具。</li>
+<li>选择 AIOC 的串口，加载 <code>.bin</code> 文件，开始刷写。</li>
+<li>提醒用户：<strong>刷第三方固件风险自负。</strong> 应保留原厂固件和校准数据的备份（CHIRP/K5 工具可以导出校准数据）。</li>
+</ol>
+<h3 id="s5-3-zh"><a class="anchor" href="#s5-3-zh" aria-label="本节链接">#</a>5.3 Direwolf：APRS、分组 TNC、iGate、数字中继（Windows / Linux / macOS）</h3>
+<p>Direwolf 是核心的“软件 TNC”。大多数 APRS 和分组软件通过 <strong>AGW（端口 8000）</strong> 或 <strong>KISS-TCP（端口 8001）</strong> 连接它。</p>
+<p><strong>安装</strong> <span class="tag tag-typical">常规</span> ：Linux <code>sudo apt install direwolf</code>。Windows：从 GitHub releases（wb2osz/direwolf）下载 zip。macOS：<code>brew install direwolf</code>。</p>
+<p><strong>找到音频设备：</strong></p>
+<ul>
+<li>Linux：<code>arecord -l</code>，例如 <code>card 1: AllInOneCable [All-In-One-Cable], device 0</code> → <code>plughw:1,0</code>（或按名称 <code>plughw:CARD=AllInOneCable,DEV=0</code>；请在 <code>arecord -l</code> 中确认准确的声卡 ID）。</li>
+<li>Windows：先运行一次 Direwolf，它会列出带编号的音频设备，使用 AIOC 的编号。</li>
+</ul>
+<p><strong>最小</strong> <code>direwolf.conf</code> <span class="tag tag-official">官方设置 + 常规补充</span> ：</p>
+<div class="code"><pre><code class="language-conf"># --- 音频 ---
+ADEVICE plughw:1,0        # Linux  (Windows: ADEVICE 3 3   &lt;- Direwolf 列出的 AIOC 输入/输出编号)
+ARATE 48000
+ACHANNELS 1
+
+# --- 通道 0 ---
+CHANNEL 0
+MYCALL N0CALL-10
+MODEM 1200
+
+# --- PTT：只选一种 ---
+PTT CM108                 # Linux: CM108 HID PTT（推荐）。自动识别；或写 &quot;PTT CM108 /dev/hidraw0&quot;
+#PTT /dev/ttyACM0 DTR -RTS  # Linux 串口 PTT
+#PTT COM5 DTR -RTS          # Windows 串口 PTT
+#PTT /dev/cu.usbmodem1101 DTR -RTS   # macOS 串口 PTT
+
+# --- 给客户端软件用的端口 ---
+AGWPORT 8000
+KISSPORT 8001
+</code></pre></div>
+<p><span class="tag tag-official">官方</span> 在 AIOC 上使用 CM108 PTT 时，Direwolf 可能会打印 <strong>警告</strong>，这些警告无害（见 direwolf issue #448）。</p>
+<p><strong>附加功能</strong> <span class="tag tag-typical">常规</span> ：</p>
+<div class="code"><pre><code class="language-conf"># 位置信标（每 30 分钟，路径 WIDE1-1,WIDE2-1）。请填你自己的经纬度。
+PBEACON delay=1 every=30 overlay=S symbol=&quot;digi&quot; lat=42^37.14N long=071^20.83W power=5 height=20 gain=3 comment=&quot;AIOC + HT&quot; via=WIDE1-1,WIDE2-1
+
+# 仅接收的 iGate（需要联网 + APRS-IS 验证码）
+IGSERVER noam.aprs2.net        # euro.aprs2.net / asia.aprs2.net / aunz.aprs2.net
+IGLOGIN N0CALL-10 12345
+
+# 补盲数字中继（只转发 WIDE1-1）—— 仅在当地合适时开启
+DIGIPEAT 0 0 ^WIDE1-1$ ^WIDE1-1$
+</code></pre></div>
+<p><span class="tag tag-community">社区</span> <strong>AIOC 用户报告的 Direwolf 常见坑：</strong></p>
+<ul>
+<li><code>PTT CM108 3 -3</code>：末尾的 <code>-3</code> 会 <strong>反转</strong> PTT，电台会一直发射。请用 <code>PTT CM108</code> 或 <code>PTT CM108 3</code>。</li>
+<li>使用 CM108 PTT 时，注释掉指向同一设备的旧 <code>DCD</code> 配置行。</li>
+<li>在树莓派上可用的串口写法：<code>PTT /dev/ttyACM0 DTR -RTS</code>（写成 <code>-RTS DTR</code> 也可以）。</li>
+<li>Windows 下 48000 Hz 时出现“pre filter size”警告：无害。也可以试试 <code>ARATE 24000</code>，或用 Direwolf 1.6 正式版代替开发版。</li>
+<li>第一次发射后 PTT <strong>一直按住</strong>，或发射时 AIOC“崩溃”，几乎都是射频回授（见第 8 节）。</li>
+</ul>
+<p>启动：<code>direwolf -c direwolf.conf</code>（加 <code>-t 0</code> 可关闭日志颜色）。
+测试：<code>direwolf</code> 会显示解出的数据包和音频电平。发一个信标，然后在 aprs.fi 上查看。</p>
+<p><strong>APRS 频率</strong> <span class="tag tag-typical">常规</span> ：144.390 MHz（北美）、144.800 MHz（欧洲/非洲）、145.175 MHz（澳大利亚）、
+<strong>144.640 MHz（中国）</strong>、144.660 MHz（日本）、145.825 MHz（国际空间站数字中继，全球）。用户须确认当地的频率规划。</p>
+<h3 id="s5-4-zh"><a class="anchor" href="#s5-4-zh" aria-label="本节链接">#</a>5.4 APRS 客户端软件（用 Direwolf 作调制解调器）</h3>
+<p>以下软件都连接同一台电脑上运行的 Direwolf，由 Direwolf 负责音频和 PTT。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>系统</th>
+<th>连接设置 <span class="tag tag-typical">常规</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>YAAC</strong>（Java）</td>
+<td>Win/Linux/macOS</td>
+<td><em>File → Configure → Expert mode → Ports → Add → “AGWPE”</em>，主机 <code>localhost</code>，端口 <code>8000</code>（或“KISS over TCP” <code>8001</code>）</td>
+</tr>
+<tr>
+<td><strong>Xastir</strong></td>
+<td>Linux/macOS</td>
+<td><em>Interface → Interface Control → Add → “Networked AGWPE”</em>，主机 <code>localhost</code>，端口 <code>8000</code></td>
+</tr>
+<tr>
+<td><strong>APRSIS32</strong></td>
+<td>Windows（也可在 Wine 下运行）</td>
+<td><em>Configure → Ports → New Port → 类型“AGW”</em>，<code>127.0.0.1:8000</code>（或 KISS TCP <code>8001</code>）</td>
+</tr>
+<tr>
+<td><strong>PinPoint APRS</strong></td>
+<td>Windows</td>
+<td>TNC 类型“AGWPE”，<code>127.0.0.1:8000</code></td>
+</tr>
+<tr>
+<td><strong>UI-View32</strong>（老软件）</td>
+<td>Windows</td>
+<td>经 Direwolf 的 AGW 端口使用 AGWPE 模式</td>
+</tr>
+<tr>
+<td><strong>APRS Messenger 等</strong></td>
+<td>Windows</td>
+<td>用 AGW 或 KISS-TCP 连接 Direwolf</td>
+</tr>
+</tbody></table></div>
+<p>YAAC 也自带声卡调制解调器，但 Direwolf 解码更好、对 AIOC PTT 的支持更可靠，所以推荐用 Direwolf。</p>
+<h3 id="s5-5-zh"><a class="anchor" href="#s5-5-zh" aria-label="本节链接">#</a>5.5 APRSdroid：在 Android 上玩 APRS</h3>
+<p><span class="tag tag-official">官方</span> AIOC 支持 APRSdroid 需要的固定 <strong>22050 Hz</strong> 采样率（实际为 22052 Hz，误差约 90 ppm，对 APRS 没有影响）。
+APRSdroid <strong>没有 PTT 控制</strong>，所以要发射，需先在 AIOC 上 <strong>开启虚拟 PTT</strong>（在电脑上一次性设置，固件 ≥ 1.3.0）：</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --ptt1 VPTT --store
+# 同时保留 CM108 + 串口 PTT：
+./aioc-util.py --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store
+</code></pre></div>
+<p>APRSdroid 设置 <span class="tag tag-typical">常规</span> ：</p>
+<ol>
+<li>用 USB-C OTG 线/转接头把 AIOC 接到手机上。</li>
+<li>APRSdroid → <em>Preferences → Connection Protocol：“AFSK”</em>（音频调制解调器）。设置呼号/SSID 和验证码（只有用 APRS-IS 才需要验证码）。</li>
+<li>手机性能较弱时，关闭“high-quality demodulator”（高质量解调器）。手机媒体音量设为中等。</li>
+<li>确保没有其他应用发出声音（开了 VPTT 后任何声音都会让电台发射）。打开勿扰模式。</li>
+</ol>
+<p>其他 Android 应用 <span class="tag tag-typical">常规</span> ：<strong>Robot36</strong>（SSTV 接收）、<strong>DroidSSTV</strong> 以及任意录音应用。应用需要使用 USB 音频输入，连接 AIOC 后大多数会自动切换。</p>
+<h3 id="s5-6-zh"><a class="anchor" href="#s5-6-zh" aria-label="本节链接">#</a>5.6 UZ7HO Soundmodem（Windows）/ QtSoundModem（Linux、Windows）</h3>
+<p>和 Direwolf 类似的软件调制解调器（AFSK 1200 等），提供 AGW（8000）和 KISS（8100）端口。
+<span class="tag tag-typical">常规</span></p>
+<ul>
+<li><em>Settings → Devices</em>：输入设备 = AIOC 麦克风，输出设备 = AIOC 扬声器。
+<strong>UZ7HO Soundmodem 不接受高于 12000 的采样率，请用 12000</strong>，AIOC 支持这个采样率。 <span class="tag tag-community">社区</span></li>
+<li>PTT：<em>PTT Port</em> = AIOC 的 COM 口。<strong>勾选“Swap COM pins for PTT”</strong>：Soundmodem 默认用 RTS 发射，交换后改用 DTR，和 AIOC 匹配。“Dual PTT”不要勾选。 <span class="tag tag-community">社区, GitHub #11</span><ul>
+<li>仍不发射的话，把 AIOC 的 PTT 源改为 <code>SERIALDTR</code>（第 6 节），或改为 <code>VPTT</code>。</li>
+</ul>
+</li>
+<li>Linux 上的 QtSoundModem 也可以用 <strong>CM108 PTT</strong>（如果你的版本有，选择 hidraw 设备 / CM108 选项）。</li>
+<li>调制方式：普通 VHF 分组/APRS 用 AFSK AX.25 1200bd。</li>
+</ul>
+<h3 id="s5-7-zh"><a class="anchor" href="#s5-7-zh" aria-label="本节链接">#</a>5.7 分组 BBS、节点和终端</h3>
+<p>以下软件都通过 AGW 或 KISS 使用 Direwolf（或 Soundmodem）作 TNC。 <span class="tag tag-typical">常规</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>系统</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>QtTermTCP</strong></td>
+<td>Win/Linux/macOS</td>
+<td>Setup → AGW：主机 127.0.0.1，端口 8000。可连接 BBS/节点。</td>
+</tr>
+<tr>
+<td><strong>Paracon</strong></td>
+<td>Win/Linux/macOS（Python）</td>
+<td>AGWPE 客户端，127.0.0.1:8000。简单的多会话分组终端。</td>
+</tr>
+<tr>
+<td><strong>EasyTerm / Outpost</strong></td>
+<td>Windows</td>
+<td>Outpost（应急通信/ARES 分组消息常用）可以用 AGWPE 或 KISS。</td>
+</tr>
+<tr>
+<td><strong>BPQ32 / LinBPQ</strong></td>
+<td>Win / Linux</td>
+<td>节点 + BBS + 聊天。<code>PORT</code> 段用 <code>DRIVER=UZ7HO</code>（以 AGW 连 Direwolf/Soundmodem），或 KISS over TCP（<code>TYPE=ASYNC</code>、<code>PROTOCOL=KISS</code>、<code>IPADDR=127.0.0.1</code>、<code>TCPPORT=8001</code>）。</td>
+</tr>
+<tr>
+<td><strong>Linux AX.25 协议栈 + Linpac / JNOS</strong></td>
+<td>Linux</td>
+<td>用 <code>kissattach</code> 连接 Direwolf 的伪终端（<code>direwolf -p</code> 会创建 <code>/tmp/kisstnc</code>），或使用 <code>tncattach</code>。</td>
+</tr>
+</tbody></table></div>
+<h3 id="s5-8-zh"><a class="anchor" href="#s5-8-zh" aria-label="本节链接">#</a>5.8 Winlink 邮件：Winlink Express、Pat、VARA FM、分组</h3>
+<h4 id="s5-8-1-zh"><a class="anchor" href="#s5-8-1-zh" aria-label="本节链接">#</a>5.8.1 Winlink Express（Windows）+ VARA FM</h4>
+<p><span class="tag tag-official">官方</span> 在 VARA FM 中把 <strong>PTT 引脚（PTT pin）设为“DTR only”</strong>，这样 VARA 产生的 DTR/RTS 状态正是 AIOC 需要的。</p>
+<p><span class="tag tag-typical">常规</span> <strong>设置步骤：</strong></p>
+<ol>
+<li>安装 <strong>Winlink Express</strong> 和 <strong>VARA FM</strong>（来自 Rosmodem 网站；免费模式限速，购买授权后解除限速）。</li>
+<li>打开 VARA FM → <em>Settings → SoundCard</em>：Device Input = AIOC 麦克风，Device Output = AIOC 扬声器。</li>
+<li>VARA FM → <em>Settings → PTT</em>：<strong>COM 口</strong> = AIOC 的 COM，<strong>Pin = DTR only</strong>。</li>
+<li>大多数手台选 <strong>Narrow</strong>（VARA FM 1200）。Wide（9600）通常无法通过 K1 音频工作（见“局限”）。</li>
+<li>调整接收电平，让 VARA 的电平表在绿色区。把发射驱动（VARA → <em>Tune</em>，加上 Windows 输出音量）调到能稳定连通的最低值。</li>
+<li>Winlink Express → <em>Open Session：“VARA FM Winlink”</em> → <em>Settings</em> → 主机保持 127.0.0.1，端口 8300/8301 → 用 <em>Channel Selection</em> 找一个网关 → <em>Start</em>。</li>
+<li>把电台的 <strong>TOT</strong> 设到最大或关闭。用小功率或中功率，避免手台过热。</li>
+</ol>
+<h4 id="s5-8-2-zh"><a class="anchor" href="#s5-8-2-zh" aria-label="本节链接">#</a>5.8.2 Winlink Express + 分组（1200 波特）</h4>
+<p><span class="tag tag-typical">常规</span> 运行 Direwolf（5.3）或 UZ7HO Soundmodem → Winlink Express → <em>Open Session：“Packet Winlink”</em> →
+<em>Settings</em>：TNC 类型 <strong>KISS</strong>，连接方式 <strong>TCP</strong>，主机 <code>127.0.0.1</code>，端口 <code>8001</code>（Direwolf KISS）/ <code>8100</code>（UZ7HO）。</p>
+<h4 id="s5-8-3-zh"><a class="anchor" href="#s5-8-3-zh" aria-label="本节链接">#</a>5.8.3 Pat（Linux、macOS、Windows、树莓派）</h4>
+<p><span class="tag tag-typical">常规</span> Pat 是一个单程序的 Winlink 客户端，带网页界面。</p>
+<div class="code"><pre><code class="language-bash">pat configure        # 设置 mycall、secure_login_password、locator
+</code></pre></div>
+<ul>
+<li><strong>通过 Direwolf 走分组（AGWPE）：</strong> 在 <code>config.json</code> 中设置 <code>&quot;ax25&quot;: {&quot;engine&quot;: &quot;agwpe&quot;, ...}</code> 和 <code>&quot;agwpe&quot;: {&quot;addr&quot;: &quot;localhost:8000&quot;}</code>。
+连接：<code>pat connect ax25:///GATEWAYCALL-10</code>（或使用网页界面：运行 <code>pat http</code>，然后打开 <a href="http://localhost:8080%EF%BC%89%E3%80%82">http://localhost:8080）。</a></li>
+<li><strong>改用 Linux 内核 AX.25：</strong> 用 <code>kissattach</code> 连接 Direwolf 的 PTY，然后设置 <code>&quot;engine&quot;: &quot;linux&quot;</code> 和 <code>&quot;port&quot;: &quot;wl2k&quot;</code>。</li>
+<li><strong>VARA FM：</strong> 在 Wine 下运行 VARA FM（AIOC 作声卡，COM 口 PTT 设为“DTR only”），然后在 Pat 中设置 <code>&quot;varafm&quot;: {&quot;addr&quot;: &quot;localhost:8300&quot;}</code>，用 <code>pat connect varafm:///GATEWAYCALL</code> 连接。</li>
+</ul>
+<h4 id="s5-8-4-zh"><a class="anchor" href="#s5-8-4-zh" aria-label="本节链接">#</a>5.8.4 VarAC / VARA Chat（通过 VARA 键盘聊天）</h4>
+<p><span class="tag tag-typical">常规</span> 先按 5.8.1 安装并设置好 VARA FM。在 VarAC（或 VARA Chat）中选择 <strong>VARA FM</strong> 作调制解调器。
+VarAC 连接 VARA 的 TCP 端口，PTT 仍由 VARA 控制（DTR only）。VarAC 自己也能做 PTT/CAT，但请保持 <strong>关闭</strong>，让 VARA 负责发射。</p>
+<h3 id="s5-9-zh"><a class="anchor" href="#s5-9-zh" aria-label="本节链接">#</a>5.9 SSTV：慢扫描电视图片</h3>
+<p><span class="tag tag-typical">常规</span></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>软件</th>
+<th>系统</th>
+<th>音频</th>
+<th>PTT</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MMSSTV</strong></td>
+<td>Windows</td>
+<td><em>Option → Setup → Misc → Sound card</em>：输入/输出选 AIOC</td>
+<td><em>Setup → TX → PTT port</em>：AIOC 的 COM。不发射的话，把 AIOC 改为 <code>SERIALDTR</code>/<code>SERIALRTS</code> 或 <code>VPTT</code>（第 6 节）。</td>
+</tr>
+<tr>
+<td><strong>QSSTV</strong></td>
+<td>Linux</td>
+<td><em>Options → Configuration → Sound</em>：ALSA/PulseAudio 选 AIOC</td>
+<td><em>CAT</em> 选项卡：Hamlib “Dummy”，PTT 经串口 <strong>DTR</strong>（<code>/dev/ttyACM0</code>），如有 Hamlib CM108 选项也可用；否则用 VPTT。</td>
+</tr>
+<tr>
+<td><strong>Black Cat SSTV / MultiScan 3B</strong></td>
+<td>macOS</td>
+<td>输入/输出选 AIOC</td>
+<td>用 AIOC 的 VPTT（最简单）</td>
+</tr>
+<tr>
+<td><strong>Robot36</strong></td>
+<td>Android</td>
+<td>USB 音频</td>
+<td>仅接收</td>
+</tr>
+</tbody></table></div>
+<p>提示：只接收（例如 <strong>国际空间站 SSTV 活动，145.800 MHz FM</strong>）完全不需要设置 PTT。接收微弱的卫星信号时，把静噪 <strong>关闭</strong> 或调低。长时间发射时注意手台过热，TOT 设为 ≥ 3 分钟。</p>
+<h3 id="s5-10-zh"><a class="anchor" href="#s5-10-zh" aria-label="本节链接">#</a>5.10 fldigi / flmsg / flamp：通过 FM 传应急通信文本和表单（NBEMS）</h3>
+<p><span class="tag tag-typical">常规</span></p>
+<ol>
+<li><em>Configure → Sound card → Audio → Devices</em>：PortAudio（或 PulseAudio）→ Capture <strong>和</strong> Playback 都选 AIOC。采样率：Native/48000。</li>
+<li>PTT，任选一种：<ul>
+<li><em>Configure → Rig Control →</em> <strong>CM108 / C-Media PTT</strong>（较新的 fldigi 版本）：选择 AIOC 的 HID，<strong>GPIO 3</strong>。</li>
+<li><em>Configure → Rig Control →</em> <strong>GPIO / Hardware PTT</strong>：“Use separate serial port PTT”，设备 = AIOC 的 COM/ttyACM，勾选 <strong>Use DTR</strong>（DTR = +V），<strong>不要勾选 RTS</strong>。点击 <em>Initialize</em>。
+不发射的话：把 AIOC 的 PTT 源设为 <code>SERIALDTR</code>（第 6 节）。</li>
+<li>或用 Hamlib，设置 <code>ptt_type=CM108</code>。</li>
+</ul>
+</li>
+<li>常用 FM 模式：<strong>MT63-2000L</strong>（ARES/NBEMS 在 FM 上的常用模式）、<strong>8PSK</strong>、<strong>Olivia</strong>。用瀑布图把信号放在约 1500 Hz 处。</li>
+<li><strong>flmsg</strong>（ICS-213 等表单）和 <strong>flamp</strong>（组播文件）通过 fldigi 工作。把它们的“fldigi”连接设为默认值（XML-RPC 127.0.0.1:7362）。</li>
+</ol>
+<h3 id="s5-11-zh"><a class="anchor" href="#s5-11-zh" aria-label="本节链接">#</a>5.11 WSJT-X / JS8Call（FT8、FT4、JS8：在 FM 上属非标准用法）</h3>
+<p><span class="tag tag-typical">常规</span> 这些通常是 SSB 模式。在 FM 手台上只能和同样用 FM 的电台互通（例如本地 2 米 FM 实验）。设置：</p>
+<ul>
+<li><em>Settings → Radio</em>：Rig 选 <strong>None</strong>。<strong>PTT Method：DTR</strong>。Port：AIOC 的 COM/ttyACM。
+（不发射的话，把 AIOC 设为 <code>SERIALDTR</code>，或 PTT 选“VOX”并开启 AIOC 的 VPTT。）</li>
+<li><em>Settings → Audio</em>：输入/输出 = AIOC，单声道。</li>
+<li>发射音量要低（干净的单音）。FM 的捕获效应对弱信号不利。</li>
+</ul>
+<h3 id="s5-12-zh"><a class="anchor" href="#s5-12-zh" aria-label="本节链接">#</a>5.12 AllStarLink 3（ASL3）：手台作 AllStar 节点电台</h3>
+<p><span class="tag tag-official">官方 + 工具文档</span> AIOC 模拟 CM108，所以 ASL3 可以直接用它控制 PTT 和读取 COS。
+ASL3 认识 AIOC 自己的 USB ID <code>1209:7388</code>，只需在 <code>res_usbradio.conf</code> 中 <strong>取消注释</strong> 即可。</p>
+<p><strong>步骤：</strong></p>
+<ol>
+<li>安装 ASL3（allstarlink.org 提供的 Debian 12 / 树莓派 OS 镜像）。用 <code>asl-menu</code> 设置节点号和密码。</li>
+<li>安装 AIOC 的 udev 规则（2.5 节），让 Asterisk 能打开 HID。</li>
+<li>允许 AIOC 的 USB ID：<div class="code"><pre><code class="language-ini">; /etc/asterisk/res_usbradio.conf
+[general]
+usb_devices = 1209:7388    ; AIOC (all in one cable)
+</code></pre></div>
+<em>（另一种做法：用</em> <code>./aioc-util.py --set-usb 0x0d8c 0x000c --store</code> <em>把 AIOC 伪装成 C-Media CM108。之后再配置它时需要加</em> <code>--open-usb 0x0d8c 0x000c</code><em>。）</em></li>
+<li>设置虚拟 COS（根据接收音频判断静噪）的保持时间。<strong>时间寄存器以 1/16 毫秒计：数值 = 毫秒 × 16</strong>
+（由固件默认值和 G1LRO 的脚本确认，1500 毫秒 = <code>0x5DC0</code>）。 <span class="tag tag-official">官方 + 社区</span><div class="code"><pre><code class="language-bash">./aioc-util.py --vcos-timctrl 24000 --store      # 1500 毫秒保持时间（G1LRO 的推荐值）
+</code></pre></div>
+<em>（aioc-util README 中的示例</em> <code>--vcos-timctrl 1500</code> <em>只有约 94 毫秒。）</em> 如果说话时字与字之间断掉，就调大。
+如果 COS 被噪声打开，就提高阈值（<code>--vcos-lvlctrl</code>，默认 256）。G1LRO 建议噪声大的电台把阈值设在 1500 左右。
+确保信道空闲时电台的 <strong>静噪是关闭的</strong>。VCOS 根据音频电平打开。
+<strong>更好的办法：硬件 COS。</strong> rev 1.2 或 G1LRO 双 COS 板可以读取电台真实的静噪状态：<code>./aioc-util.py --enable-hwcos --store</code>。
+<strong>省事的办法</strong> <span class="tag tag-community">社区</span> ：G1LRO 的脚本会帮你完成第 3–6 步（它会修改 <code>res_usbradio.conf</code>、<code>simpleusb.conf</code> 和 <code>rpt.conf</code>，并先做备份）：<div class="code"><pre><code class="language-bash">wget -O customize.sh https://raw.githubusercontent.com/G1LRO/AIOC-ASL3-Config/main/customize.sh
+sudo bash customize.sh
+</code></pre></div>
+</li>
+<li>在 <code>asl-menu</code> 中 <span class="tag tag-official">官方示例</span> ：<ul>
+<li>设备类型：<code>usbradio</code>（菜单 2 &gt; A1 &gt; N4 &gt; I2）（或 <code>simpleusb</code>，手台节点用它也很好）</li>
+<li>双工类型：<code>1</code>（菜单 2 &gt; A1 &gt; N5）</li>
+</ul>
+</li>
+<li>编辑 <code>usbradio.conf</code>（菜单 6 &gt; H）。官方示例针对普星 PX-888，作为大多数手台的起点都合适：<div class="code"><pre><code class="language-ini">rxboost = 0
+rxsqhyst = 500
+carrierfrom = usbinvert
+ctcssfrom = no
+rxdemod = speaker
+txprelim = no
+invertptt = no
+</code></pre></div>
+（<code>simpleusb.conf</code> 中对应的是 <code>carrierfrom = usbinvert</code>、<code>ctcssfrom = no</code>。）
+<span class="tag tag-community">社区</span> <strong>G1LRO 给出的</strong> <code>simpleusb-tune-menu</code> <strong>设置：</strong> I = PTT 模式（他的旧教程中为 <code>active LOW</code>），J = COS 来源 <code>usbinvert</code>（VCOS）或 <code>usb</code>（高电平有效；他的新教程在硬件 COS 时用这个），L = CTCSS 来源 <code>no</code>。
+<strong>COS 一直打开：</strong> 在 <code>usb</code> 和 <code>usbinvert</code> 之间切换，或提高 VCOS 阈值。<strong>COS 一直不打开：</strong> 切换两者，或降低阈值。</li>
+<li>运行 <code>radio-tune-menu</code>（usbradio）或 <code>simpleusb-tune-menu</code>（simpleusb）设置收发电平：<strong>V</strong> 检查 COS，<strong>e</strong> 做回声测试，<strong>2/3</strong> 调电平，<strong>W</strong> 保存。然后重启 Asterisk：<code>sudo systemctl restart asterisk</code>。</li>
+<li>用鹦鹉节点（<strong>Hubnet Parrot 40894</strong>）测试，或连接一个枢纽节点。用 <strong>小功率</strong>，天线和电脑分开放：射频窜入 USB 线是最常见的问题（第 8 节）。</li>
+</ol>
+<p><strong>AllStarLink 论坛上报告的解决办法</strong> <span class="tag tag-community">社区</span> ：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>asl-menu</code> 提示找不到音频设备</td>
+<td>在 <code>res_usbradio.conf</code> 中取消注释 <code>usb_devices = 1209:7388</code>（M0AWS 为此折腾了一整天）</td>
+</tr>
+<tr>
+<td>COS 正常但 <strong>没有接收音频</strong></td>
+<td>设置了 <code>ctcssfrom</code>：改为 <code>ctcssfrom = no</code></td>
+</tr>
+<tr>
+<td>节点反复发射</td>
+<td>确认 <code>rpt.conf</code> 中 <code>duplex = 1</code></td>
+</tr>
+<tr>
+<td>节点发射时 PTT 卡住</td>
+<td>射频回授：用 1 W 而不是 5 W、短 USB 线、卡扣磁环，天线远离树莓派</td>
+</tr>
+<tr>
+<td>尾音约 3 秒或自己发射</td>
+<td>检查 VCOS 保持时间和阈值；把电台静噪调高</td>
+</tr>
+<tr>
+<td>全双工中继</td>
+<td>有人用两个 AIOC 和两台电台（一收一发）实现了（F1FQN 的视频）</td>
+</tr>
+</tbody></table></div>
+<p><strong>HamVOIP / GMRSLive</strong>（较早的基于 AllStar 的系统）只认 C-Media 的 ID。请用上面的 <code>--set-usb 0x0d8c 0x000c</code> 选项（G1LRO 的 <code>aioc.py</code> / <code>aioc-revert.py</code> 脚本作用相同）。在 GMRS 上请遵守当地 GMRS 规定，GMRS 不属于业余无线电。</p>
+<h3 id="s5-13-zh"><a class="anchor" href="#s5-13-zh" aria-label="本节链接">#</a>5.13 SvxLink（Linux）和 EchoLink（Windows）</h3>
+<h4 id="s5-13-a-zh"><a class="anchor" href="#s5-13-a-zh" aria-label="本节链接">#</a>SvxLink：直频节点、中继控制器、EchoLink 链路</h4>
+<p><span class="tag tag-typical">常规</span> PTT 和静噪都用 AIOC 的 HID：</p>
+<div class="code"><pre><code class="language-ini"># /etc/svxlink/svxlink.conf
+[Rx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+SQL_DET=HIDRAW
+HID_DEVICE=/dev/hidraw0
+HID_SQL_PIN=VOL_DN          # AIOC 的 VCOS 在 CM108 &quot;Volume Down&quot; 上；逻辑相反时用 !VOL_DN
+# 也可以用：SQL_DET=VOX (VOX_FILTER_DEPTH / VOX_THRESH) 或 CTCSS
+
+[Tx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+PTT_TYPE=Hidraw
+HID_DEVICE=/dev/hidraw0
+HID_PTT_PIN=GPIO3
+# 串口 PTT 写法：PTT_TYPE=SerialPin, PTT_PORT=/dev/aioc, PTT_PIN=DTR!RTS
+</code></pre></div>
+<p>如需 EchoLink，启用 <code>ModuleEchoLink</code>，并在 <code>ModuleEchoLink.conf</code> 中填写呼号和密码。在路由器上转发 <strong>UDP 5198–5199</strong> 和 <strong>TCP 5200</strong>。</p>
+<h4 id="s5-13-b-zh"><a class="anchor" href="#s5-13-b-zh" aria-label="本节链接">#</a>EchoLink（Windows，Sysop 模式）</h4>
+<p><span class="tag tag-typical">常规</span></p>
+<ul>
+<li><em>Tools → Sysop Settings → RX Ctrl</em>：<strong>VOX</strong>（调整阈值）。AIOC 不支持通过串口提供 COS，所以一般用 VOX。</li>
+<li><em>TX Ctrl</em>：在 AIOC 的 COM 口上用 <strong>Serial</strong> 控制发射。EchoLink 可能拉高 RTS（或两根线都拉高）。把 AIOC 的 PTT 源设为对应的 <code>SERIALRTS</code> 或 <code>SERIALDTR</code>，或者直接用 <strong>VPTT</strong>（第 6 节）。</li>
+<li><em>Audio</em>：输入/输出 = AIOC。需要已验证的 EchoLink 账号，并转发 UDP 5198–5199。</li>
+</ul>
+<h3 id="s5-14-zh"><a class="anchor" href="#s5-14-zh" aria-label="本节链接">#</a>5.14 Hamlib / 脚本 / 通用 PTT</h3>
+<p><span class="tag tag-typical">常规</span></p>
+<div class="code"><pre><code class="language-bash"># 通过 HID 的 CM108 PTT（Linux）
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 1     # 发射
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 0     # 停止发射
+
+# 串口 DTR PTT，强制 RTS 为低
+rigctl -m 1 -p /dev/ttyACM0 -P DTR -C rts_state=OFF T 1
+
+# rigctld：供通过网络连接 Hamlib 的软件使用（端口 4532）
+rigctld -m 1 -p /dev/hidraw0 -P CM108
+</code></pre></div>
+<p><strong>aioc-util</strong> 也可以直接控制发射（固件 ≥ 1.3） <span class="tag tag-tool">工具文档</span> ：</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --set-ptt1-state on
+./aioc-util.py --set-ptt1-state off
+</code></pre></div>
+<p>用 Python + pyserial（AIOC 默认逻辑）：</p>
+<div class="code"><pre><code class="language-python">import serial, time
+s = serial.Serial(&#39;/dev/ttyACM0&#39;)   # 或 &#39;COM5&#39;
+s.rts = False; s.dtr = True         # PTT 按下 (DTR=1, RTS=0)
+time.sleep(2)
+s.dtr = False                       # PTT 松开
+</code></pre></div>
+<h3 id="s5-15-zh"><a class="anchor" href="#s5-15-zh" aria-label="本节链接">#</a>5.15 DigiPi（树莓派一体化数据站）</h3>
+<p><span class="tag tag-community">社区</span> DigiPi 是一个现成的树莓派镜像，在网页界面里提供 APRS、数字中继/iGate、分组节点、Winlink（Pat）、SSTV 等功能。
+旧版 DigiPi 不直接支持 AIOC。用户的做法是修改 <strong>每一个</strong> Direwolf 配置文件
+（<code>direwolf.tnc.conf</code>、<code>direwolf.digipeater.conf</code>、<code>direwolf.node.conf</code>、<code>direwolf.winlink.conf</code>、<code>direwolf.tracker.conf</code>、<code>direwolf.tnc300b.conf</code>）：</p>
+<div class="code"><pre><code class="language-conf">ADEVICE plughw:0,0 plughw:0,0     # 或 arecord -l 中 AIOC 的声卡编号
+PTT CM108                         # 或：PTT /dev/ttyACM0 DTR -RTS   （不要在末尾加 -3，那会反转 PTT）
+# 注释掉旧的 DCD 行
+</code></pre></div>
+<p>然后 <code>sudo remount</code>，修改文件，运行 <code>sudo ./saveconfigs.sh</code>，再 <code>sudo reboot</code>。USB 线 <strong>两端</strong> 都加磁环。
+修改前请先查看新版 DigiPi 是否已原生支持 AIOC。</p>
+<h3 id="s5-16-zh"><a class="anchor" href="#s5-16-zh" aria-label="本节链接">#</a>5.16 iPhone / iPad（RadioMail、Packet Commander）</h3>
+<p><span class="tag tag-community">社区, 2025年12月</span> iOS 应用只能把 AIOC 当 <strong>USB 声卡</strong> 用（苹果不允许应用访问 USB 串口或 HID）。
+<strong>RadioMail</strong>（Winlink）和 <strong>Packet Commander</strong> 应用内置分组调制解调器，开启 <strong>虚拟 PTT</strong> 后可以配合 AIOC 使用：</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store     # 需要 AIOC 固件 1.4.1（旧固件上 aioc-util 设置失败）
+</code></pre></div>
+<p>使用 USB-C 接口的 iPhone/iPad，或苹果的 Lightning 转 USB 相机转换器。把设备上其他声音全部静音，因为任何声音都会让电台发射。</p>
+<h3 id="s5-17-zh"><a class="anchor" href="#s5-17-zh" aria-label="本节链接">#</a>5.17 通过分组运行 Reticulum（RNS、NomadNet、Sideband、MeshChat）</h3>
+<p><span class="tag tag-typical">常规</span> Reticulum 可以使用 KISS TNC。运行 Direwolf（5.3），并在 <code>~/.reticulum/config</code> 中添加一个 TCP KISS 接口：</p>
+<div class="code"><pre><code class="language-ini">[[Direwolf AIOC]]
+  type = TCPClientInterface
+  interface_enabled = True
+  kiss_framing = True
+  target_host = 127.0.0.1
+  target_port = 8001
+</code></pre></div>
+<p>（也可以把 <code>KISSInterface</code> 指向 <code>direwolf -p</code> 创建的 Direwolf 伪终端。）1200 波特很慢，但发消息够用。
+<span class="tag tag-community">社区</span> 有用户报告 Reticulum 通过 TCP 连接 Direwolf 时有问题。遇到异常可以改用 PTY/<code>KISSInterface</code> 方式。
+请遵守本国业余无线电规定：很多执照条件禁止加密。发射前请检查 Reticulum 的配置。</p>
+<h3 id="s5-18-zh"><a class="anchor" href="#s5-18-zh" aria-label="本节链接">#</a>5.18 车台 / 短波电台（把 AIOC 接到数据口或话筒口）</h3>
+<p><span class="tag tag-community">社区</span> AIOC 本质上就是一块集成了 USB 声卡、串口和 PTT 的小板，所以有动手能力的用户会把它接到其他电台上：</p>
+<ul>
+<li>从焊盘或尾线上的 K1 插座引出信号：送往电台的音频、来自电台的音频、PTT、UART TX/RX 和地（引脚定义见 AIOC README）。</li>
+<li><strong>八重洲 FT-817ND / FT-857D / FT-7800R：</strong> 已有人用便宜的 CT-39A（数据）和 CT-62（CAT）线实现了音频、PTT 和 <strong>CAT</strong>（GitHub #137）。CAT 没反应时，<strong>交换 RX 和 TX</strong>。</li>
+<li>在 <strong>硬件 rev 1.0/1.1</strong> 上，UART 和 PTT 共用一个触点，所以 CAT 数据可能触发 PTT。请用 rev 1.2 并切断分离焊盘，或不接 PTT、改用 CAT 控制发射。</li>
+<li>rev 1.2 接线路电平数据口时：<code>--audio-tx-boost on</code>，并调高 <code>--audio-rx-gain</code>。</li>
+<li>艾可慕 Icom 的 CI-V（单线总线）不加额外电路 <strong>无法</strong> 工作（GitHub #109，尚未解决）。</li>
+<li>如果不熟悉焊接，建议买现成的专用接口。接错线可能损坏电台或 AIOC。</li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s6-zh"><a class="anchor" href="#s6-zh" aria-label="本节链接">#</a>6. PTT 故障排查流程</h2>
+<div class="code"><pre><code>软件已经“按下发射”，但电台没有发射？
+│
+├─ 1. 插头插到底了吗？电台开机了吗？VOX 关了吗？没有锁键？不是禁止发射的信道？
+│      快速硬件测试：AIOC Toolkit → Configure → Manual PTT State → PTT 1 ON。
+│      如果这里电台能发射，说明线没问题，问题出在软件的 PTT 设置上。
+│
+├─ 2. 软件支持 CM108 PTT 吗？→ 用它（Linux：检查 /dev/hidraw 权限，见 2.5 节）
+│
+├─ 3. 使用 COM 口 PTT 时：
+│     ├─ 软件设为 &quot;DTR&quot;（RTS 关闭）？→ 默认设置就应该能用。
+│     ├─ 软件同时拉高 DTR 和 RTS，或 RTS 一直为高（Linux 上常见，打开端口时两根线都会拉高）
+│     │      → aioc-util --ptt1 &quot;CM108GPIO3|SERIALDTR&quot; --store
+│     ├─ 软件只用 RTS 发射
+│     │      → aioc-util --ptt1 &quot;CM108GPIO3|SERIALRTS&quot; --store
+│     └─ VARA FM → 设置 &quot;Pin: DTR only&quot;
+│
+├─ 4. 软件完全没有 PTT（APRSdroid、部分 Mac 软件）
+│      → aioc-util --ptt1 &quot;VPTT|CM108GPIO3|SERIALDTRNRTS&quot; --store
+│
+└─ 5. 电台能发射，但松不开 / 写频时也会发射
+       → 你把 PTT 改成了 SERIALDTR/SERIALRTS：写频前恢复默认：
+         aioc-util --defaults --store
+       → 检查发射音频是否误触发 VPTT（系统声音、VPTT 阈值太低）
+</code></pre></div>
+<blockquote>
+<p>⚠️ <strong>给 AI 助手的提醒：</strong> 把 PTT 改为单独的 <code>SERIALDTR</code> 或 <code>SERIALRTS</code> 后，<strong>CHIRP 写频时电台可能会发射</strong>，因为 CHIRP 会切换这两根线。请让用户在写频前用 <code>--defaults --store</code> 恢复默认，或者专门留一个 AIOC 用于写频。</p>
+</blockquote>
+</section>
+<section class="doc-section"><h2 id="s7-zh"><a class="anchor" href="#s7-zh" aria-label="本节链接">#</a>7. 配置 AIOC 本身（AIOC Toolkit / aioc-util）</h2>
+<p>本文中每一条 <code>aioc-util</code> 命令，在浏览器版 <strong>AIOC Toolkit</strong>（<a href="https://g1lro.github.io/aioc-toolkit/%EF%BC%89%E9%87%8C%E9%83%BD%E6%9C%89%E5%AF%B9%E5%BA%94%E7%9A%84%E6%8E%A7%E4%BB%B6%E3%80%82%E4%BE%8B%E5%A6%82">https://g1lro.github.io/aioc-toolkit/）里都有对应的控件。例如</a> <code>--ptt1 VPTT</code> 对应 <strong>PTT Sources → Auto PTT1 (VPTT)</strong>，<code>--store</code> 对应 <strong>Store to Flash</strong>。不会用命令行的客户，请推荐他们用 Toolkit。 <span class="tag tag-tool">工具文档</span></p>
+<h3 id="s7-1-zh"><a class="anchor" href="#s7-1-zh" aria-label="本节链接">#</a>7.1 使用条件 <span class="tag tag-tool">工具文档</span></h3>
+<ul>
+<li>AIOC <strong>固件 ≥ 1.3.0</strong>（已在 1.3 和 1.4.1 上测试；1.2 <strong>不能</strong> 用）。</li>
+<li><strong>命令行：</strong> TF3HR（Hrafnkell Eiríksson）开发的 <code>aioc-util</code> —— <a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a></li>
+<li><strong>浏览器工具（免安装；需要电脑上的 Chrome 或 Edge 89+；Linux 上必须先安装 2.5 节的 udev 规则）：</strong><ul>
+<li><strong>G1LRO 的 AIOC Toolkit：<a href="https://g1lro.github.io/aioc-toolkit/%EF%BC%88%E6%8E%A8%E8%8D%90%EF%BC%89%E3%80%82">https://g1lro.github.io/aioc-toolkit/（推荐）。</a></strong> <span class="tag tag-tool">工具文档</span> 同时支持修改设置和刷固件，基于 aioc-util 和 webdfu 开发（源码：<a href="https://github.com/G1LRO/aioc-toolkit%EF%BC%89%E3%80%82">https://github.com/G1LRO/aioc-toolkit）。</a><ul>
+<li><strong>Configure</strong> 选项卡：<strong>Connect (WebHID)</strong> 即使 AIOC 的 USB ID 被改过也能找到它（通过读取“AIOC”识别寄存器）。功能包括：<ul>
+<li>实时 <strong>GPIO Status</strong>（PTT1/PTT2 输出、Vol+、Vol−/VCOS、静音键）</li>
+<li><strong>Manual PTT State</strong> 开/关，不用其他软件就能测试发射</li>
+<li><strong>PTT Sources</strong>（含 <strong>Swap PTT1/PTT2</strong> 和 <strong>Auto PTT1 (VPTT)</strong>）</li>
+<li><strong>CM108 Button Sources</strong></li>
+<li><strong>COS Mode</strong>（虚拟 COS 或硬件 COS）</li>
+<li><strong>Audio Settings</strong>（接收增益 1–16×、发射增强）</li>
+<li><strong>AutoPTT &amp; VCOS Thresholds</strong>（电平和时间；时间 = 毫秒 × 16）</li>
+<li><strong>Foxhunt (CW Beacon)</strong>（猎狐 CW 信标）</li>
+<li><strong>USB VID / PID Override</strong>：<strong>Fill CM108 IDs</strong> = <code>0x0D8C</code>/<code>0x000C</code>，用于 AllStar/HamVOIP</li>
+<li><strong>Device Actions</strong>：<strong>Store to Flash</strong>、<strong>Recall from Flash</strong>、<strong>Load Defaults</strong>、<strong>Reboot Device</strong></li>
+<li><strong>Raw Register Dump</strong>（原始寄存器）</li>
+</ul>
+</li>
+<li><strong>Flash Firmware</strong> 选项卡：见 9.2 节。</li>
+<li>每次都要先点 <strong>Apply</strong> 再点 <strong>Store to Flash</strong>，否则拔下 AIOC 后设置会丢失。修改 USB ID 要在 <strong>Store</strong> 之后再 <strong>Reboot</strong> 才生效。</li>
+</ul>
+</li>
+<li>较早的单一功能网页：<a href="https://aioc-util.tf3hr.net/%EF%BC%88TF3HR%EF%BC%89%E5%92%8C">https://aioc-util.tf3hr.net/（TF3HR）和</a> <a href="https://g1lro.github.io/aioc-util/%EF%BC%88G1LRO%EF%BC%89%E3%80%82">https://g1lro.github.io/aioc-util/（G1LRO）。</a> <span class="tag tag-community">社区</span></li>
+<li><strong>推荐不熟悉技术的客户使用 Toolkit</strong>：不需要 Python、hidapi.dll 或 Zadig。</li>
+</ul>
+</li>
+</ul>
+<p><strong>安装（Linux/macOS）：</strong></p>
+<div class="code"><pre><code class="language-bash">git clone https://github.com/hrafnkelle/aioc-util.git
+cd aioc-util
+python3 -m venv venv &amp;&amp; source venv/bin/activate
+pip install hid
+# Linux: sudo cp udev/rules.d/91-aioc.rules /etc/udev/rules.d/ &amp;&amp; sudo udevadm control --reload &amp;&amp; sudo udevadm trigger
+# Debian/树莓派可能需要: sudo apt install libhidapi-hidraw0 libhidapi-libusb0
+</code></pre></div>
+<p><strong>Windows：</strong> 在 PowerShell 中执行同样的虚拟环境步骤（<code>.\venv\Scripts\activate</code>）。从 libusb/hidapi 的 releases 下载 <code>hidapi.dll</code>，放在 <code>aioc-util.py</code> 旁边。用 <code>python aioc-util.py …</code> 运行。</p>
+<h3 id="s7-2-zh"><a class="anchor" href="#s7-2-zh" aria-label="本节链接">#</a>7.2 常用命令 <span class="tag tag-tool">工具文档</span></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>任务</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>显示所有寄存器</td>
+<td><code>./aioc-util.py --dump</code></td>
+</tr>
+<tr>
+<td>恢复出厂默认（并保存）</td>
+<td><code>./aioc-util.py --defaults --store</code></td>
+</tr>
+<tr>
+<td>列出 PTT 源</td>
+<td><code>./aioc-util.py --list-ptt-sources</code></td>
+</tr>
+<tr>
+<td>设置 PTT1 源</td>
+<td>`./aioc-util.py --ptt1 &quot;CM108GPIO3</td>
+</tr>
+<tr>
+<td>PTT1 使用虚拟 PTT</td>
+<td><code>./aioc-util.py --ptt1 VPTT --store</code>（或 <code>--auto-ptt1</code>）</td>
+</tr>
+<tr>
+<td>交换 PTT1/PTT2（双 PTT 电台）</td>
+<td><code>./aioc-util.py --swap-ptt --store</code></td>
+</tr>
+<tr>
+<td>VPTT/VCOS 阈值和保持时间</td>
+<td><code>./aioc-util.py --vptt-lvlctrl 0x80 --vptt-timctrl 320 --vcos-lvlctrl 0xff --vcos-timctrl 24000 --store</code>（时间 = 毫秒 × 16：320 = 20 毫秒，24000 = 1.5 秒）</td>
+</tr>
+<tr>
+<td>接收增益（硬件 rev ≥ 1.2，固件 ≥ 1.4）</td>
+<td><code>./aioc-util.py --audio-rx-gain 4x --store</code>（1x/2x/4x/8x/16x）</td>
+</tr>
+<tr>
+<td>线路电平发射增强（硬件 rev ≥ 1.2）</td>
+<td><code>./aioc-util.py --audio-tx-boost on --store</code></td>
+</tr>
+<tr>
+<td>查看音频设置</td>
+<td><code>./aioc-util.py --audio-get-settings</code></td>
+</tr>
+<tr>
+<td>硬件 COS 输入（硬件 rev ≥ 1.2）</td>
+<td><code>./aioc-util.py --enable-hwcos --store</code>（改回 VCOS：<code>--enable-vcos</code>）</td>
+</tr>
+<tr>
+<td>伪装成 CM108（HamVOIP 等）</td>
+<td><code>./aioc-util.py --set-usb 0x0d8c 0x000c --store</code></td>
+</tr>
+<tr>
+<td>改过 USB ID 后再配置</td>
+<td><code>./aioc-util.py --open-usb 0x0d8c 0x000c --dump</code></td>
+</tr>
+<tr>
+<td>多个 AIOC</td>
+<td>先 <code>--list-devices</code>，再 <code>--open-serialnum &lt;SN&gt; …</code></td>
+</tr>
+<tr>
+<td>重启</td>
+<td><code>./aioc-util.py --reboot</code></td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>不加 <code>--store</code>，下次断电后修改就会丢失。<strong>刷固件会清除所有已保存的设置。</strong> <span class="tag tag-official">官方</span></p>
+</blockquote>
+<h3 id="s7-3-zh"><a class="anchor" href="#s7-3-zh" aria-label="本节链接">#</a>7.3 寄存器参考（供高级用户和 AI 助手使用） <span class="tag tag-official">官方 — 固件 settings.h</span></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>寄存器</th>
+<th>名称</th>
+<th>作用</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0x00</td>
+<td>MAGIC</td>
+<td>读出“AIOC”</td>
+<td>—</td>
+</tr>
+<tr>
+<td>0x08</td>
+<td>USBID</td>
+<td>VID（低 16 位）/ PID（高 16 位）</td>
+<td><code>1209:7388</code></td>
+</tr>
+<tr>
+<td>0x24</td>
+<td>AIOC_IOMUX0</td>
+<td>PTT1 源位掩码</td>
+<td>CM108GPIO3 | SERIALDTRNRTS</td>
+</tr>
+<tr>
+<td>0x25</td>
+<td>AIOC_IOMUX1</td>
+<td>PTT2 源位掩码</td>
+<td>CM108GPIO4</td>
+</tr>
+<tr>
+<td>0x44–0x47</td>
+<td>CM108_IOMUX0–3</td>
+<td>CM108 按键 音量+ / 音量− / 播放静音 / 录音静音 的来源</td>
+<td>音量+ = IN2，<strong>音量− = VCOS</strong>，其余无</td>
+</tr>
+<tr>
+<td>0x60</td>
+<td>SERIAL_CTRL</td>
+<td>PTT 有效时锁定 UART</td>
+<td>PTT1 时锁定</td>
+</tr>
+<tr>
+<td>0x72</td>
+<td>AUDIO_RX</td>
+<td>接收增益 1×–16×</td>
+<td>1×</td>
+</tr>
+<tr>
+<td>0x78</td>
+<td>AUDIO_TX</td>
+<td>发射增强</td>
+<td>关</td>
+</tr>
+<tr>
+<td>0x82 / 0x84</td>
+<td>VPTT_LVLCTRL / TIMCTRL</td>
+<td>虚拟 PTT 阈值 / 保持时间（毫秒 × 16）</td>
+<td>16 / 0x140（= 20 毫秒）</td>
+</tr>
+<tr>
+<td>0x92 / 0x94</td>
+<td>VCOS_LVLCTRL / TIMCTRL</td>
+<td>虚拟 COS 阈值 / 保持时间（毫秒 × 16）</td>
+<td>256 / 0xC80（= 200 毫秒）</td>
+</tr>
+<tr>
+<td>0xA0–0xA5</td>
+<td>FOXHUNT_CTRL, MSG0–3</td>
+<td>猎狐间隔、速度、音量、16 字符消息</td>
+<td>关闭</td>
+</tr>
+</tbody></table></div>
+<p>PTT 源位：<code>CM108GPIO1=0x1, GPIO2=0x2, GPIO3=0x4, GPIO4=0x8, SERIALDTR=0x100, SERIALRTS=0x200, SERIALDTRNRTS=0x400, SERIALNDTRRTS=0x800, VPTT=0x1000</code>。
+按键来源：<code>IN1=0x10000, IN2=0x20000, VCOS=0x1000000</code>。
+命令：<code>WRITESTROBE=0x01, DEFAULTS=0x10, REBOOT=0x20, RECALL=0x40, STORE=0x80</code>。
+寄存器通过 HID 特性报告访问，格式为 <code>&lt;BBBL&gt;</code>：（报告 0、命令、地址、数值）。</p>
+<h3 id="s7-4-zh"><a class="anchor" href="#s7-4-zh" aria-label="本节链接">#</a>7.4 猎狐信标模式（固件 ≥ 1.4.0） <span class="tag tag-official">官方 + 工具文档</span></h3>
+<p>AIOC 只需 USB 供电（例如充电宝）就能自己发送摩尔斯电码识别。设置好以后不需要电脑。</p>
+<div class="code"><pre><code class="language-bash">./aioc-util.py --foxhunt-message &quot;DE N0CALL FOX&quot; --foxhunt-wpm 20 --foxhunt-interval 60 --foxhunt-volume 32000 --store
+./aioc-util.py --foxhunt-get-settings --foxhunt-get-message   # 检查
+./aioc-util.py --foxhunt-interval 0 --store                   # 关闭
+</code></pre></div>
+<p>消息最多 16 个字符 · 间隔 0–255 秒（0 = 关闭）· 速度 0–255 WPM · 音量 0–65535。
+用户须遵守当地关于无人值守信标和电台识别的规定。</p>
+</section>
+<section class="doc-section"><h2 id="s8-zh"><a class="anchor" href="#s8-zh" aria-label="本节链接">#</a>8. 已知问题与解决办法</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因</th>
+<th>解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>只在发射时</strong> USB 断开、音频乱码、电脑“叮咚”响或卡死</td>
+<td><strong>射频回授。</strong> 使用原装（单极）天线时，USB 线成了电台的地网（“虎尾线”）。 <span class="tag tag-official">官方</span></td>
+<td>降低发射功率。加 <strong>地网/虎尾线</strong>。用远离电脑的 <strong>外接或平衡天线</strong>（如偶极天线）。在 USB 线上加 <strong>卡扣磁环</strong>。用短 USB 线。 <span class="tag tag-community">社区</span> 好几位用户把功率从 5 W 降到 <strong>1 W</strong> 就好了。也有人用一小段 <strong>尾线</strong> 把 AIOC 引离电台，或用同轴延长线让天线离开 1 米以上。</td>
+</tr>
+<tr>
+<td>电台不发射</td>
+<td>PTT 方式不匹配</td>
+<td>第 6 节</td>
+</tr>
+<tr>
+<td>电台一直发射 / 随机发射</td>
+<td>Linux 的 ModemManager 在探测端口；PTT 源被设成了仅 DTR/RTS；开了 VPTT 时有系统声音</td>
+<td>udev 忽略规则（2.5）；<code>--defaults --store</code>；不要把 AIOC 设为默认音频设备</td>
+</tr>
+<tr>
+<td>CHIRP：“Radio did not respond”</td>
+<td>型号不对、插头没插好、电台停在菜单里、固件太旧</td>
+<td>重新插好，选准确型号，把 AIOC 升级到 ≥ 1.2.0（DTR 且非 RTS 修复）</td>
+</tr>
+<tr>
+<td>收发音频时有时无，PTT 时灵时不灵</td>
+<td>TRS 插头接触 / 焊点问题（自焊板），或插头没插到底</td>
+<td>重新插好。自焊板可以在侧向按压触点的同时重新熔化 TRS 焊片的焊点 <span class="tag tag-official">官方</span></td>
+</tr>
+<tr>
+<td>解码失败，声音失真</td>
+<td>发射电平太高（频偏过大）或接收削波</td>
+<td>调低系统输出音量；调低电台音量；接收增益改回 1×</td>
+</tr>
+<tr>
+<td>软件里什么都听不到</td>
+<td>静噪关着 / 音量为零 / 输入设备选错</td>
+<td>打开静噪，调大电台音量，在软件里选择 AIOC 输入</td>
+</tr>
+<tr>
+<td>macOS 上发射音频断断续续</td>
+<td>固件旧</td>
+<td>升级到 ≥ v1.4.0（含 macOS 修复） <span class="tag tag-official">官方</span></td>
+</tr>
+<tr>
+<td>UV-K5 刷固件中途失败</td>
+<td>旧固件串口缓冲区不够</td>
+<td>把 AIOC 升级到 ≥ v1.4.0 <span class="tag tag-official">官方</span></td>
+</tr>
+<tr>
+<td>Direwolf 的 CM108 警告</td>
+<td>Direwolf 本身的行为</td>
+<td>无害，忽略即可（direwolf issue #448） <span class="tag tag-official">官方</span></td>
+</tr>
+<tr>
+<td>Linux 上 /dev/ttyACM0 或 /dev/hidraw“permission denied”</td>
+<td>用户不在 dialout/plugdev 组；没有 udev 规则</td>
+<td>2.5 节</td>
+</tr>
+<tr>
+<td>aioc-util“Unexpected magic”/ 打不开</td>
+<td>固件 &lt; 1.3、USB ID 被改过，或 Windows 缺少 hidapi.dll</td>
+<td>升级固件；用 <code>--open-usb</code>；添加 hidapi.dll；或用浏览器里的 AIOC Toolkit（7.1），它能找到 USB ID 被改过的 AIOC</td>
+</tr>
+<tr>
+<td>aioc-util 报 <code>module &#39;hid&#39; has no attribute &#39;Device&#39;</code> / <code>No module named &#39;hid&#39;</code></td>
+<td>Python 包装错了（Debian 的 <code>python3-hid</code>/<code>hidapi</code>）</td>
+<td>用虚拟环境并 <code>pip install hid</code>；卸载 apt 安装的包 <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td><strong>rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下</strong>，或在 Windows 虚拟机里音频报“代码 10”</td>
+<td>旧硬件上的固件缺陷（GitHub #120/#138）</td>
+<td>刷回 <strong>v1.3.0</strong> <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td>Android：音频应用卡住、音量键失灵、AIOC 反复重连</td>
+<td>出现在 <strong>Android 11</strong> 手机上；Android 12 及以上正常（GitHub #121）</td>
+<td>换一台手机或其他 Android 版本 <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td>APRSdroid 不用 AIOC（其他应用正常）</td>
+<td>部分手机上 APRSdroid 对 USB 麦克风的缺陷（aprsdroid #149）</td>
+<td>试试“Lesser AudioSwitch”应用强制使用 USB 音频 <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td>插上 AIOC 后 S 表底噪升高</td>
+<td>地环路 / 电脑噪声经 USB 线进入</td>
+<td>用同轴线让天线离手台至少 1 米、加卡扣磁环、用 <strong>USB 隔离器</strong>，或让笔记本用电池供电 <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td>短波电台插上 AIOC 后有 S9 噪声</td>
+<td>电脑/USB 噪声；部分电台（如 RT-950 Pro）非常敏感</td>
+<td>磁环、USB 隔离器、换一台电脑；用另一台电台对比测试 <span class="tag tag-community">社区</span></td>
+</tr>
+<tr>
+<td>完全识别不到设备</td>
+<td><strong>只能充电的 USB-C 线</strong>，或板子停在 DFU 模式（没有固件）</td>
+<td>换数据线；刷固件（第 9 节） <span class="tag tag-community">社区</span></td>
+</tr>
+</tbody></table></div>
+<p><span class="tag tag-community">社区</span> <strong>自焊或维修板的接触/焊点故障查找表（来自 DL-Nordwest）：</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>现象</th>
+<th>检查</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无法读写电台</td>
+<td>驱动 / COM 口选择</td>
+</tr>
+<tr>
+<td>能写入但 <strong>读不出</strong> 电台</td>
+<td>2.5 mm <strong>环（ring）</strong> 的焊点</td>
+</tr>
+<tr>
+<td>接收音频很小</td>
+<td>3.5 mm <strong>环（ring）</strong> 的焊点；电脑音量</td>
+</tr>
+<tr>
+<td>完全没有接收音频</td>
+<td>2.5 mm <strong>尖（tip）</strong> / <strong>套（sleeve）</strong> 的焊点；电台音量；输入设备</td>
+</tr>
+<tr>
+<td>电台一直发射</td>
+<td>2.5 mm 和 3.5 mm 的 <strong>套（sleeve）</strong> 之间短路（或两个插头焊反了）</td>
+</tr>
+<tr>
+<td>只有拧着插头才正常</td>
+<td>TRS 焊点开裂：一边按压触点一边重新熔焊（第 8 节）</td>
+</tr>
+</tbody></table></div>
+</section>
+<section class="doc-section"><h2 id="s9-zh"><a class="anchor" href="#s9-zh" aria-label="本节链接">#</a>9. 固件升级</h2>
+<h3 id="s9-1-zh"><a class="anchor" href="#s9-1-zh" aria-label="本节链接">#</a>9.1 版本 <span class="tag tag-official">官方</span></h3>
+<p>从 <a href="https://github.com/skuep/AIOC/releases">https://github.com/skuep/AIOC/releases</a> 下载 <code>aioc-fw-x.y.z.bin</code></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>版本</th>
+<th>日期</th>
+<th>主要变化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>v1.4.1</strong></td>
+<td>2025-09-27</td>
+<td>修复 LED 闪烁速度和 LED 中断优先级</td>
+</tr>
+<tr>
+<td><strong>v1.4.0</strong></td>
+<td>2025-09-26</td>
+<td>修复 macOS 发射卡顿；更大的串口缓冲区（手台刷固件）；支持硬件 rev 1.2；接收增益 1–16×；发射增强；<strong>猎狐模式</strong></td>
+</tr>
+<tr>
+<td>v1.3.0</td>
+<td>2025-01-02</td>
+<td>HID 配置系统（新协议，旧脚本不可用）；虚拟 PTT / 虚拟 COS；硬件 COS 输入；更大的串口缓冲区</td>
+</tr>
+<tr>
+<td>v1.2.0</td>
+<td>2023-03-19</td>
+<td><strong>CM108 PTT</strong>；在线 DFU 升级；串口 PTT 改为 DTR=1 且 RTS=0</td>
+</tr>
+</tbody></table></div>
+<p><strong>硬件 rev 1.2 需要固件 ≥ 1.4.0。</strong> <span class="tag tag-official">官方</span></p>
+<h3 id="s9-2-zh"><a class="anchor" href="#s9-2-zh" aria-label="本节链接">#</a>9.2 升级已是 ≥ 1.2.0 的固件（不用拆壳） <span class="tag tag-official">官方</span></h3>
+<div class="code"><pre><code class="language-bash">dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
+</code></pre></div>
+<p>AIOC 会自动重启进入引导程序、刷写，然后自行重启。</p>
+<ul>
+<li><strong>Linux/macOS：</strong> 安装 <code>dfu-util</code>（<code>apt install dfu-util</code> / <code>brew install dfu-util</code>）。可能需要 <code>sudo</code> 或加入 <code>plugdev</code> 组。</li>
+<li><strong>Windows：</strong> dfu-util 需要给 DFU 接口安装 <strong>libusb/WinUSB 驱动</strong>。用 <strong>Zadig</strong> 给 AIOC 的 DFU 接口 /“STM32 BOOTLOADER”设备安装 WinUSB。（参见 AIOC README 中链接的教程：yeswolf.github.io/dfu。）
+<span class="tag tag-community">社区</span> Windows 11 上的 dfu-util 经常卡住或报 <code>LIBUSB_ERROR_NOT_SUPPORTED</code>（GitHub #28）。最简单的办法：用浏览器里的 AIOC Toolkit（见下文），或换一台 Linux 电脑或树莓派。</li>
+<li><strong>用 AIOC Toolkit 在浏览器中刷写（最简单，尤其适合 Windows）</strong> <span class="tag tag-tool">工具文档</span> ：<ol>
+<li>在 <a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a> → <strong>Flash Firmware</strong> 选项卡的 <strong>Latest Firmware</strong> 框里，通过 <strong>Download Firmware</strong> 链接下载 <code>.bin</code>。浏览器不能直接读取 GitHub 发布的文件，所以要先保存文件再选择它。</li>
+<li><strong>先让 AIOC 进入引导模式</strong>（9.3 第 1 步：短接排针最外侧的两个针脚，再插上 USB）。Toolkit 不会自己切换模式，AIOC 处于普通“DFU 运行时”模式时会阻止刷写。进入引导模式后它显示为 <code>0483:df11</code>。</li>
+<li>连接，查看 <strong>Device Status</strong>，选择文件，点击 <strong>Flash Firmware</strong> 开始刷写并观察 <strong>Log</strong>。完成后去掉短接，重新插拔。
+只刷官方的 <code>aioc-fw-x.y.z.bin</code> 文件。刷写失败可以重复以上步骤恢复。</li>
+</ol>
+</li>
+<li><strong>另一个浏览器刷写工具（原版 WebDFU）</strong> <span class="tag tag-community">社区, G1LRO 教程采用</span> ：AIOC 处于引导模式时，打开 <a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a> → <strong>Connect</strong> → 选择 <strong>STM32 Bootloader</strong> → <strong>Internal Flash</strong> → 选择 <code>.bin</code> → <strong>Download</strong>。</li>
+</ul>
+<h3 id="s9-3-zh"><a class="anchor" href="#s9-3-zh" aria-label="本节链接">#</a>9.3 首次刷写 / 救砖 <span class="tag tag-official">官方</span></h3>
+<ol>
+<li><strong>短接电路板编程排针最外侧的两个针脚</strong>（这是 BOOT 模式）。</li>
+<li>插上 USB-C。设备显示为 STM32 引导程序。</li>
+<li><code>dfu-util -a 0 -s 0x08000000:leave -D aioc-fw-x.y.z.bin</code></li>
+<li>去掉短接，拔下再插上。</li>
+</ol>
+<p>任何升级之后：<strong>重新应用你的 aioc-util 设置</strong>（它们会被清除）。</p>
+<h3 id="s9-4-zh"><a class="anchor" href="#s9-4-zh" aria-label="本节链接">#</a>9.4 怎么知道我的固件版本？</h3>
+<p>USB 描述符里不报告固件版本。实用的判断方法：</p>
+<ul>
+<li>aioc-util 或 AIOC Toolkit 能连上 → ≥ 1.3.0。能读出音频设置 / 猎狐设置 → ≥ 1.4.0。</li>
+<li>不确定的话，直接刷最新版（9.2）。这是解决大多数问题的推荐做法。</li>
+</ul>
+</section>
+<section class="doc-section"><h2 id="s10-zh"><a class="anchor" href="#s10-zh" aria-label="本节链接">#</a>10. 常见问题（供 AI 助手直接使用）</h2>
+<p><strong>问：需要装驱动吗？</strong>
+不需要。Windows 10/11、Linux 和 macOS 都用系统自带的 USB 音频和 CDC 串口驱动。只有在 Windows 上升级固件时才需要 WinUSB 驱动（Zadig）。</p>
+<p><strong>问：哪个 COM 口是它？</strong>
+在设备管理器 → 端口 中观察，拔下 AIOC 再插上，新出现的 COMx 就是 AIOC。Linux：<code>/dev/ttyACM0</code>（装了 udev 规则后也可用 <code>/dev/aioc</code>）。macOS：<code>/dev/cu.usbmodem…</code>。</p>
+<p><strong>问：写频和数字模式能用同一根线吗？</strong>
+可以。串口负责写频，声卡负责数字模式。只是不要让两个软件同时占用同一个 COM 口。</p>
+<p><strong>问：能用在车台/基地台上吗？</strong>
+只有电台带 K1 类接口，或用转接线接到它的数据口/话筒口才行。在硬件 rev 1.2 上，线路电平输入请开启 <code>--audio-tx-boost on</code>，线路电平输出请调高接收增益。</p>
+<p><strong>问：能在树莓派上用吗？</strong>
+能。Direwolf、AllStarLink 3、SvxLink、Pat、QtSoundModem 和 LinBPQ 都能在树莓派 OS 上运行。使用 CM108 PTT 和 udev 规则。</p>
+<p><strong>问：能用 iPhone/iPad 吗？</strong>
+部分可以。iOS 只把 AIOC 识别为声卡。<strong>RadioMail</strong>（Winlink）和 <strong>Packet Commander</strong> 已在 AIOC 固件 1.4.1 + 开启 <strong>虚拟 PTT</strong> 的情况下验证可用（5.16 节）。在 iOS 上无法用 CHIRP 写频，也无法使用串口或 CM108 PTT。</p>
+<p><strong>问：能用电脑通话（语音）吗？</strong>
+能。在 VoIP 或联网应用（AllStarLink、SvxLink、EchoLink、Mumble 桥接）里把 AIOC 选为麦克风/扬声器即可。语音 PTT 需要 CM108/串口控制或 VPTT。</p>
+<p><strong>问：我的电台有两个 PTT（双段手台）？</strong>
+PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 <code>--swap-ptt</code> 或 <code>--ptt2</code> 修改。</p>
+<p><strong>问：支持 9600 波特分组吗？</strong>
+通过 K1 接口不支持（音频经过滤波）。请用 1200 波特 AFSK 或 VARA FM 窄带。</p>
+</section>
+<section class="doc-section"><h2 id="s11-zh"><a class="anchor" href="#s11-zh" aria-label="本节链接">#</a>11. 参考链接</h2>
+<ul>
+<li>AIOC 项目（硬件、固件、README）：<a href="https://github.com/skuep/AIOC">https://github.com/skuep/AIOC</a></li>
+<li>AIOC 发布版本：<a href="https://github.com/skuep/AIOC/releases">https://github.com/skuep/AIOC/releases</a></li>
+<li>AIOC Discord：见 GitHub README 中的链接</li>
+<li>aioc-util（命令行）：<a href="https://github.com/hrafnkelle/aioc-util">https://github.com/hrafnkelle/aioc-util</a> · 网页版：<a href="https://aioc-util.tf3hr.net/">https://aioc-util.tf3hr.net/</a></li>
+<li>G1LRO 的 AIOC + ASL3 教程（最新）：<a href="https://g1lro.uk/?p=1593">https://g1lro.uk/?p=1593</a> · 旧版教程：<a href="https://g1lro.uk/?p=676">https://g1lro.uk/?p=676</a> · 脚本：<a href="https://github.com/G1LRO/AIOC-ASL3-Config">https://github.com/G1LRO/AIOC-ASL3-Config</a></li>
+<li><strong>AIOC Toolkit（在浏览器中配置 + 刷固件）：</strong> <a href="https://g1lro.github.io/aioc-toolkit/">https://g1lro.github.io/aioc-toolkit/</a> · 源码：<a href="https://github.com/G1LRO/aioc-toolkit">https://github.com/G1LRO/aioc-toolkit</a></li>
+<li>较早的浏览器工具：G1LRO 配置页 <a href="https://g1lro.github.io/aioc-util/">https://g1lro.github.io/aioc-util/</a> · WebDFU 刷写工具 <a href="https://devanlai.github.io/webdfu/dfu-util/">https://devanlai.github.io/webdfu/dfu-util/</a></li>
+<li>AllStarLink 论坛，AIOC 替代 CM108：<a href="https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225">https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225</a></li>
+<li>M0AWS 用 AIOC 搭建 AllStar 节点：<a href="https://m0aws.co.uk/?cat=408">https://m0aws.co.uk/?cat=408</a></li>
+<li>DL-Nordwest AIOC 系列（德语），第 4 部分故障排查：<a href="https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/">https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/</a></li>
+<li>DigiPi + AIOC 修改方法（Google 群组）：<a href="https://groups.google.com/g/digipi/c/1NfZeLpsT4M">https://groups.google.com/g/digipi/c/1NfZeLpsT4M</a></li>
+<li>AIOC GitHub issues（提问前先搜索）：<a href="https://github.com/skuep/AIOC/issues">https://github.com/skuep/AIOC/issues</a></li>
+<li>视频：Ham Radio Dude（<a href="https://www.youtube.com/watch?v=xRCmXQYRLE0%EF%BC%89%E3%80%81Temporarily">https://www.youtube.com/watch?v=xRCmXQYRLE0）、Temporarily</a> Offline（<a href="https://www.youtube.com/watch?v=RZjoPNe634o%EF%BC%89%E3%80%81AllStar">https://www.youtube.com/watch?v=RZjoPNe634o）、AllStar</a> 节点搭建（<a href="https://youtu.be/7LB6D2FLGZk">https://youtu.be/7LB6D2FLGZk</a> 、<a href="https://youtu.be/k0iP4dECx6A%EF%BC%89">https://youtu.be/k0iP4dECx6A）</a></li>
+<li>DL-Nordwest 四篇 AIOC 文章（德语）：见 AIOC README 中的链接</li>
+<li>Direwolf：<a href="https://github.com/wb2osz/direwolf">https://github.com/wb2osz/direwolf</a></li>
+<li>CHIRP：<a href="https://chirpmyradio.com">https://chirpmyradio.com</a></li>
+<li>AllStarLink：<a href="https://www.allstarlink.org">https://www.allstarlink.org</a></li>
+<li>Winlink：<a href="https://winlink.org">https://winlink.org</a> · Pat：<a href="https://getpat.io">https://getpat.io</a> · VARA：<a href="https://rosmodem.wordpress.com">https://rosmodem.wordpress.com</a></li>
+<li>APRSdroid：<a href="https://aprsdroid.org">https://aprsdroid.org</a> · YAAC：<a href="https://www.ka2ddo.org/ka2ddo/YAAC.html">https://www.ka2ddo.org/ka2ddo/YAAC.html</a> · Xastir：<a href="https://xastir.org">https://xastir.org</a></li>
+<li>SvxLink：<a href="https://www.svxlink.org">https://www.svxlink.org</a> · fldigi/NBEMS：<a href="http://www.w1hkj.org">http://www.w1hkj.org</a></li>
+<li>Quansheng Dock：<a href="https://github.com/nicsure/QuanshengDock">https://github.com/nicsure/QuanshengDock</a> · Egzumer 固件：<a href="https://github.com/egzumer/uv-k5-firmware-custom">https://github.com/egzumer/uv-k5-firmware-custom</a></li>
+</ul>
+</section>
+    </div>
   </main>
 </div>
 
-<footer>
+<footer data-i18n="footer">
   Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR,
   guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.
 </footer>
 
-<script type="text/plain" id="md-source"># AIOC (All-In-One-Cable) — Quick Start & Software Configuration Guide
+<script type="text/plain" id="md-en"># AIOC (All-In-One-Cable) — Quick Start & Software Configuration Guide
 
 > **Purpose of this document**
 > This is a knowledge base for both people and AI agents. An agent that has
@@ -2561,13 +4011,873 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 - Quansheng Dock: https://github.com/nicsure/QuanshengDock · Egzumer firmware: https://github.com/egzumer/uv-k5-firmware-custom
 
 </script>
+<script type="text/plain" id="md-zh"># AIOC（All-In-One-Cable）快速入门与软件配置指南
+
+> **本文档的用途**
+> 这是一份同时供人和 AI 助手（Agent）使用的知识库。拿到本文档的 AI 助手应能回答：
+> *“我有一个 AIOC 和某款电台，想在某台电脑上做某件事，要装什么软件、怎么设置？”*
+>
+> **文档版本：** 2026-10-31（第 3 版：社区资料、AIOC Toolkit）· 适用于 AIOC 固件 **v1.4.1**
+> （截至 2026-10-31 仍是最新版）及硬件版本 rev 1.0–1.2。英文原版为准，本文为简体中文译本。
+
+---
+
+## 0. 给 AI 助手的说明（请先读）
+
+1. **先弄清四件事。** 只问用户还没告诉你的：
+   - **目标**：想做什么（写频、APRS、Winlink、SSTV、AllStar 节点……）。
+   - **系统**：Windows、Linux（含树莓派）、macOS、Android，或 iPhone/iPad。
+   - **电台**：品牌和型号。AIOC 使用建伍（Kenwood）式 **K1** 两针插头。
+   - **AIOC 固件版本**（如果和任务有关）。VPTT、aioc-util 等功能需要 v1.3.0 或更新版本。
+2. **用决策表（第 3 节）** 选软件，再去看该软件的配置步骤。
+3. **PTT 是最常见的问题。** 电台不发射时，按 PTT 故障排查流程（第 6 节）处理。
+4. **每条信息的可信程度。** 文中用标签标注来源：
+   - **[Official]** ：来自 AIOC 的 GitHub README、发布说明或固件源码（skuep/AIOC）。
+   - **[Tool docs]** ：来自 aioc-util 文档或其他软件自己的文档。
+   - **[Community]** ：AIOC 用户在 GitHub issues、AllStarLink 论坛、DigiPi 群组或公开教程（G1LRO、DL-Nordwest、M0AWS）中的报告。这些是真实使用结果，但不保证适用于所有环境。
+   - **[Typical]** ：通常可用的常见设置。不同软件版本的菜单名称可能不同，请让用户对照自己的屏幕确认。
+5. **安全与合规。** 发射需要业余无线电执照（在中国为业余无线电台执照及相应操作证书）。测试时请让用户接假负载，或在空闲的直频频率上用小功率发射。不要建议违反频率规划或呼号识别规定的设置。
+6. **不要编造菜单路径。** 本文没写到的菜单项，请描述这个设置的作用（例如“把 AIOC 选为音频输入”），不要猜它的确切名称。
+
+---
+
+## 1. AIOC 是什么
+
+AIOC 是一块带 **USB-C** 接口的小型开源电路板，直接插在手台的 **建伍 K1 接口**（3.5 mm + 2.5 mm 双插头）上。它一个顶三个：写频线、声卡接口（类似 SignaLink 或 Digirig）和 PTT 接口。 **[Official]**
+
+插到电脑上后，它会被识别为一个包含以下部分的 USB 复合设备：
+
+| 功能 | 显示为 | 用途 |
+|---|---|---|
+| **USB 声卡** | “All-In-One-Cable” / “AIOC Audio”（1 路单声道输入，1 路单声道输出） | 电台接收音频送到电脑，电脑发射音频送到电台 |
+| **虚拟串口（CDC-ACM）** | Windows：`COMx` · Linux：`/dev/ttyACMx` · macOS：`/dev/cu.usbmodemXXXX` | 电台写频（CHIRP 等） **以及** 串口 PTT |
+| **CM108 兼容 HID** | Linux：`/dev/hidrawX` | CM108 式 PTT（GPIO3）和 COS 输入（固件 ≥ 1.2.0）；配置接口（固件 ≥ 1.3.0） |
+| **DFU 运行时** | — | 不拆壳即可升级固件（固件 ≥ 1.2.0） |
+
+关键参数 **[Official]** ：
+
+- **USB VID:PID =** `1209:7388`。在引导（DFU）模式下显示为 STM32 引导程序 `0483:df11`。
+- USB 字符串：厂商 `AIOC`，产品 `All-In-One-Cable`。
+- 主控：STM32F302，用其内置 ADC/DAC 做声卡。
+- 在 **Windows、Linux 和 macOS** 上免驱。Android 可通过 USB OTG 使用音频功能。
+- 支持的采样率：**48000 Hz（推荐）**、32000、24000、22050（供 APRSdroid 使用）、16000、12000、11025、8000。
+- 支持 **双 PTT** 电台（PTT1 和 PTT2 两路输出）。
+- PTT1 默认触发源：**CM108 GPIO3** 或 **串口** `DTR=1 且 RTS=0`，两者同时有效。
+- PTT2 默认触发源：CM108 GPIO4。
+- 默认 COS：**虚拟 COS**（VCOS，根据接收音频电平判断）通过 CM108 的 **音量减（Volume Down）** 按键上报。
+
+### 硬件版本与固件兼容性
+| 硬件 | 固件 | 说明 |
+|---|---|---|
+| **rev 1.0 / 1.1**（2023–2025 年售出的大多数） | 1.2.0、**1.3.0（最稳妥）**、1.4.x | **[Community]** 部分 rev 1.0 板子升级到 1.4.x 后会 **卡死且 PTT 一直按下**，或在 Windows 虚拟机中出现音频“代码 10”错误（GitHub #120、#138，尚未解决）。遇到这种情况请刷回 **v1.3.0**。 |
+| **rev 1.2**（2025 年 9 月起） | **必须 1.4.0 或更新** **[Official]** | 新增：外部硬件 COS 输入、可切断的 PTT/UART 分离焊盘（可把 CAT 串口与 PTT 分开）、接收增益 1–16× 可调、发射增强（线路电平）。 |
+| **G1LRO “双 COS” AIOC / URC** | 出厂 1.3.0 | **[Community]** 板上有焊接跳线：**LOGIC COS**（Tidradio H3 新固件、SA818 模块）或 **SPK COS**（宝锋/泉盛这类通过喇叭音频判断的 COS）。 |
+
+> **硬件版本印在电路板上。** 只能使用为 STM32F302 编译的官方 `aioc-fw-x.y.z.bin` 固件。
+> **[Community]** 用 STM32F373 焊出来的板子（旧版物料清单里出现过）无法枚举（错误 -71），需要更换主控芯片（GitHub #122）。
+
+### 已测试的电台 **[Official]**
+- 宝锋 Baofeng UV-5R（CHIRP + APRS）
+- 欧讯 Wouxun UV-9D Mate（CHIRP + APRS）
+- BTECH UV-6X2 / 6X2（CHIRP）
+- 泉盛 Quansheng UV-K5（原厂固件、Egzumer 第三方固件、Quansheng Dock）
+
+**用户报告可用的其他机型** **[Community]** ：宝锋 UV-82、BF-888、普星 Puxing PX-888(D)、欧讯 KG-UV9D Plus、
+Retevis RT85、Explorer QRZ-1、Tidradio H3，以及 **建伍 TH-F6A**（需把接口设为 **SP/MIC** 模式：菜单 9）。
+也有用户把 AIOC 手工接到车台和短波电台的数据/话筒口上：**八重洲 Yaesu FT-817ND / FT-857D / FT-7800R**（音频、PTT 和 CAT 串口）、协谷 Xiegu G90，以及通过建伍转接头连接的 Radtel RT-950 Pro。注意：在 rev 1.0 板子上，CAT 串口数据可能触发 PTT（GitHub #34），硬件 rev 1.2 的 PTT/UART 分离焊盘可解决此问题。
+
+**一般来说** **[Typical]** ：任何带建伍式两针 K1 接口的手台都可以。包括大多数宝锋
+（UV-5R 系列、BF-888S、UV-82 *（UV-82 有双 PTT 版本）*）、泉盛（UV-K5/K6/K5(8)/UV-5R Plus）、
+BTECH、欧讯、TIDRADIO、Radtel、Retevis、Abbree、普星以及带 K1 接口的建伍手台。使用 **其他接口** 的电台
+（八重洲、艾可慕 Icom、摩托罗拉多针接口、宝锋/BTECH 螺纹式 UV-5X 插头、Anytone/Alinco 单插头）**无法直接插上**，需要转接头。
+
+### 局限（购买或尝试前请告知用户）
+- **只能通过话筒/喇叭接口传音频。** K1 接口传的是经过滤波和去加重的喇叭音频以及话筒输入。因此 **9600 波特分组、M17、DMR、D-STAR，或任何需要“平坦”鉴频器/调制器音频的模式都无法** 通过 K1 接口工作。1200 波特 AFSK 分组/APRS、VARA FM（窄带）、SSTV、fldigi 各模式和语音都能很好地工作。
+- **SSB 数字模式（FT8、JS8、FreeDV）** 需要 SSB 电台。用 FM 手台时这些软件 *能运行*，但联系不到短波 SSB 上的普通 FT8/JS8 用户。
+- **APRSdroid 没有 PTT 控制。** 请使用 AIOC 的 **虚拟 PTT（VPTT）**（固件 ≥ 1.3.0）或电台的声控（VOX）。
+- **iPhone/iPad 应用只能把 AIOC 当声卡用**：iOS 不允许应用访问串口和 HID 部分，所以发射必须用 **VPTT**。 **[Community]**
+- **廉价手台收发切换慢。** 分组通信可以用，但重传比车台多。 **[Community]**
+- **刷新固件会清除设置。** 升级后请重新应用你的 aioc-util 设置。 **[Official]**
+
+---
+
+## 2. 首次设置（所有用户）
+
+### 2.1 连接
+1. **先关闭电台**，再把 AIOC 用力插进 K1 接口，两个插头都要插到底。
+2. 用 USB-C 线连接电脑、手机或树莓派。
+3. 打开电台，调到要用的频率。
+
+### 2.2 确认电脑已识别
+| 系统 | 检查方法 |
+|---|---|
+| **Windows** | 设备管理器 → *端口（COM 和 LPT）* 出现一个新的 **COMx**。*声音设置* 里输入（麦克风）和输出（扬声器）都有“All-In-One-Cable”。 |
+| **Linux** | `lsusb` 显示 `1209:7388`。`arecord -l` / `aplay -l` 显示声卡。`ls /dev/ttyACM*` 显示串口。`ls /dev/hidraw*` 显示 HID。 |
+| **macOS** | 系统设置 → 声音 中有“All-In-One-Cable”。`ls /dev/cu.usbmodem*` 显示串口。 |
+| **Android** | 需要 USB-C OTG 连接。连接后，使用系统音频输入的应用会自动使用 AIOC。 |
+
+### 2.3 系统音频设置（重要）
+- **不要把 AIOC 设为系统默认播放设备。** 否则系统声音（通知、视频、提示音）都会从电台发出去；如果开了 VPTT，它们 **会让电台发射**。请保留你平时的扬声器为默认设备，只在电台软件里选择 AIOC。
+- **Windows：** 声音控制面板 → AIOC 设备 → *属性*：
+  - *高级*：格式设为 **1 声道、16 位、48000 Hz**。
+  - 关闭“音频增强”，以及“通信 → 降低其他声音”的自动闪避。
+  - *侦听* 选项卡：确认“侦听此设备” **未勾选**。
+- **Linux（PipeWire/PulseAudio）：** 用 `pavucontrol` 调电平。很多程序（Direwolf 及基于 ALSA 的程序）可直接使用 ALSA（`plughw:CARD,0`），可避免重采样。
+- **macOS：** 音频 MIDI 设置 → AIOC → 格式设为 48,000 Hz。
+
+### 2.4 调整音频电平（所有数字模式）
+**[Typical]**
+- **接收（电台 → 电脑）：** 把 **电台音量旋钮** 开到大约 30–50%（部分 VARA FM 用户开到约 75%；G1LRO 建议 AllStar 节点用约 50%） **[Community]** 。调到软件电平表显示信号强但不削波为止。例如 Direwolf 收到一包数据时，“audio level”应在 30–70 左右。
+  在硬件 rev 1.2 且固件 ≥ 1.4.0 时，还可以用 aioc-util 提高 AIOC 内部接收增益（1×–16×）。
+- **发射（电脑 → 电台）：** 系统里 AIOC 的 **输出音量先设为约 30–50%**。太大会频偏过大、失真，对方解不出来。可用另一台电台监听，或看其他电台能否解码你的信号。
+  硬件 rev 1.2 有发射“增强”（boost）功能，用于线路电平输入（普通手台不需要）。
+- **电台设置：** 关闭 **声控 VOX**（除非你有意使用 VOX）。关闭按键音和尾音。关闭 **省电模式**：它会截掉收到数据包的开头。 **[Community]**
+  **静噪：** 用 Direwolf 或 Soundmodem 收分组/APRS 时，**静噪全开（0 级）** 往往解码更好，因为宝锋的静噪打开慢，会切掉数据包开头，而软件调制解调器本身会做载波检测。 **[Community]**
+  对类似 VOX 的方案（VPTT/VCOS、AllStarLink、SvxLink、EchoLink），信道空闲时静噪必须是 **关闭** 的（无信号时静音）。把 **发射限时（TOT）** 设得比你最长的一次发射更长（SSTV 和 Winlink 可能超过 2 分钟）。
+
+### 2.5 Linux 权限（只需设置一次）
+打开 `/dev/ttyACM*` 或 `/dev/hidraw*` 的程序需要权限：
+
+```bash
+# 串口权限
+sudo usermod -aG dialout $USER     # (Arch/Fedora 可能是 "uucp" 组)
+# 音频
+sudo usermod -aG audio $USER
+
+# AIOC HID 的 udev 规则（CM108 PTT / 配置）+ 防止 ModemManager 占用串口
+sudo tee /etc/udev/rules.d/91-aioc.rules >/dev/null <<'EOF'
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7388", MODE="0666"
+SUBSYSTEM=="tty",    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7388", ENV{ID_MM_DEVICE_IGNORE}="1", SYMLINK+="aioc", MODE="0666"
+EOF
+sudo udevadm control --reload && sudo udevadm trigger
+# 注销并重新登录（使组生效），然后拔插 AIOC
+```
+设置后，串口还可以用 **`/dev/aioc`** 访问。ttyACM 编号变化时这个名字不变。
+aioc-util 项目也自带现成的 udev 规则（`udev/rules.d/91-aioc.rules`）。 **[Tool docs]**
+
+> **ModemManager**（Ubuntu、Debian 桌面版、Fedora 上常见）可能会探测新的 ttyACM 设备并向其发送 AT 指令，导致写频失败或随机触发 PTT。上面的 `ID_MM_DEVICE_IGNORE` 规则可以避免。
+> 如果你不用蜂窝网络调制解调器，也可以运行 `sudo systemctl disable --now ModemManager`。
+
+---
+
+## 3. 决策表：“我需要什么软件？”
+
+| 用户想要…… | Windows | Linux / 树莓派 | macOS | Android | 章节 |
+|---|---|---|---|---|---|
+| **写频（频道/存储）** | CHIRP | CHIRP | CHIRP | — | 5.1 |
+| **刷第三方固件（泉盛 UV-K5）** | 网页刷机工具（Chrome）/ k5prog | 网页刷机工具 / k5prog | 网页刷机工具 | — | 5.2 |
+| **收发 APRS（带地图）** | Direwolf + APRSIS32 / YAAC / PinPoint | Direwolf + YAAC / Xastir | Direwolf + YAAC | APRSdroid（+VPTT） | 5.3–5.5 |
+| **APRS iGate 网关 / 数字中继** | Direwolf | Direwolf（无界面树莓派） | Direwolf | — | 5.3 |
+| **给其他软件用的分组 TNC（KISS/AGW）** | Direwolf、UZ7HO Soundmodem | Direwolf、QtSoundModem | Direwolf | — | 5.3、5.6 |
+| **分组 BBS / 节点 / 终端** | Direwolf + QtTermTCP / EasyTerm / BPQ32 | Direwolf + Paracon / QtTermTCP / LinBPQ / Linpac | Direwolf + QtTermTCP | — | 5.7 |
+| **在 VHF/UHF 上收发 Winlink 邮件** | Winlink Express + VARA FM / 分组 | Pat + Direwolf（分组）或 VARA FM（Wine） | Pat + Direwolf | — | 5.8 |
+| **VARA FM 键盘聊天** | VarAC / VARA Chat | Wine 下运行 VarAC | — | — | 5.8 |
+| **SSTV（收发图片、国际空间站 SSTV）** | MMSSTV | QSSTV | Black Cat SSTV / MultiScan | Robot36（仅接收） | 5.9 |
+| **应急通信文本/表单（NBEMS）** | fldigi + flmsg + flamp | fldigi + flmsg + flamp | fldigi | — | 5.10 |
+| **FT8 / JS8（FM 上非标准用法）** | WSJT-X / JS8Call | WSJT-X / JS8Call | WSJT-X / JS8Call | — | 5.11 |
+| **AllStarLink 节点（手台作节点电台）** | — | **AllStarLink 3**（Debian / 树莓派） | — | — | 5.12 |
+| **EchoLink 链路 / 直频节点 / 中继控制器** | EchoLink（Sysop 模式） | **SvxLink** | — | — | 5.13 |
+| **用脚本控制 PTT / 通用电台控制** | Hamlib（rigctl/rigctld） | Hamlib、aioc-util | Hamlib | — | 5.14 |
+| **树莓派一体化数据站（网页界面里做 APRS、Winlink、分组、SSTV）** | — | **DigiPi**（树莓派镜像） | — | — | 5.15 |
+| **用 iPhone 或 iPad 收发 Winlink / 分组** | — | — | — | iOS：RadioMail、Packet Commander（+VPTT） | 5.16 |
+| **基于分组的 Mesh / 离网组网** | Reticulum，经 Direwolf KISS | Reticulum（RNS、NomadNet、Sideband），经 Direwolf KISS | Reticulum | Sideband | 5.17 |
+| **GMRS 上的 AllStar 式联网** | — | GMRSLive（基于 AllStar） | — | — | 5.12 |
+| **接车台/短波电台（音频 + PTT + CAT）** | WSJT-X/fldigi + CAT | 同左 | 同左 | — | 5.18 |
+| **猎狐信标（无需电脑）** | AIOC Toolkit 或 aioc-util（用于设置） | 同左 | 同左 | — | 7.4 |
+| **修改 AIOC 设置（PTT 源、VPTT/VCOS、增益）** | **AIOC Toolkit**（Chrome/Edge） | AIOC Toolkit 或 aioc-util | AIOC Toolkit 或 aioc-util | — | 7 |
+| **升级 AIOC 固件** | **AIOC Toolkit**（Flash Firmware 选项卡） | dfu-util 或 AIOC Toolkit | dfu-util 或 AIOC Toolkit | — | 9 |
+| **录制或监听接收音频、扫描记录** | Audacity / 任意录音软件 | Audacity / arecord / rtl 类工具 | Audacity | 任意录音应用 | 2.4 |
+
+---
+
+## 4. PTT 方式（看任何配置步骤之前请先理解）
+
+AIOC 可以用多种方式让电台发射（PTT1），这些方式可以组合使用。 **[Official]**
+
+| 方式 | 软件如何触发 | 适合 | 默认？ |
+|---|---|---|---|
+| **CM108 HID GPIO3** | 支持“CM108 PTT”的软件（Direwolf、AllStarLink、SvxLink、Hamlib `-P CM108`、Linux 上的 QtSoundModem） | Linux；最可靠的方式 | ✅ 开启 |
+| **串口** `DTR=1 且 RTS=0` | 软件在 AIOC 的 COM 口上把 DTR 置高、RTS 置低 | 用 COM 口 PTT 的 Windows/macOS 软件 | ✅ 开启 |
+| **仅串口 DTR**（`SERIALDTR`） | 软件拉高 DTR，但 RTS 也保持高电平 | 无法保持 RTS 为低的软件 | 需用 aioc-util 设置 |
+| **仅串口 RTS**（`SERIALRTS`） | 软件用 RTS 控制发射 | 只支持 RTS PTT 的软件 | 需用 aioc-util 设置 |
+| **串口 非DTR 且 RTS**（`SERIALNDTRRTS`） | 反向逻辑 | 很少用到 | 需用 aioc-util 设置 |
+| **虚拟 PTT（VPTT）** | **软件无需 PTT 控制。** 只要软件播放的音频超过阈值，AIOC 就让电台发射（相当于 AIOC 内部一个非常快、干净的声控） | APRSdroid，任何没有 PTT 的应用 | 需用 aioc-util 设置，固件 ≥ 1.3.0 |
+
+> **固件 1.2.0 之前**，PTT 只看“DTR=1”，导致 CHIRP 写频时电台会发射。固件 ≥ 1.2.0 改为 DTR=1 且 RTS=0。 **[Official]**
+>
+> **UART 锁定：** 默认情况下，PTT1 有效期间会忽略电台发来的串口数据，这样 AIOC 能同时当写频线和声卡用。可在 `SERIAL_CTRL` 寄存器中修改。 **[Official]**
+
+**给 AI 助手的经验法则：**
+1. 软件支持 **CM108 PTT** 就用它。
+2. 否则用 **COM 口的“DTR”PTT**，并保持 RTS 关闭/为低。
+3. 电台还是不发射，看第 6 节。
+
+---
+
+## 5. 软件配置步骤
+
+> 示例中请把 `N0CALL` 换成用户的呼号，把 `COM5`、`/dev/ttyACM0`、`/dev/hidraw0` 和 `plughw:1,0` 换成用户实际的设备（见 2.2 节）。
+
+### 5.1 CHIRP：给电台写频（Windows / Linux / macOS）
+**[Official]** CHIRP 的用法和普通写频线完全一样，不需要驱动。
+1. 从 chirpmyradio.com 安装 **CHIRP-next**。Linux：pipx/flatpak；macOS：.app 安装包。
+2. 把 AIOC 插到电台上并开机。电台要停在 **普通的信道/频率界面**（不要停在菜单里）。
+3. CHIRP → **Radio → Download from Radio**（从电台读取）→ 选择 AIOC 的端口（`COMx`、`/dev/ttyACM0` 或 `/dev/cu.usbmodem…`）→ 选择厂商/型号 → OK。
+4. 编辑信道 → **Radio → Upload to Radio**（写入电台）。
+
+提示 **[Typical]** ：
+- 写入之前，一定 **先读取并保存一份备份** `.img`。
+- 泉盛 UV-K5 **原厂固件**：用“Quansheng UV-K5”驱动。**Egzumer 或其他第三方固件**：用固件作者提供的对应 CHIRP 驱动模块（在 CHIRP 中：*Help → Developer mode → File → Load module*），或在较新的 CHIRP 里选择列出该固件的驱动。
+- **[Community]** **Windows：CHIRP 读频后电台一直在发射。** 早期固件（1.2.0 之前）会这样，因为 Windows 关闭端口时会改变 DTR/RTS。请把 AIOC 升级到 ≥ 1.2.0。如果红灯一直亮，拔插一下 USB。
+- **[Community]** 读频失败一次就再试一次。刚插上后的第一次偶尔会失败，晃一下插头就好（接触问题）。
+- 如果提示“radio did not respond”（电台无响应）：重新插好插头、确认电台已开机、选择准确的型号（例如 UV-5R 与 UV-5R Plus / UV-5RM 是不同的电台）、调低音量、关闭 VOX。
+- 宝锋 **UV-5RM / UV-5R Mini / UV-17** 等较新型号可能需要特定的 CHIRP 型号或厂家自己的写频软件。AIOC 仍然可以当它们的写频线。
+- **厂家写频软件**（宝锋/BTECH/Radtel/TIDRADIO 的工具）也能用：选择 AIOC 的 COM 口即可。**RT Systems** 软件可能只认 RT Systems 自家的线。
+
+### 5.2 泉盛 UV-K5 刷固件
+**[Official]** 固件 v1.4.0 把串口缓冲区加倍，专门解决部分手台刷固件失败的问题。开始前请确认 AIOC 已是 v1.4.x。
+
+**[Typical]**
+1. 关闭电台。**按住 PTT 再开机** 进入引导模式（手电灯亮，屏幕不亮）。
+2. 在 Chrome/Edge 中使用网页刷机工具（Web Serial）。Egzumer 项目里有链接。也可以用 `k5prog`/`uvk5` 等命令行工具。
+3. 选择 AIOC 的串口，加载 `.bin` 文件，开始刷写。
+4. 提醒用户：**刷第三方固件风险自负。** 应保留原厂固件和校准数据的备份（CHIRP/K5 工具可以导出校准数据）。
+
+### 5.3 Direwolf：APRS、分组 TNC、iGate、数字中继（Windows / Linux / macOS）
+Direwolf 是核心的“软件 TNC”。大多数 APRS 和分组软件通过 **AGW（端口 8000）** 或 **KISS-TCP（端口 8001）** 连接它。
+
+**安装** **[Typical]** ：Linux `sudo apt install direwolf`。Windows：从 GitHub releases（wb2osz/direwolf）下载 zip。macOS：`brew install direwolf`。
+
+**找到音频设备：**
+- Linux：`arecord -l`，例如 `card 1: AllInOneCable [All-In-One-Cable], device 0` → `plughw:1,0`（或按名称 `plughw:CARD=AllInOneCable,DEV=0`；请在 `arecord -l` 中确认准确的声卡 ID）。
+- Windows：先运行一次 Direwolf，它会列出带编号的音频设备，使用 AIOC 的编号。
+
+**最小** `direwolf.conf` **[Official settings + Typical extras]** ：
+```conf
+# --- 音频 ---
+ADEVICE plughw:1,0        # Linux  (Windows: ADEVICE 3 3   <- Direwolf 列出的 AIOC 输入/输出编号)
+ARATE 48000
+ACHANNELS 1
+
+# --- 通道 0 ---
+CHANNEL 0
+MYCALL N0CALL-10
+MODEM 1200
+
+# --- PTT：只选一种 ---
+PTT CM108                 # Linux: CM108 HID PTT（推荐）。自动识别；或写 "PTT CM108 /dev/hidraw0"
+#PTT /dev/ttyACM0 DTR -RTS  # Linux 串口 PTT
+#PTT COM5 DTR -RTS          # Windows 串口 PTT
+#PTT /dev/cu.usbmodem1101 DTR -RTS   # macOS 串口 PTT
+
+# --- 给客户端软件用的端口 ---
+AGWPORT 8000
+KISSPORT 8001
+```
+**[Official]** 在 AIOC 上使用 CM108 PTT 时，Direwolf 可能会打印 **警告**，这些警告无害（见 direwolf issue #448）。
+
+**附加功能** **[Typical]** ：
+```conf
+# 位置信标（每 30 分钟，路径 WIDE1-1,WIDE2-1）。请填你自己的经纬度。
+PBEACON delay=1 every=30 overlay=S symbol="digi" lat=42^37.14N long=071^20.83W power=5 height=20 gain=3 comment="AIOC + HT" via=WIDE1-1,WIDE2-1
+
+# 仅接收的 iGate（需要联网 + APRS-IS 验证码）
+IGSERVER noam.aprs2.net        # euro.aprs2.net / asia.aprs2.net / aunz.aprs2.net
+IGLOGIN N0CALL-10 12345
+
+# 补盲数字中继（只转发 WIDE1-1）—— 仅在当地合适时开启
+DIGIPEAT 0 0 ^WIDE1-1$ ^WIDE1-1$
+```
+**[Community]** **AIOC 用户报告的 Direwolf 常见坑：**
+- `PTT CM108 3 -3`：末尾的 `-3` 会 **反转** PTT，电台会一直发射。请用 `PTT CM108` 或 `PTT CM108 3`。
+- 使用 CM108 PTT 时，注释掉指向同一设备的旧 `DCD` 配置行。
+- 在树莓派上可用的串口写法：`PTT /dev/ttyACM0 DTR -RTS`（写成 `-RTS DTR` 也可以）。
+- Windows 下 48000 Hz 时出现“pre filter size”警告：无害。也可以试试 `ARATE 24000`，或用 Direwolf 1.6 正式版代替开发版。
+- 第一次发射后 PTT **一直按住**，或发射时 AIOC“崩溃”，几乎都是射频回授（见第 8 节）。
+
+启动：`direwolf -c direwolf.conf`（加 `-t 0` 可关闭日志颜色）。
+测试：`direwolf` 会显示解出的数据包和音频电平。发一个信标，然后在 aprs.fi 上查看。
+
+**APRS 频率** **[Typical]** ：144.390 MHz（北美）、144.800 MHz（欧洲/非洲）、145.175 MHz（澳大利亚）、
+**144.640 MHz（中国）**、144.660 MHz（日本）、145.825 MHz（国际空间站数字中继，全球）。用户须确认当地的频率规划。
+
+### 5.4 APRS 客户端软件（用 Direwolf 作调制解调器）
+以下软件都连接同一台电脑上运行的 Direwolf，由 Direwolf 负责音频和 PTT。
+
+| 软件 | 系统 | 连接设置 **[Typical]** |
+|---|---|---|
+| **YAAC**（Java） | Win/Linux/macOS | *File → Configure → Expert mode → Ports → Add → “AGWPE”*，主机 `localhost`，端口 `8000`（或“KISS over TCP” `8001`） |
+| **Xastir** | Linux/macOS | *Interface → Interface Control → Add → “Networked AGWPE”*，主机 `localhost`，端口 `8000` |
+| **APRSIS32** | Windows（也可在 Wine 下运行） | *Configure → Ports → New Port → 类型“AGW”*，`127.0.0.1:8000`（或 KISS TCP `8001`） |
+| **PinPoint APRS** | Windows | TNC 类型“AGWPE”，`127.0.0.1:8000` |
+| **UI-View32**（老软件） | Windows | 经 Direwolf 的 AGW 端口使用 AGWPE 模式 |
+| **APRS Messenger 等** | Windows | 用 AGW 或 KISS-TCP 连接 Direwolf |
+
+YAAC 也自带声卡调制解调器，但 Direwolf 解码更好、对 AIOC PTT 的支持更可靠，所以推荐用 Direwolf。
+
+### 5.5 APRSdroid：在 Android 上玩 APRS
+**[Official]** AIOC 支持 APRSdroid 需要的固定 **22050 Hz** 采样率（实际为 22052 Hz，误差约 90 ppm，对 APRS 没有影响）。
+APRSdroid **没有 PTT 控制**，所以要发射，需先在 AIOC 上 **开启虚拟 PTT**（在电脑上一次性设置，固件 ≥ 1.3.0）：
+```bash
+./aioc-util.py --ptt1 VPTT --store
+# 同时保留 CM108 + 串口 PTT：
+./aioc-util.py --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store
+```
+APRSdroid 设置 **[Typical]** ：
+1. 用 USB-C OTG 线/转接头把 AIOC 接到手机上。
+2. APRSdroid → *Preferences → Connection Protocol：“AFSK”*（音频调制解调器）。设置呼号/SSID 和验证码（只有用 APRS-IS 才需要验证码）。
+3. 手机性能较弱时，关闭“high-quality demodulator”（高质量解调器）。手机媒体音量设为中等。
+4. 确保没有其他应用发出声音（开了 VPTT 后任何声音都会让电台发射）。打开勿扰模式。
+
+其他 Android 应用 **[Typical]** ：**Robot36**（SSTV 接收）、**DroidSSTV** 以及任意录音应用。应用需要使用 USB 音频输入，连接 AIOC 后大多数会自动切换。
+
+### 5.6 UZ7HO Soundmodem（Windows）/ QtSoundModem（Linux、Windows）
+和 Direwolf 类似的软件调制解调器（AFSK 1200 等），提供 AGW（8000）和 KISS（8100）端口。
+**[Typical]**
+- *Settings → Devices*：输入设备 = AIOC 麦克风，输出设备 = AIOC 扬声器。
+  **UZ7HO Soundmodem 不接受高于 12000 的采样率，请用 12000**，AIOC 支持这个采样率。 **[Community]**
+- PTT：*PTT Port* = AIOC 的 COM 口。**勾选“Swap COM pins for PTT”**：Soundmodem 默认用 RTS 发射，交换后改用 DTR，和 AIOC 匹配。“Dual PTT”不要勾选。 **[Community, GitHub #11]**
+  - 仍不发射的话，把 AIOC 的 PTT 源改为 `SERIALDTR`（第 6 节），或改为 `VPTT`。
+- Linux 上的 QtSoundModem 也可以用 **CM108 PTT**（如果你的版本有，选择 hidraw 设备 / CM108 选项）。
+- 调制方式：普通 VHF 分组/APRS 用 AFSK AX.25 1200bd。
+
+### 5.7 分组 BBS、节点和终端
+以下软件都通过 AGW 或 KISS 使用 Direwolf（或 Soundmodem）作 TNC。 **[Typical]**
+
+| 软件 | 系统 | 说明 |
+|---|---|---|
+| **QtTermTCP** | Win/Linux/macOS | Setup → AGW：主机 127.0.0.1，端口 8000。可连接 BBS/节点。 |
+| **Paracon** | Win/Linux/macOS（Python） | AGWPE 客户端，127.0.0.1:8000。简单的多会话分组终端。 |
+| **EasyTerm / Outpost** | Windows | Outpost（应急通信/ARES 分组消息常用）可以用 AGWPE 或 KISS。 |
+| **BPQ32 / LinBPQ** | Win / Linux | 节点 + BBS + 聊天。`PORT` 段用 `DRIVER=UZ7HO`（以 AGW 连 Direwolf/Soundmodem），或 KISS over TCP（`TYPE=ASYNC`、`PROTOCOL=KISS`、`IPADDR=127.0.0.1`、`TCPPORT=8001`）。 |
+| **Linux AX.25 协议栈 + Linpac / JNOS** | Linux | 用 `kissattach` 连接 Direwolf 的伪终端（`direwolf -p` 会创建 `/tmp/kisstnc`），或使用 `tncattach`。 |
+
+### 5.8 Winlink 邮件：Winlink Express、Pat、VARA FM、分组
+#### 5.8.1 Winlink Express（Windows）+ VARA FM
+**[Official]** 在 VARA FM 中把 **PTT 引脚（PTT pin）设为“DTR only”**，这样 VARA 产生的 DTR/RTS 状态正是 AIOC 需要的。
+
+**[Typical]** **设置步骤：**
+1. 安装 **Winlink Express** 和 **VARA FM**（来自 Rosmodem 网站；免费模式限速，购买授权后解除限速）。
+2. 打开 VARA FM → *Settings → SoundCard*：Device Input = AIOC 麦克风，Device Output = AIOC 扬声器。
+3. VARA FM → *Settings → PTT*：**COM 口** = AIOC 的 COM，**Pin = DTR only**。
+4. 大多数手台选 **Narrow**（VARA FM 1200）。Wide（9600）通常无法通过 K1 音频工作（见“局限”）。
+5. 调整接收电平，让 VARA 的电平表在绿色区。把发射驱动（VARA → *Tune*，加上 Windows 输出音量）调到能稳定连通的最低值。
+6. Winlink Express → *Open Session：“VARA FM Winlink”* → *Settings* → 主机保持 127.0.0.1，端口 8300/8301 → 用 *Channel Selection* 找一个网关 → *Start*。
+7. 把电台的 **TOT** 设到最大或关闭。用小功率或中功率，避免手台过热。
+
+#### 5.8.2 Winlink Express + 分组（1200 波特）
+**[Typical]** 运行 Direwolf（5.3）或 UZ7HO Soundmodem → Winlink Express → *Open Session：“Packet Winlink”* →
+*Settings*：TNC 类型 **KISS**，连接方式 **TCP**，主机 `127.0.0.1`，端口 `8001`（Direwolf KISS）/ `8100`（UZ7HO）。
+
+#### 5.8.3 Pat（Linux、macOS、Windows、树莓派）
+**[Typical]** Pat 是一个单程序的 Winlink 客户端，带网页界面。
+```bash
+pat configure        # 设置 mycall、secure_login_password、locator
+```
+- **通过 Direwolf 走分组（AGWPE）：** 在 `config.json` 中设置 `"ax25": {"engine": "agwpe", ...}` 和 `"agwpe": {"addr": "localhost:8000"}`。
+  连接：`pat connect ax25:///GATEWAYCALL-10`（或使用网页界面：运行 `pat http`，然后打开 http://localhost:8080）。
+- **改用 Linux 内核 AX.25：** 用 `kissattach` 连接 Direwolf 的 PTY，然后设置 `"engine": "linux"` 和 `"port": "wl2k"`。
+- **VARA FM：** 在 Wine 下运行 VARA FM（AIOC 作声卡，COM 口 PTT 设为“DTR only”），然后在 Pat 中设置 `"varafm": {"addr": "localhost:8300"}`，用 `pat connect varafm:///GATEWAYCALL` 连接。
+
+#### 5.8.4 VarAC / VARA Chat（通过 VARA 键盘聊天）
+**[Typical]** 先按 5.8.1 安装并设置好 VARA FM。在 VarAC（或 VARA Chat）中选择 **VARA FM** 作调制解调器。
+VarAC 连接 VARA 的 TCP 端口，PTT 仍由 VARA 控制（DTR only）。VarAC 自己也能做 PTT/CAT，但请保持 **关闭**，让 VARA 负责发射。
+
+### 5.9 SSTV：慢扫描电视图片
+**[Typical]**
+| 软件 | 系统 | 音频 | PTT |
+|---|---|---|---|
+| **MMSSTV** | Windows | *Option → Setup → Misc → Sound card*：输入/输出选 AIOC | *Setup → TX → PTT port*：AIOC 的 COM。不发射的话，把 AIOC 改为 `SERIALDTR`/`SERIALRTS` 或 `VPTT`（第 6 节）。 |
+| **QSSTV** | Linux | *Options → Configuration → Sound*：ALSA/PulseAudio 选 AIOC | *CAT* 选项卡：Hamlib “Dummy”，PTT 经串口 **DTR**（`/dev/ttyACM0`），如有 Hamlib CM108 选项也可用；否则用 VPTT。 |
+| **Black Cat SSTV / MultiScan 3B** | macOS | 输入/输出选 AIOC | 用 AIOC 的 VPTT（最简单） |
+| **Robot36** | Android | USB 音频 | 仅接收 |
+
+提示：只接收（例如 **国际空间站 SSTV 活动，145.800 MHz FM**）完全不需要设置 PTT。接收微弱的卫星信号时，把静噪 **关闭** 或调低。长时间发射时注意手台过热，TOT 设为 ≥ 3 分钟。
+
+### 5.10 fldigi / flmsg / flamp：通过 FM 传应急通信文本和表单（NBEMS）
+**[Typical]**
+1. *Configure → Sound card → Audio → Devices*：PortAudio（或 PulseAudio）→ Capture **和** Playback 都选 AIOC。采样率：Native/48000。
+2. PTT，任选一种：
+   - *Configure → Rig Control →* **CM108 / C-Media PTT**（较新的 fldigi 版本）：选择 AIOC 的 HID，**GPIO 3**。
+   - *Configure → Rig Control →* **GPIO / Hardware PTT**：“Use separate serial port PTT”，设备 = AIOC 的 COM/ttyACM，勾选 **Use DTR**（DTR = +V），**不要勾选 RTS**。点击 *Initialize*。
+     不发射的话：把 AIOC 的 PTT 源设为 `SERIALDTR`（第 6 节）。
+   - 或用 Hamlib，设置 `ptt_type=CM108`。
+3. 常用 FM 模式：**MT63-2000L**（ARES/NBEMS 在 FM 上的常用模式）、**8PSK**、**Olivia**。用瀑布图把信号放在约 1500 Hz 处。
+4. **flmsg**（ICS-213 等表单）和 **flamp**（组播文件）通过 fldigi 工作。把它们的“fldigi”连接设为默认值（XML-RPC 127.0.0.1:7362）。
+
+### 5.11 WSJT-X / JS8Call（FT8、FT4、JS8：在 FM 上属非标准用法）
+**[Typical]** 这些通常是 SSB 模式。在 FM 手台上只能和同样用 FM 的电台互通（例如本地 2 米 FM 实验）。设置：
+- *Settings → Radio*：Rig 选 **None**。**PTT Method：DTR**。Port：AIOC 的 COM/ttyACM。
+  （不发射的话，把 AIOC 设为 `SERIALDTR`，或 PTT 选“VOX”并开启 AIOC 的 VPTT。）
+- *Settings → Audio*：输入/输出 = AIOC，单声道。
+- 发射音量要低（干净的单音）。FM 的捕获效应对弱信号不利。
+
+### 5.12 AllStarLink 3（ASL3）：手台作 AllStar 节点电台
+**[Official + Tool docs]** AIOC 模拟 CM108，所以 ASL3 可以直接用它控制 PTT 和读取 COS。
+ASL3 认识 AIOC 自己的 USB ID `1209:7388`，只需在 `res_usbradio.conf` 中 **取消注释** 即可。
+
+**步骤：**
+1. 安装 ASL3（allstarlink.org 提供的 Debian 12 / 树莓派 OS 镜像）。用 `asl-menu` 设置节点号和密码。
+2. 安装 AIOC 的 udev 规则（2.5 节），让 Asterisk 能打开 HID。
+3. 允许 AIOC 的 USB ID：
+   ```ini
+   ; /etc/asterisk/res_usbradio.conf
+   [general]
+   usb_devices = 1209:7388    ; AIOC (all in one cable)
+   ```
+   *（另一种做法：用* `./aioc-util.py --set-usb 0x0d8c 0x000c --store` *把 AIOC 伪装成 C-Media CM108。之后再配置它时需要加* `--open-usb 0x0d8c 0x000c`*。）*
+4. 设置虚拟 COS（根据接收音频判断静噪）的保持时间。**时间寄存器以 1/16 毫秒计：数值 = 毫秒 × 16**
+   （由固件默认值和 G1LRO 的脚本确认，1500 毫秒 = `0x5DC0`）。 **[Official + Community]**
+   ```bash
+   ./aioc-util.py --vcos-timctrl 24000 --store      # 1500 毫秒保持时间（G1LRO 的推荐值）
+   ```
+   *（aioc-util README 中的示例* `--vcos-timctrl 1500` *只有约 94 毫秒。）* 如果说话时字与字之间断掉，就调大。
+   如果 COS 被噪声打开，就提高阈值（`--vcos-lvlctrl`，默认 256）。G1LRO 建议噪声大的电台把阈值设在 1500 左右。
+   确保信道空闲时电台的 **静噪是关闭的**。VCOS 根据音频电平打开。
+   **更好的办法：硬件 COS。** rev 1.2 或 G1LRO 双 COS 板可以读取电台真实的静噪状态：`./aioc-util.py --enable-hwcos --store`。
+   **省事的办法** **[Community]** ：G1LRO 的脚本会帮你完成第 3–6 步（它会修改 `res_usbradio.conf`、`simpleusb.conf` 和 `rpt.conf`，并先做备份）：
+   ```bash
+   wget -O customize.sh https://raw.githubusercontent.com/G1LRO/AIOC-ASL3-Config/main/customize.sh
+   sudo bash customize.sh
+   ```
+5. 在 `asl-menu` 中 **[Official example]** ：
+   - 设备类型：`usbradio`（菜单 2 > A1 > N4 > I2）（或 `simpleusb`，手台节点用它也很好）
+   - 双工类型：`1`（菜单 2 > A1 > N5）
+6. 编辑 `usbradio.conf`（菜单 6 > H）。官方示例针对普星 PX-888，作为大多数手台的起点都合适：
+   ```ini
+   rxboost = 0
+   rxsqhyst = 500
+   carrierfrom = usbinvert
+   ctcssfrom = no
+   rxdemod = speaker
+   txprelim = no
+   invertptt = no
+   ```
+   （`simpleusb.conf` 中对应的是 `carrierfrom = usbinvert`、`ctcssfrom = no`。）
+   **[Community]** **G1LRO 给出的** `simpleusb-tune-menu` **设置：** I = PTT 模式（他的旧教程中为 `active LOW`），J = COS 来源 `usbinvert`（VCOS）或 `usb`（高电平有效；他的新教程在硬件 COS 时用这个），L = CTCSS 来源 `no`。
+   **COS 一直打开：** 在 `usb` 和 `usbinvert` 之间切换，或提高 VCOS 阈值。**COS 一直不打开：** 切换两者，或降低阈值。
+7. 运行 `radio-tune-menu`（usbradio）或 `simpleusb-tune-menu`（simpleusb）设置收发电平：**V** 检查 COS，**e** 做回声测试，**2/3** 调电平，**W** 保存。然后重启 Asterisk：`sudo systemctl restart asterisk`。
+8. 用鹦鹉节点（**Hubnet Parrot 40894**）测试，或连接一个枢纽节点。用 **小功率**，天线和电脑分开放：射频窜入 USB 线是最常见的问题（第 8 节）。
+
+**AllStarLink 论坛上报告的解决办法** **[Community]** ：
+| 现象 | 解决 |
+|---|---|
+| `asl-menu` 提示找不到音频设备 | 在 `res_usbradio.conf` 中取消注释 `usb_devices = 1209:7388`（M0AWS 为此折腾了一整天） |
+| COS 正常但 **没有接收音频** | 设置了 `ctcssfrom`：改为 `ctcssfrom = no` |
+| 节点反复发射 | 确认 `rpt.conf` 中 `duplex = 1` |
+| 节点发射时 PTT 卡住 | 射频回授：用 1 W 而不是 5 W、短 USB 线、卡扣磁环，天线远离树莓派 |
+| 尾音约 3 秒或自己发射 | 检查 VCOS 保持时间和阈值；把电台静噪调高 |
+| 全双工中继 | 有人用两个 AIOC 和两台电台（一收一发）实现了（F1FQN 的视频） |
+
+**HamVOIP / GMRSLive**（较早的基于 AllStar 的系统）只认 C-Media 的 ID。请用上面的 `--set-usb 0x0d8c 0x000c` 选项（G1LRO 的 `aioc.py` / `aioc-revert.py` 脚本作用相同）。在 GMRS 上请遵守当地 GMRS 规定，GMRS 不属于业余无线电。
+
+### 5.13 SvxLink（Linux）和 EchoLink（Windows）
+#### SvxLink：直频节点、中继控制器、EchoLink 链路
+**[Typical]** PTT 和静噪都用 AIOC 的 HID：
+```ini
+# /etc/svxlink/svxlink.conf
+[Rx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+SQL_DET=HIDRAW
+HID_DEVICE=/dev/hidraw0
+HID_SQL_PIN=VOL_DN          # AIOC 的 VCOS 在 CM108 "Volume Down" 上；逻辑相反时用 !VOL_DN
+# 也可以用：SQL_DET=VOX (VOX_FILTER_DEPTH / VOX_THRESH) 或 CTCSS
+
+[Tx1]
+TYPE=Local
+AUDIO_DEV=alsa:plughw:1
+AUDIO_CHANNEL=0
+PTT_TYPE=Hidraw
+HID_DEVICE=/dev/hidraw0
+HID_PTT_PIN=GPIO3
+# 串口 PTT 写法：PTT_TYPE=SerialPin, PTT_PORT=/dev/aioc, PTT_PIN=DTR!RTS
+```
+如需 EchoLink，启用 `ModuleEchoLink`，并在 `ModuleEchoLink.conf` 中填写呼号和密码。在路由器上转发 **UDP 5198–5199** 和 **TCP 5200**。
+
+#### EchoLink（Windows，Sysop 模式）
+**[Typical]**
+- *Tools → Sysop Settings → RX Ctrl*：**VOX**（调整阈值）。AIOC 不支持通过串口提供 COS，所以一般用 VOX。
+- *TX Ctrl*：在 AIOC 的 COM 口上用 **Serial** 控制发射。EchoLink 可能拉高 RTS（或两根线都拉高）。把 AIOC 的 PTT 源设为对应的 `SERIALRTS` 或 `SERIALDTR`，或者直接用 **VPTT**（第 6 节）。
+- *Audio*：输入/输出 = AIOC。需要已验证的 EchoLink 账号，并转发 UDP 5198–5199。
+
+### 5.14 Hamlib / 脚本 / 通用 PTT
+**[Typical]**
+```bash
+# 通过 HID 的 CM108 PTT（Linux）
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 1     # 发射
+rigctl -m 1 -p /dev/hidraw0 -P CM108 T 0     # 停止发射
+
+# 串口 DTR PTT，强制 RTS 为低
+rigctl -m 1 -p /dev/ttyACM0 -P DTR -C rts_state=OFF T 1
+
+# rigctld：供通过网络连接 Hamlib 的软件使用（端口 4532）
+rigctld -m 1 -p /dev/hidraw0 -P CM108
+```
+**aioc-util** 也可以直接控制发射（固件 ≥ 1.3） **[Tool docs]** ：
+```bash
+./aioc-util.py --set-ptt1-state on
+./aioc-util.py --set-ptt1-state off
+```
+用 Python + pyserial（AIOC 默认逻辑）：
+```python
+import serial, time
+s = serial.Serial('/dev/ttyACM0')   # 或 'COM5'
+s.rts = False; s.dtr = True         # PTT 按下 (DTR=1, RTS=0)
+time.sleep(2)
+s.dtr = False                       # PTT 松开
+```
+
+### 5.15 DigiPi（树莓派一体化数据站）
+**[Community]** DigiPi 是一个现成的树莓派镜像，在网页界面里提供 APRS、数字中继/iGate、分组节点、Winlink（Pat）、SSTV 等功能。
+旧版 DigiPi 不直接支持 AIOC。用户的做法是修改 **每一个** Direwolf 配置文件
+（`direwolf.tnc.conf`、`direwolf.digipeater.conf`、`direwolf.node.conf`、`direwolf.winlink.conf`、`direwolf.tracker.conf`、`direwolf.tnc300b.conf`）：
+```conf
+ADEVICE plughw:0,0 plughw:0,0     # 或 arecord -l 中 AIOC 的声卡编号
+PTT CM108                         # 或：PTT /dev/ttyACM0 DTR -RTS   （不要在末尾加 -3，那会反转 PTT）
+# 注释掉旧的 DCD 行
+```
+然后 `sudo remount`，修改文件，运行 `sudo ./saveconfigs.sh`，再 `sudo reboot`。USB 线 **两端** 都加磁环。
+修改前请先查看新版 DigiPi 是否已原生支持 AIOC。
+
+### 5.16 iPhone / iPad（RadioMail、Packet Commander）
+**[Community, Dec 2025]** iOS 应用只能把 AIOC 当 **USB 声卡** 用（苹果不允许应用访问 USB 串口或 HID）。
+**RadioMail**（Winlink）和 **Packet Commander** 应用内置分组调制解调器，开启 **虚拟 PTT** 后可以配合 AIOC 使用：
+```bash
+./aioc-util.py --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store     # 需要 AIOC 固件 1.4.1（旧固件上 aioc-util 设置失败）
+```
+使用 USB-C 接口的 iPhone/iPad，或苹果的 Lightning 转 USB 相机转换器。把设备上其他声音全部静音，因为任何声音都会让电台发射。
+
+### 5.17 通过分组运行 Reticulum（RNS、NomadNet、Sideband、MeshChat）
+**[Typical]** Reticulum 可以使用 KISS TNC。运行 Direwolf（5.3），并在 `~/.reticulum/config` 中添加一个 TCP KISS 接口：
+```ini
+[[Direwolf AIOC]]
+  type = TCPClientInterface
+  interface_enabled = True
+  kiss_framing = True
+  target_host = 127.0.0.1
+  target_port = 8001
+```
+（也可以把 `KISSInterface` 指向 `direwolf -p` 创建的 Direwolf 伪终端。）1200 波特很慢，但发消息够用。
+**[Community]** 有用户报告 Reticulum 通过 TCP 连接 Direwolf 时有问题。遇到异常可以改用 PTY/`KISSInterface` 方式。
+请遵守本国业余无线电规定：很多执照条件禁止加密。发射前请检查 Reticulum 的配置。
+
+### 5.18 车台 / 短波电台（把 AIOC 接到数据口或话筒口）
+**[Community]** AIOC 本质上就是一块集成了 USB 声卡、串口和 PTT 的小板，所以有动手能力的用户会把它接到其他电台上：
+- 从焊盘或尾线上的 K1 插座引出信号：送往电台的音频、来自电台的音频、PTT、UART TX/RX 和地（引脚定义见 AIOC README）。
+- **八重洲 FT-817ND / FT-857D / FT-7800R：** 已有人用便宜的 CT-39A（数据）和 CT-62（CAT）线实现了音频、PTT 和 **CAT**（GitHub #137）。CAT 没反应时，**交换 RX 和 TX**。
+- 在 **硬件 rev 1.0/1.1** 上，UART 和 PTT 共用一个触点，所以 CAT 数据可能触发 PTT。请用 rev 1.2 并切断分离焊盘，或不接 PTT、改用 CAT 控制发射。
+- rev 1.2 接线路电平数据口时：`--audio-tx-boost on`，并调高 `--audio-rx-gain`。
+- 艾可慕 Icom 的 CI-V（单线总线）不加额外电路 **无法** 工作（GitHub #109，尚未解决）。
+- 如果不熟悉焊接，建议买现成的专用接口。接错线可能损坏电台或 AIOC。
+
+---
+
+## 6. PTT 故障排查流程
+
+```
+软件已经“按下发射”，但电台没有发射？
+│
+├─ 1. 插头插到底了吗？电台开机了吗？VOX 关了吗？没有锁键？不是禁止发射的信道？
+│      快速硬件测试：AIOC Toolkit → Configure → Manual PTT State → PTT 1 ON。
+│      如果这里电台能发射，说明线没问题，问题出在软件的 PTT 设置上。
+│
+├─ 2. 软件支持 CM108 PTT 吗？→ 用它（Linux：检查 /dev/hidraw 权限，见 2.5 节）
+│
+├─ 3. 使用 COM 口 PTT 时：
+│     ├─ 软件设为 "DTR"（RTS 关闭）？→ 默认设置就应该能用。
+│     ├─ 软件同时拉高 DTR 和 RTS，或 RTS 一直为高（Linux 上常见，打开端口时两根线都会拉高）
+│     │      → aioc-util --ptt1 "CM108GPIO3|SERIALDTR" --store
+│     ├─ 软件只用 RTS 发射
+│     │      → aioc-util --ptt1 "CM108GPIO3|SERIALRTS" --store
+│     └─ VARA FM → 设置 "Pin: DTR only"
+│
+├─ 4. 软件完全没有 PTT（APRSdroid、部分 Mac 软件）
+│      → aioc-util --ptt1 "VPTT|CM108GPIO3|SERIALDTRNRTS" --store
+│
+└─ 5. 电台能发射，但松不开 / 写频时也会发射
+       → 你把 PTT 改成了 SERIALDTR/SERIALRTS：写频前恢复默认：
+         aioc-util --defaults --store
+       → 检查发射音频是否误触发 VPTT（系统声音、VPTT 阈值太低）
+```
+
+> ⚠️ **给 AI 助手的提醒：** 把 PTT 改为单独的 `SERIALDTR` 或 `SERIALRTS` 后，**CHIRP 写频时电台可能会发射**，因为 CHIRP 会切换这两根线。请让用户在写频前用 `--defaults --store` 恢复默认，或者专门留一个 AIOC 用于写频。
+
+---
+
+## 7. 配置 AIOC 本身（AIOC Toolkit / aioc-util）
+
+本文中每一条 `aioc-util` 命令，在浏览器版 **AIOC Toolkit**（https://g1lro.github.io/aioc-toolkit/）里都有对应的控件。例如 `--ptt1 VPTT` 对应 **PTT Sources → Auto PTT1 (VPTT)**，`--store` 对应 **Store to Flash**。不会用命令行的客户，请推荐他们用 Toolkit。 **[Tool docs]**
+
+### 7.1 使用条件 **[Tool docs]**
+- AIOC **固件 ≥ 1.3.0**（已在 1.3 和 1.4.1 上测试；1.2 **不能** 用）。
+- **命令行：** TF3HR（Hrafnkell Eiríksson）开发的 `aioc-util` —— https://github.com/hrafnkelle/aioc-util
+- **浏览器工具（免安装；需要电脑上的 Chrome 或 Edge 89+；Linux 上必须先安装 2.5 节的 udev 规则）：**
+  - **G1LRO 的 AIOC Toolkit：https://g1lro.github.io/aioc-toolkit/（推荐）。** **[Tool docs]** 同时支持修改设置和刷固件，基于 aioc-util 和 webdfu 开发（源码：https://github.com/G1LRO/aioc-toolkit）。
+    - **Configure** 选项卡：**Connect (WebHID)** 即使 AIOC 的 USB ID 被改过也能找到它（通过读取“AIOC”识别寄存器）。功能包括：
+      - 实时 **GPIO Status**（PTT1/PTT2 输出、Vol+、Vol−/VCOS、静音键）
+      - **Manual PTT State** 开/关，不用其他软件就能测试发射
+      - **PTT Sources**（含 **Swap PTT1/PTT2** 和 **Auto PTT1 (VPTT)**）
+      - **CM108 Button Sources**
+      - **COS Mode**（虚拟 COS 或硬件 COS）
+      - **Audio Settings**（接收增益 1–16×、发射增强）
+      - **AutoPTT & VCOS Thresholds**（电平和时间；时间 = 毫秒 × 16）
+      - **Foxhunt (CW Beacon)**（猎狐 CW 信标）
+      - **USB VID / PID Override**：**Fill CM108 IDs** = `0x0D8C`/`0x000C`，用于 AllStar/HamVOIP
+      - **Device Actions**：**Store to Flash**、**Recall from Flash**、**Load Defaults**、**Reboot Device**
+      - **Raw Register Dump**（原始寄存器）
+    - **Flash Firmware** 选项卡：见 9.2 节。
+    - 每次都要先点 **Apply** 再点 **Store to Flash**，否则拔下 AIOC 后设置会丢失。修改 USB ID 要在 **Store** 之后再 **Reboot** 才生效。
+  - 较早的单一功能网页：https://aioc-util.tf3hr.net/（TF3HR）和 https://g1lro.github.io/aioc-util/（G1LRO）。 **[Community]**
+  - **推荐不熟悉技术的客户使用 Toolkit**：不需要 Python、hidapi.dll 或 Zadig。
+
+**安装（Linux/macOS）：**
+```bash
+git clone https://github.com/hrafnkelle/aioc-util.git
+cd aioc-util
+python3 -m venv venv && source venv/bin/activate
+pip install hid
+# Linux: sudo cp udev/rules.d/91-aioc.rules /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+# Debian/树莓派可能需要: sudo apt install libhidapi-hidraw0 libhidapi-libusb0
+```
+**Windows：** 在 PowerShell 中执行同样的虚拟环境步骤（`.\venv\Scripts\activate`）。从 libusb/hidapi 的 releases 下载 `hidapi.dll`，放在 `aioc-util.py` 旁边。用 `python aioc-util.py …` 运行。
+
+### 7.2 常用命令 **[Tool docs]**
+| 任务 | 命令 |
+|---|---|
+| 显示所有寄存器 | `./aioc-util.py --dump` |
+| 恢复出厂默认（并保存） | `./aioc-util.py --defaults --store` |
+| 列出 PTT 源 | `./aioc-util.py --list-ptt-sources` |
+| 设置 PTT1 源 | `./aioc-util.py --ptt1 "CM108GPIO3|SERIALDTR" --store` |
+| PTT1 使用虚拟 PTT | `./aioc-util.py --ptt1 VPTT --store`（或 `--auto-ptt1`） |
+| 交换 PTT1/PTT2（双 PTT 电台） | `./aioc-util.py --swap-ptt --store` |
+| VPTT/VCOS 阈值和保持时间 | `./aioc-util.py --vptt-lvlctrl 0x80 --vptt-timctrl 320 --vcos-lvlctrl 0xff --vcos-timctrl 24000 --store`（时间 = 毫秒 × 16：320 = 20 毫秒，24000 = 1.5 秒） |
+| 接收增益（硬件 rev ≥ 1.2，固件 ≥ 1.4） | `./aioc-util.py --audio-rx-gain 4x --store`（1x/2x/4x/8x/16x） |
+| 线路电平发射增强（硬件 rev ≥ 1.2） | `./aioc-util.py --audio-tx-boost on --store` |
+| 查看音频设置 | `./aioc-util.py --audio-get-settings` |
+| 硬件 COS 输入（硬件 rev ≥ 1.2） | `./aioc-util.py --enable-hwcos --store`（改回 VCOS：`--enable-vcos`） |
+| 伪装成 CM108（HamVOIP 等） | `./aioc-util.py --set-usb 0x0d8c 0x000c --store` |
+| 改过 USB ID 后再配置 | `./aioc-util.py --open-usb 0x0d8c 0x000c --dump` |
+| 多个 AIOC | 先 `--list-devices`，再 `--open-serialnum <SN> …` |
+| 重启 | `./aioc-util.py --reboot` |
+
+> 不加 `--store`，下次断电后修改就会丢失。**刷固件会清除所有已保存的设置。** **[Official]**
+
+### 7.3 寄存器参考（供高级用户和 AI 助手使用） **[Official — firmware settings.h]**
+| 寄存器 | 名称 | 作用 | 默认值 |
+|---|---|---|---|
+| 0x00 | MAGIC | 读出“AIOC” | — |
+| 0x08 | USBID | VID（低 16 位）/ PID（高 16 位） | `1209:7388` |
+| 0x24 | AIOC_IOMUX0 | PTT1 源位掩码 | CM108GPIO3 \| SERIALDTRNRTS |
+| 0x25 | AIOC_IOMUX1 | PTT2 源位掩码 | CM108GPIO4 |
+| 0x44–0x47 | CM108_IOMUX0–3 | CM108 按键 音量+ / 音量− / 播放静音 / 录音静音 的来源 | 音量+ = IN2，**音量− = VCOS**，其余无 |
+| 0x60 | SERIAL_CTRL | PTT 有效时锁定 UART | PTT1 时锁定 |
+| 0x72 | AUDIO_RX | 接收增益 1×–16× | 1× |
+| 0x78 | AUDIO_TX | 发射增强 | 关 |
+| 0x82 / 0x84 | VPTT_LVLCTRL / TIMCTRL | 虚拟 PTT 阈值 / 保持时间（毫秒 × 16） | 16 / 0x140（= 20 毫秒） |
+| 0x92 / 0x94 | VCOS_LVLCTRL / TIMCTRL | 虚拟 COS 阈值 / 保持时间（毫秒 × 16） | 256 / 0xC80（= 200 毫秒） |
+| 0xA0–0xA5 | FOXHUNT_CTRL, MSG0–3 | 猎狐间隔、速度、音量、16 字符消息 | 关闭 |
+
+PTT 源位：`CM108GPIO1=0x1, GPIO2=0x2, GPIO3=0x4, GPIO4=0x8, SERIALDTR=0x100, SERIALRTS=0x200, SERIALDTRNRTS=0x400, SERIALNDTRRTS=0x800, VPTT=0x1000`。
+按键来源：`IN1=0x10000, IN2=0x20000, VCOS=0x1000000`。
+命令：`WRITESTROBE=0x01, DEFAULTS=0x10, REBOOT=0x20, RECALL=0x40, STORE=0x80`。
+寄存器通过 HID 特性报告访问，格式为 `<BBBL>`：（报告 0、命令、地址、数值）。
+
+### 7.4 猎狐信标模式（固件 ≥ 1.4.0） **[Official + Tool docs]**
+AIOC 只需 USB 供电（例如充电宝）就能自己发送摩尔斯电码识别。设置好以后不需要电脑。
+```bash
+./aioc-util.py --foxhunt-message "DE N0CALL FOX" --foxhunt-wpm 20 --foxhunt-interval 60 --foxhunt-volume 32000 --store
+./aioc-util.py --foxhunt-get-settings --foxhunt-get-message   # 检查
+./aioc-util.py --foxhunt-interval 0 --store                   # 关闭
+```
+消息最多 16 个字符 · 间隔 0–255 秒（0 = 关闭）· 速度 0–255 WPM · 音量 0–65535。
+用户须遵守当地关于无人值守信标和电台识别的规定。
+
+---
+
+## 8. 已知问题与解决办法
+
+| 现象 | 原因 | 解决 |
+|---|---|---|
+| **只在发射时** USB 断开、音频乱码、电脑“叮咚”响或卡死 | **射频回授。** 使用原装（单极）天线时，USB 线成了电台的地网（“虎尾线”）。 **[Official]** | 降低发射功率。加 **地网/虎尾线**。用远离电脑的 **外接或平衡天线**（如偶极天线）。在 USB 线上加 **卡扣磁环**。用短 USB 线。 **[Community]** 好几位用户把功率从 5 W 降到 **1 W** 就好了。也有人用一小段 **尾线** 把 AIOC 引离电台，或用同轴延长线让天线离开 1 米以上。 |
+| 电台不发射 | PTT 方式不匹配 | 第 6 节 |
+| 电台一直发射 / 随机发射 | Linux 的 ModemManager 在探测端口；PTT 源被设成了仅 DTR/RTS；开了 VPTT 时有系统声音 | udev 忽略规则（2.5）；`--defaults --store`；不要把 AIOC 设为默认音频设备 |
+| CHIRP：“Radio did not respond” | 型号不对、插头没插好、电台停在菜单里、固件太旧 | 重新插好，选准确型号，把 AIOC 升级到 ≥ 1.2.0（DTR 且非 RTS 修复） |
+| 收发音频时有时无，PTT 时灵时不灵 | TRS 插头接触 / 焊点问题（自焊板），或插头没插到底 | 重新插好。自焊板可以在侧向按压触点的同时重新熔化 TRS 焊片的焊点 **[Official]** |
+| 解码失败，声音失真 | 发射电平太高（频偏过大）或接收削波 | 调低系统输出音量；调低电台音量；接收增益改回 1× |
+| 软件里什么都听不到 | 静噪关着 / 音量为零 / 输入设备选错 | 打开静噪，调大电台音量，在软件里选择 AIOC 输入 |
+| macOS 上发射音频断断续续 | 固件旧 | 升级到 ≥ v1.4.0（含 macOS 修复） **[Official]** |
+| UV-K5 刷固件中途失败 | 旧固件串口缓冲区不够 | 把 AIOC 升级到 ≥ v1.4.0 **[Official]** |
+| Direwolf 的 CM108 警告 | Direwolf 本身的行为 | 无害，忽略即可（direwolf issue #448） **[Official]** |
+| Linux 上 /dev/ttyACM0 或 /dev/hidraw“permission denied” | 用户不在 dialout/plugdev 组；没有 udev 规则 | 2.5 节 |
+| aioc-util“Unexpected magic”/ 打不开 | 固件 < 1.3、USB ID 被改过，或 Windows 缺少 hidapi.dll | 升级固件；用 `--open-usb`；添加 hidapi.dll；或用浏览器里的 AIOC Toolkit（7.1），它能找到 USB ID 被改过的 AIOC |
+| aioc-util 报 `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Python 包装错了（Debian 的 `python3-hid`/`hidapi`） | 用虚拟环境并 `pip install hid`；卸载 apt 安装的包 **[Community]** |
+| **rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下**，或在 Windows 虚拟机里音频报“代码 10” | 旧硬件上的固件缺陷（GitHub #120/#138） | 刷回 **v1.3.0** **[Community]** |
+| Android：音频应用卡住、音量键失灵、AIOC 反复重连 | 出现在 **Android 11** 手机上；Android 12 及以上正常（GitHub #121） | 换一台手机或其他 Android 版本 **[Community]** |
+| APRSdroid 不用 AIOC（其他应用正常） | 部分手机上 APRSdroid 对 USB 麦克风的缺陷（aprsdroid #149） | 试试“Lesser AudioSwitch”应用强制使用 USB 音频 **[Community]** |
+| 插上 AIOC 后 S 表底噪升高 | 地环路 / 电脑噪声经 USB 线进入 | 用同轴线让天线离手台至少 1 米、加卡扣磁环、用 **USB 隔离器**，或让笔记本用电池供电 **[Community]** |
+| 短波电台插上 AIOC 后有 S9 噪声 | 电脑/USB 噪声；部分电台（如 RT-950 Pro）非常敏感 | 磁环、USB 隔离器、换一台电脑；用另一台电台对比测试 **[Community]** |
+| 完全识别不到设备 | **只能充电的 USB-C 线**，或板子停在 DFU 模式（没有固件） | 换数据线；刷固件（第 9 节） **[Community]** |
+
+**[Community]** **自焊或维修板的接触/焊点故障查找表（来自 DL-Nordwest）：**
+| 现象 | 检查 |
+|---|---|
+| 无法读写电台 | 驱动 / COM 口选择 |
+| 能写入但 **读不出** 电台 | 2.5 mm **环（ring）** 的焊点 |
+| 接收音频很小 | 3.5 mm **环（ring）** 的焊点；电脑音量 |
+| 完全没有接收音频 | 2.5 mm **尖（tip）** / **套（sleeve）** 的焊点；电台音量；输入设备 |
+| 电台一直发射 | 2.5 mm 和 3.5 mm 的 **套（sleeve）** 之间短路（或两个插头焊反了） |
+| 只有拧着插头才正常 | TRS 焊点开裂：一边按压触点一边重新熔焊（第 8 节） |
+
+---
+
+## 9. 固件升级
+
+### 9.1 版本 **[Official]**
+从 https://github.com/skuep/AIOC/releases 下载 `aioc-fw-x.y.z.bin`
+| 版本 | 日期 | 主要变化 |
+|---|---|---|
+| **v1.4.1** | 2025-09-27 | 修复 LED 闪烁速度和 LED 中断优先级 |
+| **v1.4.0** | 2025-09-26 | 修复 macOS 发射卡顿；更大的串口缓冲区（手台刷固件）；支持硬件 rev 1.2；接收增益 1–16×；发射增强；**猎狐模式** |
+| v1.3.0 | 2025-01-02 | HID 配置系统（新协议，旧脚本不可用）；虚拟 PTT / 虚拟 COS；硬件 COS 输入；更大的串口缓冲区 |
+| v1.2.0 | 2023-03-19 | **CM108 PTT**；在线 DFU 升级；串口 PTT 改为 DTR=1 且 RTS=0 |
+
+**硬件 rev 1.2 需要固件 ≥ 1.4.0。** **[Official]**
+
+### 9.2 升级已是 ≥ 1.2.0 的固件（不用拆壳） **[Official]**
+```bash
+dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
+```
+AIOC 会自动重启进入引导程序、刷写，然后自行重启。
+- **Linux/macOS：** 安装 `dfu-util`（`apt install dfu-util` / `brew install dfu-util`）。可能需要 `sudo` 或加入 `plugdev` 组。
+- **Windows：** dfu-util 需要给 DFU 接口安装 **libusb/WinUSB 驱动**。用 **Zadig** 给 AIOC 的 DFU 接口 /“STM32 BOOTLOADER”设备安装 WinUSB。（参见 AIOC README 中链接的教程：yeswolf.github.io/dfu。）
+  **[Community]** Windows 11 上的 dfu-util 经常卡住或报 `LIBUSB_ERROR_NOT_SUPPORTED`（GitHub #28）。最简单的办法：用浏览器里的 AIOC Toolkit（见下文），或换一台 Linux 电脑或树莓派。
+- **用 AIOC Toolkit 在浏览器中刷写（最简单，尤其适合 Windows）** **[Tool docs]** ：
+  1. 在 https://g1lro.github.io/aioc-toolkit/ → **Flash Firmware** 选项卡的 **Latest Firmware** 框里，通过 **Download Firmware** 链接下载 `.bin`。浏览器不能直接读取 GitHub 发布的文件，所以要先保存文件再选择它。
+  2. **先让 AIOC 进入引导模式**（9.3 第 1 步：短接排针最外侧的两个针脚，再插上 USB）。Toolkit 不会自己切换模式，AIOC 处于普通“DFU 运行时”模式时会阻止刷写。进入引导模式后它显示为 `0483:df11`。
+  3. 连接，查看 **Device Status**，选择文件，点击 **Flash Firmware** 开始刷写并观察 **Log**。完成后去掉短接，重新插拔。
+  只刷官方的 `aioc-fw-x.y.z.bin` 文件。刷写失败可以重复以上步骤恢复。
+- **另一个浏览器刷写工具（原版 WebDFU）** **[Community, used in G1LRO's guide]** ：AIOC 处于引导模式时，打开 https://devanlai.github.io/webdfu/dfu-util/ → **Connect** → 选择 **STM32 Bootloader** → **Internal Flash** → 选择 `.bin` → **Download**。
+
+### 9.3 首次刷写 / 救砖 **[Official]**
+1. **短接电路板编程排针最外侧的两个针脚**（这是 BOOT 模式）。
+2. 插上 USB-C。设备显示为 STM32 引导程序。
+3. `dfu-util -a 0 -s 0x08000000:leave -D aioc-fw-x.y.z.bin`
+4. 去掉短接，拔下再插上。
+
+任何升级之后：**重新应用你的 aioc-util 设置**（它们会被清除）。
+
+### 9.4 怎么知道我的固件版本？
+USB 描述符里不报告固件版本。实用的判断方法：
+- aioc-util 或 AIOC Toolkit 能连上 → ≥ 1.3.0。能读出音频设置 / 猎狐设置 → ≥ 1.4.0。
+- 不确定的话，直接刷最新版（9.2）。这是解决大多数问题的推荐做法。
+
+---
+
+## 10. 常见问题（供 AI 助手直接使用）
+
+**问：需要装驱动吗？**
+不需要。Windows 10/11、Linux 和 macOS 都用系统自带的 USB 音频和 CDC 串口驱动。只有在 Windows 上升级固件时才需要 WinUSB 驱动（Zadig）。
+
+**问：哪个 COM 口是它？**
+在设备管理器 → 端口 中观察，拔下 AIOC 再插上，新出现的 COMx 就是 AIOC。Linux：`/dev/ttyACM0`（装了 udev 规则后也可用 `/dev/aioc`）。macOS：`/dev/cu.usbmodem…`。
+
+**问：写频和数字模式能用同一根线吗？**
+可以。串口负责写频，声卡负责数字模式。只是不要让两个软件同时占用同一个 COM 口。
+
+**问：能用在车台/基地台上吗？**
+只有电台带 K1 类接口，或用转接线接到它的数据口/话筒口才行。在硬件 rev 1.2 上，线路电平输入请开启 `--audio-tx-boost on`，线路电平输出请调高接收增益。
+
+**问：能在树莓派上用吗？**
+能。Direwolf、AllStarLink 3、SvxLink、Pat、QtSoundModem 和 LinBPQ 都能在树莓派 OS 上运行。使用 CM108 PTT 和 udev 规则。
+
+**问：能用 iPhone/iPad 吗？**
+部分可以。iOS 只把 AIOC 识别为声卡。**RadioMail**（Winlink）和 **Packet Commander** 已在 AIOC 固件 1.4.1 + 开启 **虚拟 PTT** 的情况下验证可用（5.16 节）。在 iOS 上无法用 CHIRP 写频，也无法使用串口或 CM108 PTT。
+
+**问：能用电脑通话（语音）吗？**
+能。在 VoIP 或联网应用（AllStarLink、SvxLink、EchoLink、Mumble 桥接）里把 AIOC 选为麦克风/扬声器即可。语音 PTT 需要 CM108/串口控制或 VPTT。
+
+**问：我的电台有两个 PTT（双段手台）？**
+PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 `--ptt2` 修改。
+
+**问：支持 9600 波特分组吗？**
+通过 K1 接口不支持（音频经过滤波）。请用 1200 波特 AFSK 或 VARA FM 窄带。
+
+---
+
+## 11. 参考链接
+- AIOC 项目（硬件、固件、README）：https://github.com/skuep/AIOC
+- AIOC 发布版本：https://github.com/skuep/AIOC/releases
+- AIOC Discord：见 GitHub README 中的链接
+- aioc-util（命令行）：https://github.com/hrafnkelle/aioc-util · 网页版：https://aioc-util.tf3hr.net/
+- G1LRO 的 AIOC + ASL3 教程（最新）：https://g1lro.uk/?p=1593 · 旧版教程：https://g1lro.uk/?p=676 · 脚本：https://github.com/G1LRO/AIOC-ASL3-Config
+- **AIOC Toolkit（在浏览器中配置 + 刷固件）：** https://g1lro.github.io/aioc-toolkit/ · 源码：https://github.com/G1LRO/aioc-toolkit
+- 较早的浏览器工具：G1LRO 配置页 https://g1lro.github.io/aioc-util/ · WebDFU 刷写工具 https://devanlai.github.io/webdfu/dfu-util/
+- AllStarLink 论坛，AIOC 替代 CM108：https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225
+- M0AWS 用 AIOC 搭建 AllStar 节点：https://m0aws.co.uk/?cat=408
+- DL-Nordwest AIOC 系列（德语），第 4 部分故障排查：https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/
+- DigiPi + AIOC 修改方法（Google 群组）：https://groups.google.com/g/digipi/c/1NfZeLpsT4M
+- AIOC GitHub issues（提问前先搜索）：https://github.com/skuep/AIOC/issues
+- 视频：Ham Radio Dude（https://www.youtube.com/watch?v=xRCmXQYRLE0）、Temporarily Offline（https://www.youtube.com/watch?v=RZjoPNe634o）、AllStar 节点搭建（https://youtu.be/7LB6D2FLGZk 、https://youtu.be/k0iP4dECx6A）
+- DL-Nordwest 四篇 AIOC 文章（德语）：见 AIOC README 中的链接
+- Direwolf：https://github.com/wb2osz/direwolf
+- CHIRP：https://chirpmyradio.com
+- AllStarLink：https://www.allstarlink.org
+- Winlink：https://winlink.org · Pat：https://getpat.io · VARA：https://rosmodem.wordpress.com
+- APRSdroid：https://aprsdroid.org · YAAC：https://www.ka2ddo.org/ka2ddo/YAAC.html · Xastir：https://xastir.org
+- SvxLink：https://www.svxlink.org · fldigi/NBEMS：http://www.w1hkj.org
+- Quansheng Dock：https://github.com/nicsure/QuanshengDock · Egzumer 固件：https://github.com/egzumer/uv-k5-firmware-custom
+
+</script>
 <script>
 (function () {
+  // ---------- Interface strings ----------
+  var STR = {
+    en: {
+      kicker: 'Ham radio · All-In-One-Cable', title: 'AIOC Quick Start Guide',
+      lede: 'Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems. Pick what you want to do below to see the software and settings, or read the full guide.',
+      factsLabel: 'AIOC key facts', fFirmware: 'Firmware', fSerial: 'Serial PTT', fAudio: 'Audio', fAudioVal: '48 kHz mono', fPlug: 'Radio plug', fPlugVal: 'Kenwood K1',
+      copyMd: 'Copy guide for your AI assistant', btnPtt: 'Radio won’t transmit?', btnIssues: 'Known issues', btnFw: 'Update firmware',
+      finderTitle: 'Find your setup', finderHint: 'Choose a task and your device. The answer links to the step-by-step section.',
+      iWant: 'I want to', on: 'On', tocLabel: 'Guide contents', searchLabel: 'Search the guide', searchPh: 'e.g. VARA, hidraw, UV-K5',
+      legendLabel: 'Source labels', legendIntro: 'Where each statement comes from:',
+      tOfficial: 'Official', tOfficialD: 'AIOC project', tTool: 'Tool docs', tToolD: 'software docs',
+      tCommunity: 'Community', tCommunityD: 'user reports', tTypical: 'Typical', tTypicalD: 'common settings, check your screen',
+      footer: 'Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR, guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.',
+      on_: ' on ', software: 'Software', ptt: 'PTT', tip: 'Tip', open: 'Open: ',
+      copied: function (kb) { return 'Copied ' + kb + ' KB of Markdown. Paste it into your AI assistant.'; },
+      copyBlocked: 'Copy was blocked by the browser.', copy: 'Copy', copiedShort: 'Copied', copyManual: 'Select and copy manually',
+      hits: function (n, q) { return n + ' chapter' + (n > 1 ? 's' : '') + ' mention "' + q + '"'; },
+      noHits: function (q) { return 'No matches for "' + q + '"'; }
+    },
+    zh: {
+      kicker: '业余无线电 · All-In-One-Cable', title: 'AIOC 快速入门指南',
+      lede: '给手台写频，玩 APRS、Winlink、分组通信、SSTV 和 AllStarLink，解决 PTT 不发射等问题。在下方选择你想做的事，查看需要的软件和设置，或阅读完整指南。',
+      factsLabel: 'AIOC 关键参数', fFirmware: '固件', fSerial: '串口 PTT', fAudio: '音频', fAudioVal: '48 kHz 单声道', fPlug: '电台接口', fPlugVal: '建伍 K1',
+      copyMd: '复制指南给 AI 助手', btnPtt: '电台不发射？', btnIssues: '已知问题', btnFw: '升级固件',
+      finderTitle: '找到你的设置', finderHint: '选择任务和设备，结果会链接到详细步骤。',
+      iWant: '我想要', on: '使用', tocLabel: '指南目录', searchLabel: '搜索指南', searchPh: '例如 VARA、hidraw、UV-K5',
+      legendLabel: '来源标签', legendIntro: '每条信息的来源：',
+      tOfficial: '官方', tOfficialD: 'AIOC 项目', tTool: '工具文档', tToolD: '软件文档',
+      tCommunity: '社区', tCommunityD: '用户报告', tTypical: '常规', tTypicalD: '常见设置，请对照屏幕确认',
+      footer: '内容基于 Simon Küppers 的开源 AIOC 项目（github.com/skuep/AIOC）、TF3HR 的 aioc-util 工具、G1LRO、M0AWS 和 DL-Nordwest 的教程以及 AIOC 用户报告。发射需要业余无线电执照。',
+      on_: ' · ', software: '软件', ptt: 'PTT', tip: '提示', open: '查看：',
+      copied: function (kb) { return '已复制 ' + kb + ' KB 的 Markdown，粘贴给你的 AI 助手即可。'; },
+      copyBlocked: '浏览器阻止了复制。', copy: '复制', copiedShort: '已复制', copyManual: '请手动选中复制',
+      hits: function (n, q) { return n + ' 个章节提到“' + q + '”'; },
+      noHits: function (q) { return '没有找到“' + q + '”'; }
+    }
+  };
+
   // ---------- Setup finder data ----------
-  var OS = [
-    { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
-    { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
-  ];
+  var OS = { en: [
+      { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
+      { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+    ], zh: [
+      { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / 树莓派' },
+      { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+    ] };
   var NO_PHONE = 'Not available on phones. Use a computer.';
   var GOALS = [
     { id: 'program', label: 'Program channels', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: NO_PHONE, ios: NO_PHONE },
@@ -2606,14 +4916,110 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
     { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'AIOC Toolkit in Chrome/Edge (Foxhunt box)', linux: 'AIOC Toolkit or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
       ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
     { id: 'config', label: 'Change AIOC settings', sw: { win: 'AIOC Toolkit in Chrome/Edge (no install)', linux: 'AIOC Toolkit (install the udev rule) or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: NO_PHONE, ios: NO_PHONE },
-      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'AIOC Toolkit / aioc-util'], ['s6', 'PTT fixes']] },
     { id: 'firmware', label: 'Update firmware', sw: { win: 'AIOC Toolkit, Flash Firmware tab (easiest), or dfu-util + Zadig', linux: 'dfu-util, or the AIOC Toolkit', mac: 'dfu-util (Homebrew), or the AIOC Toolkit', android: NO_PHONE, ios: NO_PHONE },
       ptt: '—', tip: 'For the Toolkit, put the AIOC in bootloader mode first. Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
   ];
 
+  // Chinese overrides for the finder (same ids and section links as GOALS)
+  var ZNP = '手机上不可用，请用电脑。';
+  var GOALS_ZH = {
+    program: { label: '写频', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: ZNP, ios: ZNP },
+      ptt: '不需要。在 CHIRP 中选择 AIOC 的串口即可。', tip: '写入前先从电台读取并保存备份。', sec: ['CHIRP 步骤'] },
+    k5: { label: '刷 UV-K5 固件', sw: { win: 'Chrome/Edge 中的网页刷机工具，或 k5prog', linux: 'Chrome/Edge 中的网页刷机工具，或 k5prog', mac: 'Chrome/Edge 中的网页刷机工具', android: ZNP, ios: ZNP },
+      ptt: '不需要。按住 PTT 开机进入引导模式。', tip: '先把 AIOC 升级到 v1.4.x，它的串口缓冲区更大。', sec: ['UV-K5 刷固件'] },
+    aprs: { label: 'APRS', sw: { win: 'Direwolf + APRSIS32、YAAC 或 PinPoint', linux: 'Direwolf + YAAC 或 Xastir', mac: 'Direwolf + YAAC', android: 'APRSdroid（开启 AIOC 虚拟 PTT）', ios: '暂无经过测试的 APRS 应用' },
+      ptt: { win: 'Direwolf：PTT COMx DTR -RTS', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT /dev/cu.usbmodem… DTR -RTS', android: '虚拟 PTT：aioc-util --ptt1 VPTT --store', ios: '—' },
+      tip: '中国 APRS 频率为 144.640 MHz（北美 144.390，欧洲 144.800）。', sec: ['Direwolf', 'APRS 地图软件', 'APRSdroid'] },
+    igate: { label: 'iGate / 数字中继', sw: { win: 'Direwolf', linux: 'Direwolf（无界面树莓派），或 DigiPi', mac: 'Direwolf', android: ZNP, ios: ZNP },
+      ptt: { win: 'PTT COMx DTR -RTS', linux: 'PTT CM108', mac: 'PTT /dev/cu.usbmodem… DTR -RTS', android: '—', ios: '—' },
+      tip: 'iGate 需要 APRS-IS 验证码。用 1 W 功率和合适的天线，避免射频导致死机。', sec: ['Direwolf', 'DigiPi'] },
+    winlink: { label: 'Winlink 邮件', sw: { win: 'Winlink Express + VARA FM（或经 Direwolf/Soundmodem 走分组）', linux: 'Pat + Direwolf（分组），或 Wine 下的 VARA FM', mac: 'Pat + Direwolf（分组）', android: '暂无经过测试的应用', ios: 'RadioMail（开启 AIOC 虚拟 PTT）' },
+      ptt: { win: 'VARA FM：PTT pin 选“DTR only”', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT … DTR -RTS', android: '—', ios: '虚拟 PTT（固件 1.4.1）' },
+      tip: '用 VARA FM 窄带（Narrow）。把电台的发射限时（TOT）设到最大。', sec: ['Winlink', 'iPhone / iPad'] },
+    packet: { label: '分组 BBS / 终端', sw: { win: 'Direwolf 或 UZ7HO Soundmodem + QtTermTCP、Outpost 或 BPQ32', linux: 'Direwolf + Paracon、QtTermTCP 或 LinBPQ', mac: 'Direwolf + QtTermTCP', android: '暂无经过测试的应用', ios: 'Packet Commander（开启 AIOC 虚拟 PTT）' },
+      ptt: { win: 'Soundmodem：勾选“Swap COM pins for PTT”，采样率 12000 Hz', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT … DTR -RTS', android: '—', ios: '虚拟 PTT' },
+      tip: '静噪全开、关闭省电，能帮廉价手台收到每个数据包的开头。', sec: ['Soundmodem', 'BBS 和终端'] },
+    varac: { label: 'VARA 键盘聊天', sw: { win: 'VarAC 或 VARA Chat + VARA FM', linux: 'Wine 下运行 VarAC + VARA FM', mac: '未测试', android: ZNP, ios: ZNP },
+      ptt: '由 VARA FM 控制发射（PTT pin 选“DTR only”），VarAC 的 PTT 保持关闭。', tip: '', sec: ['VARA FM 设置'] },
+    sstv: { label: 'SSTV 图片', sw: { win: 'MMSSTV', linux: 'QSSTV', mac: 'Black Cat SSTV 或 MultiScan', android: 'Robot36（仅接收）', ios: '未测试' },
+      ptt: 'COM 口 DTR；软件无法控制发射时用 AIOC 虚拟 PTT。只接收不需要 PTT。', tip: '国际空间站 SSTV 活动在 145.800 MHz FM。', sec: ['SSTV'] },
+    nbems: { label: '应急通信文本和表单', sw: { win: 'fldigi + flmsg + flamp', linux: 'fldigi + flmsg + flamp', mac: 'fldigi + flmsg', android: ZNP, ios: ZNP },
+      ptt: 'fldigi 用 CM108 PTT（GPIO 3），或串口 PTT 只勾选“Use DTR”。', tip: 'ARES 网络在 FM 上常用 MT63-2000L 模式。', sec: ['fldigi / NBEMS'] },
+    ft8: { label: 'FT8 / JS8（FM）', sw: { win: 'WSJT-X 或 JS8Call', linux: 'WSJT-X 或 JS8Call', mac: 'WSJT-X 或 JS8Call', android: ZNP, ios: ZNP },
+      ptt: 'PTT 方式选 AIOC 端口上的 DTR，电台（Rig）选“None”。', tip: '这些是 SSB 模式。用 FM 手台只能联系其他 FM 电台。', sec: ['WSJT-X / JS8Call'] },
+    allstar: { label: 'AllStarLink 节点', sw: { win: '只能在 Linux 上运行', linux: 'AllStarLink 3（树莓派或 Debian）', mac: '只能在 Linux 上运行', android: '只能在 Linux 上运行', ios: '只能在 Linux 上运行' },
+      ptt: '内置支持：AllStar 把 AIOC 当 CM108 用。取消注释 usb_devices = 1209:7388。', tip: '设置 VCOS 保持时间（毫秒 × 16），或在 rev 1.2 上用硬件 COS。', sec: ['AllStarLink 3'] },
+    echolink: { label: 'EchoLink / SvxLink', sw: { win: 'EchoLink（Sysop 模式）', linux: 'SvxLink', mac: '未测试', android: ZNP, ios: ZNP },
+      ptt: { win: '串口控制发射，或 AIOC 虚拟 PTT', linux: 'SvxLink：PTT_TYPE=Hidraw，HID_PTT_PIN=GPIO3', mac: '—', android: '—', ios: '—' },
+      tip: '在路由器上转发 UDP 5198–5199 和 TCP 5200。', sec: ['SvxLink / EchoLink'] },
+    mesh: { label: 'Reticulum 组网', sw: { win: 'Reticulum + Direwolf（KISS）', linux: 'Reticulum（NomadNet、MeshChat）+ Direwolf', mac: 'Reticulum + Direwolf', android: 'Sideband，经运行 Direwolf 的电脑', ios: '未测试' },
+      ptt: '由 Direwolf 控制 PTT。', tip: '先确认你的执照对加密的规定。', sec: ['Reticulum'] },
+    rig: { label: '车台 / 短波电台', sw: { win: '手工接线的 AIOC + WSJT-X、fldigi、VARA', linux: '手工接线的 AIOC + WSJT-X、fldigi、Direwolf', mac: '手工接线的 AIOC + WSJT-X、fldigi', android: ZNP, ios: ZNP },
+      ptt: 'AIOC 的 PTT，或通过 AIOC 串口用 CAT 控制发射。', tip: '硬件 rev 1.2 把 PTT 和串口数据分开了。艾可慕 CI-V 不能用。', sec: ['接到其他电台'] },
+    foxhunt: { label: '猎狐信标', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（Foxhunt 区）', linux: 'AIOC Toolkit 或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: '先在电脑上设置好，再用充电宝供电运行', ios: '先在电脑上设置好，再用充电宝供电运行' },
+      ptt: 'AIOC 自己控制电台发射。', tip: '需要固件 1.4.0 或更新。', sec: ['猎狐模式'] },
+    config: { label: '修改 AIOC 设置', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（免安装）', linux: 'AIOC Toolkit（需安装 udev 规则）或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: ZNP, ios: ZNP },
+      ptt: 'PTT 源、虚拟 PTT/COS、音频增益、USB ID。', tip: 'AIOC Toolkit：g1lro.github.io/aioc-toolkit。先点 Apply 再点 Store to Flash，否则拔下后设置会丢失。', sec: ['AIOC Toolkit / aioc-util', 'PTT 故障排查'] },
+    firmware: { label: '升级固件', sw: { win: 'AIOC Toolkit 的 Flash Firmware 选项卡（最简单），或 dfu-util + Zadig', linux: 'dfu-util，或 AIOC Toolkit', mac: 'dfu-util（Homebrew），或 AIOC Toolkit', android: ZNP, ios: ZNP },
+      ptt: '—', tip: '用 Toolkit 刷写前先让 AIOC 进入引导模式。升级会清除已保存的设置。旧的 rev 1.0 板如果 v1.4.x 不正常，请用 v1.3.0。', sec: ['固件升级'] }
+  };
+  var UNAVAILABLE = /^(Not |No tested|Runs on Linux only|手机上不可用|暂无|未测试|只能在 Linux)/;
+
+  // ---------- Language ----------
+  var lang = 'en';
+  function sfx() { return lang === 'zh' ? '-zh' : ''; }
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function detectLang() {
+    var h = location.hash.slice(1);
+    if (h === 'zh' || /-zh$/.test(h)) return 'zh';
+    if (h === 'en' || (h && document.getElementById(h))) return 'en';
+    var saved = load('aioc-lang');
+    if (saved === 'en' || saved === 'zh') return saved;
+    var prefs = navigator.languages || [navigator.language || ''];
+    for (var i = 0; i < prefs.length; i++) if (/^zh/i.test(prefs[i] || '')) return 'zh';
+    return 'en';
+  }
+
+  function applyStrings() {
+    var S = STR[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function (n) { n.textContent = S[n.dataset.i18n]; });
+    document.querySelectorAll('[data-i18n-attr]').forEach(function (n) {
+      n.dataset.i18nAttr.split(';').forEach(function (pair) { var p = pair.split(':'); n.setAttribute(p[0], S[p[1]]); });
+    });
+    document.querySelectorAll('[data-sec]').forEach(function (a) { a.setAttribute('href', '#' + a.dataset.sec + sfx()); });
+    document.querySelectorAll('[data-set-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)); });
+    document.querySelectorAll('[data-lang]').forEach(function (n) { n.hidden = n.dataset.lang !== lang; });
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = S.title;
+  }
+
+  function setLang(next, fromUser) {
+    if (next === lang && !fromUser) return;
+    var h = location.hash.slice(1);
+    lang = next;
+    if (fromUser) store('aioc-lang', lang);
+    search.value = ''; runSearch();
+    applyStrings();
+    buildChips();
+    render();
+    document.getElementById('copy-status').textContent = '';
+    // Keep the reader at the same section in the other language
+    var base = h.replace(/-zh$/, '');
+    if (fromUser && base && document.getElementById(base)) {
+      var target = base + sfx();
+      history.replaceState(null, '', '#' + target);
+      var el = document.getElementById(target);
+      if (el) el.scrollIntoView();
+    }
+  }
+
+  // ---------- Finder ----------
   var state = { goal: 'aprs', os: 'win' };
   try {
-    var saved = JSON.parse(localStorage.getItem('aioc-finder') || 'null');
+    var saved = JSON.parse(load('aioc-finder') || 'null');
     if (saved && saved.goal && saved.os) state = saved;
   } catch (e) {}
 
@@ -2623,41 +5029,49 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
     if (text != null) n.textContent = text;
     return n;
   }
-  function chips(container, list, key) {
-    list.forEach(function (item) {
-      var b = el('button', { type: 'button', class: 'chip', 'data-id': item.id, 'aria-pressed': String(state[key] === item.id) }, item.label);
-      b.addEventListener('click', function () { state[key] = item.id; render(); });
-      container.appendChild(b);
-    });
+  function goalView(g) {
+    if (lang !== 'zh') return { label: g.label, sw: g.sw, ptt: g.ptt, tip: g.tip, secNames: g.sec.map(function (s) { return s[1]; }) };
+    var z = GOALS_ZH[g.id];
+    return { label: z.label, sw: z.sw, ptt: z.ptt, tip: z.tip, secNames: z.sec };
   }
-  chips(document.getElementById('goals'), GOALS, 'goal');
-  chips(document.getElementById('oses'), OS, 'os');
-
+  function buildChips() {
+    var goals = document.getElementById('goals'), oses = document.getElementById('oses');
+    goals.innerHTML = ''; oses.innerHTML = '';
+    GOALS.forEach(function (g) { addChip(goals, g.id, goalView(g).label, 'goal'); });
+    OS[lang].forEach(function (o) { addChip(oses, o.id, o.label, 'os'); });
+  }
+  function addChip(container, id, label, key) {
+    var b = el('button', { type: 'button', class: 'chip', 'data-id': id, 'aria-pressed': String(state[key] === id) }, label);
+    b.addEventListener('click', function () { state[key] = id; render(); });
+    container.appendChild(b);
+  }
   function render() {
+    var S = STR[lang];
     document.querySelectorAll('#goals .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.goal)); });
     document.querySelectorAll('#oses .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.os)); });
-    try { localStorage.setItem('aioc-finder', JSON.stringify(state)); } catch (e) {}
+    store('aioc-finder', JSON.stringify(state));
     var g = GOALS.filter(function (x) { return x.id === state.goal; })[0];
-    var osLabel = OS.filter(function (x) { return x.id === state.os; })[0].label;
-    var sw = g.sw[state.os];
-    var ptt = typeof g.ptt === 'string' ? g.ptt : g.ptt[state.os];
-    var unavailable = /^(Not |No tested|Runs on Linux only)/.test(sw);
+    var v = goalView(g);
+    var osLabel = OS[lang].filter(function (x) { return x.id === state.os; })[0].label;
+    var sw = v.sw[state.os];
+    var ptt = typeof v.ptt === 'string' ? v.ptt : v.ptt[state.os];
+    var unavailable = UNAVAILABLE.test(sw);
     var r = document.getElementById('result');
     r.innerHTML = '';
-    r.appendChild(el('h3', {}, g.label + ' on ' + osLabel));
+    r.appendChild(el('h3', {}, v.label + S.on_ + osLabel));
     var dl = el('dl', {});
-    dl.appendChild(el('dt', {}, 'Software'));
+    dl.appendChild(el('dt', {}, S.software));
     dl.appendChild(el('dd', unavailable ? { class: 'na' } : {}, sw));
-    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, 'PTT')); dl.appendChild(el('dd', {}, ptt)); }
-    if (g.tip) { dl.appendChild(el('dt', {}, 'Tip')); dl.appendChild(el('dd', {}, g.tip)); }
+    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, S.ptt)); dl.appendChild(el('dd', {}, ptt)); }
+    if (v.tip) { dl.appendChild(el('dt', {}, S.tip)); dl.appendChild(el('dd', {}, v.tip)); }
     r.appendChild(dl);
     var links = el('div', { class: 'links' });
-    g.sec.forEach(function (s) {
-      if (document.getElementById(s[0])) links.appendChild(el('a', { href: '#' + s[0] }, 'Open: ' + s[1] + ' →'));
+    g.sec.forEach(function (s, i) {
+      var id = s[0] + sfx();
+      if (document.getElementById(id)) links.appendChild(el('a', { href: '#' + id }, S.open + v.secNames[i] + ' →'));
     });
     r.appendChild(links);
   }
-  render();
 
   // ---------- Copy buttons ----------
   function copyText(text, onDone) {
@@ -2672,31 +5086,31 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
     ta.remove(); return ok;
   }
   document.querySelectorAll('.code').forEach(function (block) {
-    var b = el('button', { type: 'button', class: 'copy-btn' }, 'Copy');
+    var b = el('button', { type: 'button', class: 'copy-btn' }, STR.en.copy);
     b.addEventListener('click', function () {
       copyText(block.querySelector('pre').innerText, function (ok) {
-        b.textContent = ok ? 'Copied' : 'Select and copy manually';
-        setTimeout(function () { b.textContent = 'Copy'; }, 1800);
+        b.textContent = ok ? STR[lang].copiedShort : STR[lang].copyManual;
+        setTimeout(function () { b.textContent = STR[lang].copy; }, 1800);
       });
     });
     block.appendChild(b);
   });
   document.getElementById('copy-md').addEventListener('click', function () {
-    var md = document.getElementById('md-source').textContent;
+    var md = document.getElementById('md-' + lang).textContent;
     var status = document.getElementById('copy-status');
     copyText(md, function (ok) {
-      status.textContent = ok ? 'Copied ' + Math.round(md.length / 1024) + ' KB of Markdown. Paste it into your AI assistant.' : 'Copy was blocked by the browser.';
+      status.textContent = ok ? STR[lang].copied(Math.round(md.length / 1024)) : STR[lang].copyBlocked;
     });
   });
 
-  // ---------- Search ----------
-  var sections = Array.prototype.slice.call(document.querySelectorAll('.doc-section'));
-  var tocItems = Array.prototype.slice.call(document.querySelectorAll('#toc li'));
+  // ---------- Search (active language only) ----------
   var search = document.getElementById('search');
   var note = document.getElementById('search-note');
+  function activeSections() { return Array.prototype.slice.call(document.querySelectorAll('.guide-body[data-lang="' + lang + '"] .doc-section')); }
   function clearMarks() {
-    document.querySelectorAll('main mark').forEach(function (m) { m.replaceWith(document.createTextNode(m.textContent)); });
-    sections.forEach(function (s) { s.normalize(); });
+    document.querySelectorAll('main mark').forEach(function (m) {
+      var p = m.parentNode; m.replaceWith(document.createTextNode(m.textContent)); p.normalize();
+    });
   }
   function markIn(root, q) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
@@ -2708,32 +5122,44 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
       var m = document.createElement('mark'); m.textContent = after.nodeValue; after.replaceWith(m);
     });
   }
+  function runSearch() {
+    var q = search.value.trim();
+    var sections = activeSections();
+    var tocItems = Array.prototype.slice.call(document.querySelectorAll('.toc[data-lang="' + lang + '"] li'));
+    clearMarks();
+    document.querySelectorAll('.doc-section.hidden, .toc li.hidden').forEach(function (n) { n.classList.remove('hidden'); });
+    if (q.length < 2) { note.textContent = ''; return; }
+    var ql = q.toLowerCase(), hits = 0;
+    sections.forEach(function (s) {
+      var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
+      s.classList.toggle('hidden', !match);
+      if (match) { hits++; markIn(s, q); }
+    });
+    tocItems.forEach(function (li) {
+      var target = document.getElementById(li.querySelector('a').getAttribute('href').slice(1));
+      var sec = target && target.closest('.doc-section');
+      li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
+    });
+    note.textContent = hits ? STR[lang].hits(hits, q) : STR[lang].noHits(q);
+  }
   var timer;
-  search.addEventListener('input', function () {
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      var q = search.value.trim();
-      clearMarks();
-      if (q.length < 2) {
-        sections.forEach(function (s) { s.classList.remove('hidden'); });
-        tocItems.forEach(function (li) { li.classList.remove('hidden'); });
-        note.textContent = ''; return;
-      }
-      var ql = q.toLowerCase(), hits = 0;
-      sections.forEach(function (s) {
-        var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
-        s.classList.toggle('hidden', !match);
-        if (match) { hits++; markIn(s, q); }
-      });
-      tocItems.forEach(function (li) {
-        var id = li.querySelector('a').getAttribute('href').slice(1);
-        var target = document.getElementById(id);
-        var sec = target && target.closest('.doc-section');
-        li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
-      });
-      note.textContent = hits ? hits + ' chapter' + (hits > 1 ? 's' : '') + ' mention "' + q + '"' : 'No matches for "' + q + '"';
-    }, 160);
+  search.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(runSearch, 160); });
+
+  // ---------- Start ----------
+  document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.dataset.setLang, true); });
   });
+  window.addEventListener('hashchange', function () {
+    var h = location.hash.slice(1);
+    if (/-zh$/.test(h) || h === 'zh') setLang('zh', false);
+    else if (h === 'en' || (h && document.getElementById(h))) setLang('en', false);
+  });
+  lang = detectLang();
+  applyStrings();
+  buildChips();
+  render();
+  var startId = location.hash.slice(1);
+  if (startId && document.getElementById(startId)) document.getElementById(startId).scrollIntoView();
 })();
 </script>
 </body>

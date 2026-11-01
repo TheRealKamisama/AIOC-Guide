@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A knowledge base for the **AIOC (ham radio All-In-One-Cable)**, maintained by an AIOC retailer. It has two outputs, both from one Markdown source:
+A knowledge base for the **AIOC (ham radio All-In-One-Cable)**, maintained by an AIOC retailer. The guide exists in two languages, and both feed one web page:
 
-1. `AIOC-Quick-Start-Guide.md`: the guide itself. It is written so that **AI agents** can answer customer questions ("I have radio X and OS Y and want to do Z: which software and settings?"). It is also pasted into chat assistants as-is.
-2. `site/index.html`: a single-file web page built from the Markdown. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It is live on GitHub Pages (see Deploy). A private copy is published as a claude.ai artifact (slug `9723f2b5-e6cd-4cc2-bf58-b291fc9e5947`); republish it with `publish_files` after rebuilding.
+1. `AIOC-Quick-Start-Guide.md` (English, the master) and `AIOC-Quick-Start-Guide.zh-CN.md` (Simplified Chinese translation): the guide itself. It is written so that **AI agents** can answer customer questions ("I have radio X and OS Y and want to do Z: which software and settings?"). It is also pasted into chat assistants as-is.
+2. `site/index.html`: a single-file bilingual web page built from both Markdown files, with an English/中文 toggle. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It is live on GitHub Pages (see Deploy). A private copy is published as a claude.ai artifact (slug `9723f2b5-e6cd-4cc2-bf58-b291fc9e5947`); republish it with `publish_files` after rebuilding.
 
 ## Build
 
@@ -21,21 +21,24 @@ There are no tests or linter. To check the page, open `site/index.html` in a bro
 ## Deploy
 
 - GitHub repo: `TheRealKamisama/AIOC-Guide` (public). Commits use the noreply identity set in the repo's git config (`35005476+TheRealKamisama@users.noreply.github.com`); don't commit with any other email.
-- `.github/workflows/pages.yml` runs on every push to `main` (or manually): `npm ci && npm run build` with `OUT_DIR=_site`, then deploys `_site/` to GitHub Pages. The site serves `index.html` plus `AIOC-Quick-Start-Guide.md` (the public Markdown, without Appendix A) for agents to fetch.
+- `.github/workflows/pages.yml` runs on every push to `main` (or manually): `npm ci && npm run build` with `OUT_DIR=_site`, then deploys `_site/` to GitHub Pages. The site serves `index.html` plus both Markdown files (public versions, without Appendix A) for agents to fetch.
 - Pages is enabled (source: **GitHub Actions**) at https://therealkamisama.github.io/AIOC-Guide/. Pages on a private repo needs a paid plan, so making the repo private again stops deploys.
 
 ## How the build works (`site/build.mjs`)
 
-- It reads `../AIOC-Quick-Start-Guide.md` and removes the H1, the opening "Purpose" blockquote, and everything from `## Appendix A` (the retailer's unfilled placeholders) onward. The appendix is also removed from the embedded Markdown used by the copy button.
+- It reads both Markdown files (the `LANGS` list) and, from each, removes the H1, the opening "Purpose" blockquote, and everything from `## Appendix A` (the retailer's unfilled placeholders) onward. The appendix is also removed from the embedded Markdown used by the copy button.
 - It renders the Markdown with `marked` (pinned to 12.0.2) at build time. The page doesn't need a CDN to show content.
-- **Heading ids come from the section number**: `5.3 Direwolf…` → `#s5-3`, `6. PTT…` → `#s6`. Several things depend on these ids: the table of contents, the hero buttons (`#s6`, `#s8`, `#s9`), and the `sec` links in the `GOALS` array in `template.html`. **If you renumber sections, update `GOALS` and the hero links.** The finder hides links whose id doesn't exist, so a broken link fails silently.
-- Inline source tags written as `**[Official]**`, `**[Tool docs]**`, `**[Community…]**` and `**[Typical]**` are turned into coloured pills, matched on the first word. Keep that exact bold-bracket form in the Markdown.
+- **Heading ids come from the section number**: `5.3 Direwolf…` → `#s5-3`, `6. PTT…` → `#s6`. Unnumbered sub-headings get the last number plus a letter (`#s1-a`). Chinese ids add `-zh` (`#s5-3-zh`). The build warns if the two languages' heading structure differs. Several things depend on these ids: the table of contents, the hero buttons (`#s6`, `#s8`, `#s9`), and the `sec` links in the `GOALS` array in `template.html`. **If you renumber sections, update `GOALS` and the hero links.** The finder hides links whose id doesn't exist, so a broken link fails silently.
+- Inline source tags written as `**[Official]**`, `**[Tool docs]**`, `**[Community…]**` and `**[Typical]**` are turned into coloured pills, matched on the first word. Keep that exact bold-bracket form in **both** Markdown files (English inside the brackets). The build shows Chinese labels on the Chinese page through `ZH_TAG_WORDS`.
+- In the Chinese Markdown, put a space on both sides of `**…**` when the bold text starts or ends with punctuation (brackets, backticks, quotes). Otherwise CommonMark won't render it next to CJK characters. The build warns about unrendered `**`.
 - Each `##` block is wrapped in `<section class="doc-section">`. In-page search filters at that level. Tables get a scroll wrapper and code blocks get copy buttons.
-- Template slots are `<!--TOC-->`, `<!--GUIDE-->` and `<!--MD-->`. They are filled with function replacements, because the Markdown contains `$` sequences.
+- Template slots are `<!--TOC_EN-->`/`<!--TOC_ZH-->`, `<!--GUIDE_EN-->`/`<!--GUIDE_ZH-->` and `<!--MD_EN-->`/`<!--MD_ZH-->`. They are filled with function replacements, because the Markdown contains `$` sequences.
 
 ## Page constraints (`site/template.html`)
 
-All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex). There are no other network calls, because the claude.ai artifact sandbox blocks them; keep it that way so one file works both there and on GitHub Pages. The colours are tokens in `:root`, with dark-theme copies under `prefers-color-scheme` and `[data-theme="dark"]`, so change all three together. The finder's data (`GOALS` × `OS`) is hand-written in the inline script. Keep it consistent with the guide's Decision Table (Section 3).
+All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex, plus Noto Sans SC for Chinese). There are no other network calls, because the claude.ai artifact sandbox blocks them; keep it that way so one file works both there and on GitHub Pages. The colours are tokens in `:root`, with dark-theme copies under `prefers-color-scheme` and `[data-theme="dark"]`, so change all three together. The finder's data (`GOALS` × `OS`) is hand-written in the inline script, with Chinese text in `GOALS_ZH` (same ids, and `sec` names in the same order). Keep both consistent with the guide's Decision Table (Section 3).
+
+**Language:** interface strings are in `STR.en`/`STR.zh`; elements get them via `data-i18n` / `data-i18n-attr`. The language comes from: the URL hash (`#zh`, or any id ending in `-zh`), then the saved choice, then the browser language. `#zh` is the link to use for Chinese QR codes and customers.
 
 ## Editing the guide: content rules
 
@@ -47,5 +50,6 @@ All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex)
   - VPTT/VCOS timing registers are **milliseconds × 16**.
   - Hardware rev 1.2 needs firmware ≥ 1.4.0.
   - Some rev 1.0 boards misbehave on 1.4.x, so recommend 1.3.0 for them.
+- **Change both languages together.** Edit the English guide, then make the same edit in the Chinese file, keeping section numbers and structure identical.
 - Keep the document version line at the top, and the firmware release table in Section 9.1, up to date when the information changes.
 - Planned next: a customer business-card leaflet with QR codes pointing to the published guide URL.

@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AIOC Quick Start Guide</title>
+<meta name="description" content="AIOC (ham radio All-In-One-Cable) quick start guide in English and Simplified Chinese / AIOC 快速入门指南（英文、简体中文）">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* Layout idea: a radio-shack field manual. Sticky index on the left, the manual on the right,
    a "find your setup" selector up top that points into the manual. Signal-amber accent = PTT/TX. */
@@ -26,8 +27,8 @@
   --t-tool: #3b4fa8;     --t-tool-bg: #e2e7fa;
   --t-community: #8a4a00; --t-community-bg: #fdecd2;
   --t-typical: #4f5b66;  --t-typical-bg: #e7ebef;
-  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "IBM Plex Sans Condensed", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --radius: 6px;
   color-scheme: light;
@@ -163,6 +164,18 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
   .result dl { grid-template-columns: 1fr; gap: 2px; }
   .result dt { margin-top: 6px; }
 }
+
+/* ---------- Language ---------- */
+[hidden] { display: none !important; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.topbar .kicker { margin: 0; }
+.lang-switch { display: inline-flex; border: 1px solid #3b4e5d; border-radius: 999px; padding: 2px; background: #111b23; }
+.lang-switch button { font: 600 13px/1 var(--font-body); color: #b9c6d1; background: transparent; border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.lang-switch button[aria-pressed="true"] { background: var(--lcd-ink); color: #1a0d05; }
+.lang-switch button:hover:not([aria-pressed="true"]) { color: #fff; }
+:lang(zh) body, body:lang(zh) { line-height: 1.75; }
+:lang(zh) .kicker, :lang(zh) .field-label, :lang(zh) .readout dt, :lang(zh) .result dt { letter-spacing: .04em; }
+:lang(zh) .guide p, :lang(zh) .guide li { max-width: 46em; }
 </style>
 </head>
 <body>
@@ -170,25 +183,31 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <header class="masthead">
   <div class="masthead-inner">
     <div>
-      <p class="kicker">Ham radio · All-In-One-Cable</p>
-      <h1>AIOC Quick Start Guide</h1>
-      <p class="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
+      <div class="topbar">
+        <p class="kicker" data-i18n="kicker">Ham radio · All-In-One-Cable</p>
+        <div class="lang-switch" role="group" aria-label="Language / 语言">
+          <button type="button" data-set-lang="en" lang="en" aria-pressed="true">English</button>
+          <button type="button" data-set-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+        </div>
+      </div>
+      <h1 data-i18n="title">AIOC Quick Start Guide</h1>
+      <p class="lede" data-i18n="lede">Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems.
         Pick what you want to do below to see the software and settings, or read the full guide.</p>
     </div>
-    <dl class="readout" aria-label="AIOC key facts">
+    <dl class="readout" data-i18n-attr="aria-label:factsLabel" aria-label="AIOC key facts">
       <div><dt>USB ID</dt><dd>1209:7388</dd></div>
-      <div><dt>Firmware</dt><dd>v1.4.1</dd></div>
-      <div><dt>Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
+      <div><dt data-i18n="fFirmware">Firmware</dt><dd>v1.4.1</dd></div>
+      <div><dt data-i18n="fSerial">Serial PTT</dt><dd>DTR=1 · RTS=0</dd></div>
       <div><dt>CM108 PTT</dt><dd>GPIO3</dd></div>
-      <div><dt>Audio</dt><dd>48 kHz mono</dd></div>
-      <div><dt>Radio plug</dt><dd>Kenwood K1</dd></div>
+      <div><dt data-i18n="fAudio">Audio</dt><dd data-i18n="fAudioVal">48 kHz mono</dd></div>
+      <div><dt data-i18n="fPlug">Radio plug</dt><dd data-i18n="fPlugVal">Kenwood K1</dd></div>
     </dl>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="copy-md" type="button">Copy guide for your AI assistant</button>
-    <a class="btn btn-ghost" href="#s6">Radio won't transmit?</a>
-    <a class="btn btn-ghost" href="#s8">Known issues</a>
-    <a class="btn btn-ghost" href="#s9">Update firmware</a>
+    <button class="btn btn-primary" id="copy-md" type="button" data-i18n="copyMd">Copy guide for your AI assistant</button>
+    <a class="btn btn-ghost" href="#s6" data-sec="s6" data-i18n="btnPtt">Radio won't transmit?</a>
+    <a class="btn btn-ghost" href="#s8" data-sec="s8" data-i18n="btnIssues">Known issues</a>
+    <a class="btn btn-ghost" href="#s9" data-sec="s9" data-i18n="btnFw">Update firmware</a>
     <span class="copy-status" id="copy-status" role="status"></span>
   </div>
 </header>
@@ -196,15 +215,15 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <section class="finder" aria-labelledby="finder-title">
   <div class="finder-card">
     <div class="finder-head">
-      <h2 id="finder-title">Find your setup</h2>
-      <p>Choose a task and your device. The answer links to the step-by-step section.</p>
+      <h2 id="finder-title" data-i18n="finderTitle">Find your setup</h2>
+      <p data-i18n="finderHint">Choose a task and your device. The answer links to the step-by-step section.</p>
     </div>
     <div>
-      <span class="field-label" id="goal-label">I want to</span>
+      <span class="field-label" id="goal-label" data-i18n="iWant">I want to</span>
       <div class="chips" id="goals" role="group" aria-labelledby="goal-label"></div>
     </div>
     <div>
-      <span class="field-label" id="os-label">On</span>
+      <span class="field-label" id="os-label" data-i18n="on">On</span>
       <div class="chips" id="oses" role="group" aria-labelledby="os-label"></div>
     </div>
     <div class="result" id="result" aria-live="polite"></div>
@@ -212,40 +231,90 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 </section>
 
 <div class="layout">
-  <nav class="index" aria-label="Guide contents">
-    <label class="field-label" for="search">Search the guide</label>
-    <input class="search" id="search" type="search" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
+  <nav class="index" data-i18n-attr="aria-label:tocLabel" aria-label="Guide contents">
+    <label class="field-label" for="search" data-i18n="searchLabel">Search the guide</label>
+    <input class="search" id="search" type="search" data-i18n-attr="placeholder:searchPh" placeholder="e.g. VARA, hidraw, UV-K5" autocomplete="off">
     <p class="search-note" id="search-note"></p>
-    <ul id="toc">
-<!--TOC-->
+    <ul class="toc" data-lang="en" lang="en">
+<!--TOC_EN-->
+    </ul>
+    <ul class="toc" data-lang="zh" lang="zh-CN" hidden>
+<!--TOC_ZH-->
     </ul>
   </nav>
 
   <main class="guide" id="guide">
-    <div class="legend" aria-label="Source labels">
-      <span>Where each statement comes from:</span>
-      <span class="tag tag-official">Official</span><span>AIOC project</span>
-      <span class="tag tag-tool">Tool docs</span><span>software docs</span>
-      <span class="tag tag-community">Community</span><span>user reports</span>
-      <span class="tag tag-typical">Typical</span><span>common settings, check your screen</span>
+    <div class="legend" data-i18n-attr="aria-label:legendLabel" aria-label="Source labels">
+      <span data-i18n="legendIntro">Where each statement comes from:</span>
+      <span class="tag tag-official" data-i18n="tOfficial">Official</span><span data-i18n="tOfficialD">AIOC project</span>
+      <span class="tag tag-tool" data-i18n="tTool">Tool docs</span><span data-i18n="tToolD">software docs</span>
+      <span class="tag tag-community" data-i18n="tCommunity">Community</span><span data-i18n="tCommunityD">user reports</span>
+      <span class="tag tag-typical" data-i18n="tTypical">Typical</span><span data-i18n="tTypicalD">common settings, check your screen</span>
     </div>
-<!--GUIDE-->
+    <div class="guide-body" data-lang="en" lang="en">
+<!--GUIDE_EN-->
+    </div>
+    <div class="guide-body" data-lang="zh" lang="zh-CN" hidden>
+<!--GUIDE_ZH-->
+    </div>
   </main>
 </div>
 
-<footer>
+<footer data-i18n="footer">
   Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR,
   guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.
 </footer>
 
-<script type="text/plain" id="md-source"><!--MD--></script>
+<script type="text/plain" id="md-en"><!--MD_EN--></script>
+<script type="text/plain" id="md-zh"><!--MD_ZH--></script>
 <script>
 (function () {
+  // ---------- Interface strings ----------
+  var STR = {
+    en: {
+      kicker: 'Ham radio · All-In-One-Cable', title: 'AIOC Quick Start Guide',
+      lede: 'Program your handheld, run APRS, Winlink, packet, SSTV and AllStarLink, and fix PTT problems. Pick what you want to do below to see the software and settings, or read the full guide.',
+      factsLabel: 'AIOC key facts', fFirmware: 'Firmware', fSerial: 'Serial PTT', fAudio: 'Audio', fAudioVal: '48 kHz mono', fPlug: 'Radio plug', fPlugVal: 'Kenwood K1',
+      copyMd: 'Copy guide for your AI assistant', btnPtt: 'Radio won’t transmit?', btnIssues: 'Known issues', btnFw: 'Update firmware',
+      finderTitle: 'Find your setup', finderHint: 'Choose a task and your device. The answer links to the step-by-step section.',
+      iWant: 'I want to', on: 'On', tocLabel: 'Guide contents', searchLabel: 'Search the guide', searchPh: 'e.g. VARA, hidraw, UV-K5',
+      legendLabel: 'Source labels', legendIntro: 'Where each statement comes from:',
+      tOfficial: 'Official', tOfficialD: 'AIOC project', tTool: 'Tool docs', tToolD: 'software docs',
+      tCommunity: 'Community', tCommunityD: 'user reports', tTypical: 'Typical', tTypicalD: 'common settings, check your screen',
+      footer: 'Based on the open-source AIOC project by Simon Küppers (github.com/skuep/AIOC), the aioc-util tool by TF3HR, guides by G1LRO, M0AWS and DL-Nordwest, and AIOC user reports. Transmitting requires an amateur radio licence.',
+      on_: ' on ', software: 'Software', ptt: 'PTT', tip: 'Tip', open: 'Open: ',
+      copied: function (kb) { return 'Copied ' + kb + ' KB of Markdown. Paste it into your AI assistant.'; },
+      copyBlocked: 'Copy was blocked by the browser.', copy: 'Copy', copiedShort: 'Copied', copyManual: 'Select and copy manually',
+      hits: function (n, q) { return n + ' chapter' + (n > 1 ? 's' : '') + ' mention "' + q + '"'; },
+      noHits: function (q) { return 'No matches for "' + q + '"'; }
+    },
+    zh: {
+      kicker: '业余无线电 · All-In-One-Cable', title: 'AIOC 快速入门指南',
+      lede: '给手台写频，玩 APRS、Winlink、分组通信、SSTV 和 AllStarLink，解决 PTT 不发射等问题。在下方选择你想做的事，查看需要的软件和设置，或阅读完整指南。',
+      factsLabel: 'AIOC 关键参数', fFirmware: '固件', fSerial: '串口 PTT', fAudio: '音频', fAudioVal: '48 kHz 单声道', fPlug: '电台接口', fPlugVal: '建伍 K1',
+      copyMd: '复制指南给 AI 助手', btnPtt: '电台不发射？', btnIssues: '已知问题', btnFw: '升级固件',
+      finderTitle: '找到你的设置', finderHint: '选择任务和设备，结果会链接到详细步骤。',
+      iWant: '我想要', on: '使用', tocLabel: '指南目录', searchLabel: '搜索指南', searchPh: '例如 VARA、hidraw、UV-K5',
+      legendLabel: '来源标签', legendIntro: '每条信息的来源：',
+      tOfficial: '官方', tOfficialD: 'AIOC 项目', tTool: '工具文档', tToolD: '软件文档',
+      tCommunity: '社区', tCommunityD: '用户报告', tTypical: '常规', tTypicalD: '常见设置，请对照屏幕确认',
+      footer: '内容基于 Simon Küppers 的开源 AIOC 项目（github.com/skuep/AIOC）、TF3HR 的 aioc-util 工具、G1LRO、M0AWS 和 DL-Nordwest 的教程以及 AIOC 用户报告。发射需要业余无线电执照。',
+      on_: ' · ', software: '软件', ptt: 'PTT', tip: '提示', open: '查看：',
+      copied: function (kb) { return '已复制 ' + kb + ' KB 的 Markdown，粘贴给你的 AI 助手即可。'; },
+      copyBlocked: '浏览器阻止了复制。', copy: '复制', copiedShort: '已复制', copyManual: '请手动选中复制',
+      hits: function (n, q) { return n + ' 个章节提到“' + q + '”'; },
+      noHits: function (q) { return '没有找到“' + q + '”'; }
+    }
+  };
+
   // ---------- Setup finder data ----------
-  var OS = [
-    { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
-    { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
-  ];
+  var OS = { en: [
+      { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / Raspberry Pi' },
+      { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+    ], zh: [
+      { id: 'win', label: 'Windows' }, { id: 'linux', label: 'Linux / 树莓派' },
+      { id: 'mac', label: 'macOS' }, { id: 'android', label: 'Android' }, { id: 'ios', label: 'iPhone / iPad' }
+    ] };
   var NO_PHONE = 'Not available on phones. Use a computer.';
   var GOALS = [
     { id: 'program', label: 'Program channels', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: NO_PHONE, ios: NO_PHONE },
@@ -284,14 +353,110 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
     { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'AIOC Toolkit in Chrome/Edge (Foxhunt box)', linux: 'AIOC Toolkit or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
       ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
     { id: 'config', label: 'Change AIOC settings', sw: { win: 'AIOC Toolkit in Chrome/Edge (no install)', linux: 'AIOC Toolkit (install the udev rule) or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: NO_PHONE, ios: NO_PHONE },
-      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'aioc-util'], ['s6', 'PTT fixes']] },
+      ptt: 'PTT sources, Virtual PTT/COS, audio gain, USB ID.', tip: 'AIOC Toolkit: g1lro.github.io/aioc-toolkit. Press Apply, then Store to Flash, or settings are lost on unplug.', sec: [['s7', 'AIOC Toolkit / aioc-util'], ['s6', 'PTT fixes']] },
     { id: 'firmware', label: 'Update firmware', sw: { win: 'AIOC Toolkit, Flash Firmware tab (easiest), or dfu-util + Zadig', linux: 'dfu-util, or the AIOC Toolkit', mac: 'dfu-util (Homebrew), or the AIOC Toolkit', android: NO_PHONE, ios: NO_PHONE },
       ptt: '—', tip: 'For the Toolkit, put the AIOC in bootloader mode first. Updating erases stored settings. Old rev 1.0 boards: use v1.3.0 if v1.4.x misbehaves.', sec: [['s9', 'Firmware update']] }
   ];
 
+  // Chinese overrides for the finder (same ids and section links as GOALS)
+  var ZNP = '手机上不可用，请用电脑。';
+  var GOALS_ZH = {
+    program: { label: '写频', sw: { win: 'CHIRP', linux: 'CHIRP', mac: 'CHIRP', android: ZNP, ios: ZNP },
+      ptt: '不需要。在 CHIRP 中选择 AIOC 的串口即可。', tip: '写入前先从电台读取并保存备份。', sec: ['CHIRP 步骤'] },
+    k5: { label: '刷 UV-K5 固件', sw: { win: 'Chrome/Edge 中的网页刷机工具，或 k5prog', linux: 'Chrome/Edge 中的网页刷机工具，或 k5prog', mac: 'Chrome/Edge 中的网页刷机工具', android: ZNP, ios: ZNP },
+      ptt: '不需要。按住 PTT 开机进入引导模式。', tip: '先把 AIOC 升级到 v1.4.x，它的串口缓冲区更大。', sec: ['UV-K5 刷固件'] },
+    aprs: { label: 'APRS', sw: { win: 'Direwolf + APRSIS32、YAAC 或 PinPoint', linux: 'Direwolf + YAAC 或 Xastir', mac: 'Direwolf + YAAC', android: 'APRSdroid（开启 AIOC 虚拟 PTT）', ios: '暂无经过测试的 APRS 应用' },
+      ptt: { win: 'Direwolf：PTT COMx DTR -RTS', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT /dev/cu.usbmodem… DTR -RTS', android: '虚拟 PTT：aioc-util --ptt1 VPTT --store', ios: '—' },
+      tip: '中国 APRS 频率为 144.640 MHz（北美 144.390，欧洲 144.800）。', sec: ['Direwolf', 'APRS 地图软件', 'APRSdroid'] },
+    igate: { label: 'iGate / 数字中继', sw: { win: 'Direwolf', linux: 'Direwolf（无界面树莓派），或 DigiPi', mac: 'Direwolf', android: ZNP, ios: ZNP },
+      ptt: { win: 'PTT COMx DTR -RTS', linux: 'PTT CM108', mac: 'PTT /dev/cu.usbmodem… DTR -RTS', android: '—', ios: '—' },
+      tip: 'iGate 需要 APRS-IS 验证码。用 1 W 功率和合适的天线，避免射频导致死机。', sec: ['Direwolf', 'DigiPi'] },
+    winlink: { label: 'Winlink 邮件', sw: { win: 'Winlink Express + VARA FM（或经 Direwolf/Soundmodem 走分组）', linux: 'Pat + Direwolf（分组），或 Wine 下的 VARA FM', mac: 'Pat + Direwolf（分组）', android: '暂无经过测试的应用', ios: 'RadioMail（开启 AIOC 虚拟 PTT）' },
+      ptt: { win: 'VARA FM：PTT pin 选“DTR only”', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT … DTR -RTS', android: '—', ios: '虚拟 PTT（固件 1.4.1）' },
+      tip: '用 VARA FM 窄带（Narrow）。把电台的发射限时（TOT）设到最大。', sec: ['Winlink', 'iPhone / iPad'] },
+    packet: { label: '分组 BBS / 终端', sw: { win: 'Direwolf 或 UZ7HO Soundmodem + QtTermTCP、Outpost 或 BPQ32', linux: 'Direwolf + Paracon、QtTermTCP 或 LinBPQ', mac: 'Direwolf + QtTermTCP', android: '暂无经过测试的应用', ios: 'Packet Commander（开启 AIOC 虚拟 PTT）' },
+      ptt: { win: 'Soundmodem：勾选“Swap COM pins for PTT”，采样率 12000 Hz', linux: 'Direwolf：PTT CM108', mac: 'Direwolf：PTT … DTR -RTS', android: '—', ios: '虚拟 PTT' },
+      tip: '静噪全开、关闭省电，能帮廉价手台收到每个数据包的开头。', sec: ['Soundmodem', 'BBS 和终端'] },
+    varac: { label: 'VARA 键盘聊天', sw: { win: 'VarAC 或 VARA Chat + VARA FM', linux: 'Wine 下运行 VarAC + VARA FM', mac: '未测试', android: ZNP, ios: ZNP },
+      ptt: '由 VARA FM 控制发射（PTT pin 选“DTR only”），VarAC 的 PTT 保持关闭。', tip: '', sec: ['VARA FM 设置'] },
+    sstv: { label: 'SSTV 图片', sw: { win: 'MMSSTV', linux: 'QSSTV', mac: 'Black Cat SSTV 或 MultiScan', android: 'Robot36（仅接收）', ios: '未测试' },
+      ptt: 'COM 口 DTR；软件无法控制发射时用 AIOC 虚拟 PTT。只接收不需要 PTT。', tip: '国际空间站 SSTV 活动在 145.800 MHz FM。', sec: ['SSTV'] },
+    nbems: { label: '应急通信文本和表单', sw: { win: 'fldigi + flmsg + flamp', linux: 'fldigi + flmsg + flamp', mac: 'fldigi + flmsg', android: ZNP, ios: ZNP },
+      ptt: 'fldigi 用 CM108 PTT（GPIO 3），或串口 PTT 只勾选“Use DTR”。', tip: 'ARES 网络在 FM 上常用 MT63-2000L 模式。', sec: ['fldigi / NBEMS'] },
+    ft8: { label: 'FT8 / JS8（FM）', sw: { win: 'WSJT-X 或 JS8Call', linux: 'WSJT-X 或 JS8Call', mac: 'WSJT-X 或 JS8Call', android: ZNP, ios: ZNP },
+      ptt: 'PTT 方式选 AIOC 端口上的 DTR，电台（Rig）选“None”。', tip: '这些是 SSB 模式。用 FM 手台只能联系其他 FM 电台。', sec: ['WSJT-X / JS8Call'] },
+    allstar: { label: 'AllStarLink 节点', sw: { win: '只能在 Linux 上运行', linux: 'AllStarLink 3（树莓派或 Debian）', mac: '只能在 Linux 上运行', android: '只能在 Linux 上运行', ios: '只能在 Linux 上运行' },
+      ptt: '内置支持：AllStar 把 AIOC 当 CM108 用。取消注释 usb_devices = 1209:7388。', tip: '设置 VCOS 保持时间（毫秒 × 16），或在 rev 1.2 上用硬件 COS。', sec: ['AllStarLink 3'] },
+    echolink: { label: 'EchoLink / SvxLink', sw: { win: 'EchoLink（Sysop 模式）', linux: 'SvxLink', mac: '未测试', android: ZNP, ios: ZNP },
+      ptt: { win: '串口控制发射，或 AIOC 虚拟 PTT', linux: 'SvxLink：PTT_TYPE=Hidraw，HID_PTT_PIN=GPIO3', mac: '—', android: '—', ios: '—' },
+      tip: '在路由器上转发 UDP 5198–5199 和 TCP 5200。', sec: ['SvxLink / EchoLink'] },
+    mesh: { label: 'Reticulum 组网', sw: { win: 'Reticulum + Direwolf（KISS）', linux: 'Reticulum（NomadNet、MeshChat）+ Direwolf', mac: 'Reticulum + Direwolf', android: 'Sideband，经运行 Direwolf 的电脑', ios: '未测试' },
+      ptt: '由 Direwolf 控制 PTT。', tip: '先确认你的执照对加密的规定。', sec: ['Reticulum'] },
+    rig: { label: '车台 / 短波电台', sw: { win: '手工接线的 AIOC + WSJT-X、fldigi、VARA', linux: '手工接线的 AIOC + WSJT-X、fldigi、Direwolf', mac: '手工接线的 AIOC + WSJT-X、fldigi', android: ZNP, ios: ZNP },
+      ptt: 'AIOC 的 PTT，或通过 AIOC 串口用 CAT 控制发射。', tip: '硬件 rev 1.2 把 PTT 和串口数据分开了。艾可慕 CI-V 不能用。', sec: ['接到其他电台'] },
+    foxhunt: { label: '猎狐信标', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（Foxhunt 区）', linux: 'AIOC Toolkit 或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: '先在电脑上设置好，再用充电宝供电运行', ios: '先在电脑上设置好，再用充电宝供电运行' },
+      ptt: 'AIOC 自己控制电台发射。', tip: '需要固件 1.4.0 或更新。', sec: ['猎狐模式'] },
+    config: { label: '修改 AIOC 设置', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（免安装）', linux: 'AIOC Toolkit（需安装 udev 规则）或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: ZNP, ios: ZNP },
+      ptt: 'PTT 源、虚拟 PTT/COS、音频增益、USB ID。', tip: 'AIOC Toolkit：g1lro.github.io/aioc-toolkit。先点 Apply 再点 Store to Flash，否则拔下后设置会丢失。', sec: ['AIOC Toolkit / aioc-util', 'PTT 故障排查'] },
+    firmware: { label: '升级固件', sw: { win: 'AIOC Toolkit 的 Flash Firmware 选项卡（最简单），或 dfu-util + Zadig', linux: 'dfu-util，或 AIOC Toolkit', mac: 'dfu-util（Homebrew），或 AIOC Toolkit', android: ZNP, ios: ZNP },
+      ptt: '—', tip: '用 Toolkit 刷写前先让 AIOC 进入引导模式。升级会清除已保存的设置。旧的 rev 1.0 板如果 v1.4.x 不正常，请用 v1.3.0。', sec: ['固件升级'] }
+  };
+  var UNAVAILABLE = /^(Not |No tested|Runs on Linux only|手机上不可用|暂无|未测试|只能在 Linux)/;
+
+  // ---------- Language ----------
+  var lang = 'en';
+  function sfx() { return lang === 'zh' ? '-zh' : ''; }
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function detectLang() {
+    var h = location.hash.slice(1);
+    if (h === 'zh' || /-zh$/.test(h)) return 'zh';
+    if (h === 'en' || (h && document.getElementById(h))) return 'en';
+    var saved = load('aioc-lang');
+    if (saved === 'en' || saved === 'zh') return saved;
+    var prefs = navigator.languages || [navigator.language || ''];
+    for (var i = 0; i < prefs.length; i++) if (/^zh/i.test(prefs[i] || '')) return 'zh';
+    return 'en';
+  }
+
+  function applyStrings() {
+    var S = STR[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function (n) { n.textContent = S[n.dataset.i18n]; });
+    document.querySelectorAll('[data-i18n-attr]').forEach(function (n) {
+      n.dataset.i18nAttr.split(';').forEach(function (pair) { var p = pair.split(':'); n.setAttribute(p[0], S[p[1]]); });
+    });
+    document.querySelectorAll('[data-sec]').forEach(function (a) { a.setAttribute('href', '#' + a.dataset.sec + sfx()); });
+    document.querySelectorAll('[data-set-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setLang === lang)); });
+    document.querySelectorAll('[data-lang]').forEach(function (n) { n.hidden = n.dataset.lang !== lang; });
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = S.title;
+  }
+
+  function setLang(next, fromUser) {
+    if (next === lang && !fromUser) return;
+    var h = location.hash.slice(1);
+    lang = next;
+    if (fromUser) store('aioc-lang', lang);
+    search.value = ''; runSearch();
+    applyStrings();
+    buildChips();
+    render();
+    document.getElementById('copy-status').textContent = '';
+    // Keep the reader at the same section in the other language
+    var base = h.replace(/-zh$/, '');
+    if (fromUser && base && document.getElementById(base)) {
+      var target = base + sfx();
+      history.replaceState(null, '', '#' + target);
+      var el = document.getElementById(target);
+      if (el) el.scrollIntoView();
+    }
+  }
+
+  // ---------- Finder ----------
   var state = { goal: 'aprs', os: 'win' };
   try {
-    var saved = JSON.parse(localStorage.getItem('aioc-finder') || 'null');
+    var saved = JSON.parse(load('aioc-finder') || 'null');
     if (saved && saved.goal && saved.os) state = saved;
   } catch (e) {}
 
@@ -301,41 +466,49 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
     if (text != null) n.textContent = text;
     return n;
   }
-  function chips(container, list, key) {
-    list.forEach(function (item) {
-      var b = el('button', { type: 'button', class: 'chip', 'data-id': item.id, 'aria-pressed': String(state[key] === item.id) }, item.label);
-      b.addEventListener('click', function () { state[key] = item.id; render(); });
-      container.appendChild(b);
-    });
+  function goalView(g) {
+    if (lang !== 'zh') return { label: g.label, sw: g.sw, ptt: g.ptt, tip: g.tip, secNames: g.sec.map(function (s) { return s[1]; }) };
+    var z = GOALS_ZH[g.id];
+    return { label: z.label, sw: z.sw, ptt: z.ptt, tip: z.tip, secNames: z.sec };
   }
-  chips(document.getElementById('goals'), GOALS, 'goal');
-  chips(document.getElementById('oses'), OS, 'os');
-
+  function buildChips() {
+    var goals = document.getElementById('goals'), oses = document.getElementById('oses');
+    goals.innerHTML = ''; oses.innerHTML = '';
+    GOALS.forEach(function (g) { addChip(goals, g.id, goalView(g).label, 'goal'); });
+    OS[lang].forEach(function (o) { addChip(oses, o.id, o.label, 'os'); });
+  }
+  function addChip(container, id, label, key) {
+    var b = el('button', { type: 'button', class: 'chip', 'data-id': id, 'aria-pressed': String(state[key] === id) }, label);
+    b.addEventListener('click', function () { state[key] = id; render(); });
+    container.appendChild(b);
+  }
   function render() {
+    var S = STR[lang];
     document.querySelectorAll('#goals .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.goal)); });
     document.querySelectorAll('#oses .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.id === state.os)); });
-    try { localStorage.setItem('aioc-finder', JSON.stringify(state)); } catch (e) {}
+    store('aioc-finder', JSON.stringify(state));
     var g = GOALS.filter(function (x) { return x.id === state.goal; })[0];
-    var osLabel = OS.filter(function (x) { return x.id === state.os; })[0].label;
-    var sw = g.sw[state.os];
-    var ptt = typeof g.ptt === 'string' ? g.ptt : g.ptt[state.os];
-    var unavailable = /^(Not |No tested|Runs on Linux only)/.test(sw);
+    var v = goalView(g);
+    var osLabel = OS[lang].filter(function (x) { return x.id === state.os; })[0].label;
+    var sw = v.sw[state.os];
+    var ptt = typeof v.ptt === 'string' ? v.ptt : v.ptt[state.os];
+    var unavailable = UNAVAILABLE.test(sw);
     var r = document.getElementById('result');
     r.innerHTML = '';
-    r.appendChild(el('h3', {}, g.label + ' on ' + osLabel));
+    r.appendChild(el('h3', {}, v.label + S.on_ + osLabel));
     var dl = el('dl', {});
-    dl.appendChild(el('dt', {}, 'Software'));
+    dl.appendChild(el('dt', {}, S.software));
     dl.appendChild(el('dd', unavailable ? { class: 'na' } : {}, sw));
-    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, 'PTT')); dl.appendChild(el('dd', {}, ptt)); }
-    if (g.tip) { dl.appendChild(el('dt', {}, 'Tip')); dl.appendChild(el('dd', {}, g.tip)); }
+    if (!unavailable && ptt && ptt !== '—') { dl.appendChild(el('dt', {}, S.ptt)); dl.appendChild(el('dd', {}, ptt)); }
+    if (v.tip) { dl.appendChild(el('dt', {}, S.tip)); dl.appendChild(el('dd', {}, v.tip)); }
     r.appendChild(dl);
     var links = el('div', { class: 'links' });
-    g.sec.forEach(function (s) {
-      if (document.getElementById(s[0])) links.appendChild(el('a', { href: '#' + s[0] }, 'Open: ' + s[1] + ' →'));
+    g.sec.forEach(function (s, i) {
+      var id = s[0] + sfx();
+      if (document.getElementById(id)) links.appendChild(el('a', { href: '#' + id }, S.open + v.secNames[i] + ' →'));
     });
     r.appendChild(links);
   }
-  render();
 
   // ---------- Copy buttons ----------
   function copyText(text, onDone) {
@@ -350,31 +523,31 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
     ta.remove(); return ok;
   }
   document.querySelectorAll('.code').forEach(function (block) {
-    var b = el('button', { type: 'button', class: 'copy-btn' }, 'Copy');
+    var b = el('button', { type: 'button', class: 'copy-btn' }, STR.en.copy);
     b.addEventListener('click', function () {
       copyText(block.querySelector('pre').innerText, function (ok) {
-        b.textContent = ok ? 'Copied' : 'Select and copy manually';
-        setTimeout(function () { b.textContent = 'Copy'; }, 1800);
+        b.textContent = ok ? STR[lang].copiedShort : STR[lang].copyManual;
+        setTimeout(function () { b.textContent = STR[lang].copy; }, 1800);
       });
     });
     block.appendChild(b);
   });
   document.getElementById('copy-md').addEventListener('click', function () {
-    var md = document.getElementById('md-source').textContent;
+    var md = document.getElementById('md-' + lang).textContent;
     var status = document.getElementById('copy-status');
     copyText(md, function (ok) {
-      status.textContent = ok ? 'Copied ' + Math.round(md.length / 1024) + ' KB of Markdown. Paste it into your AI assistant.' : 'Copy was blocked by the browser.';
+      status.textContent = ok ? STR[lang].copied(Math.round(md.length / 1024)) : STR[lang].copyBlocked;
     });
   });
 
-  // ---------- Search ----------
-  var sections = Array.prototype.slice.call(document.querySelectorAll('.doc-section'));
-  var tocItems = Array.prototype.slice.call(document.querySelectorAll('#toc li'));
+  // ---------- Search (active language only) ----------
   var search = document.getElementById('search');
   var note = document.getElementById('search-note');
+  function activeSections() { return Array.prototype.slice.call(document.querySelectorAll('.guide-body[data-lang="' + lang + '"] .doc-section')); }
   function clearMarks() {
-    document.querySelectorAll('main mark').forEach(function (m) { m.replaceWith(document.createTextNode(m.textContent)); });
-    sections.forEach(function (s) { s.normalize(); });
+    document.querySelectorAll('main mark').forEach(function (m) {
+      var p = m.parentNode; m.replaceWith(document.createTextNode(m.textContent)); p.normalize();
+    });
   }
   function markIn(root, q) {
     var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
@@ -386,32 +559,44 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
       var m = document.createElement('mark'); m.textContent = after.nodeValue; after.replaceWith(m);
     });
   }
+  function runSearch() {
+    var q = search.value.trim();
+    var sections = activeSections();
+    var tocItems = Array.prototype.slice.call(document.querySelectorAll('.toc[data-lang="' + lang + '"] li'));
+    clearMarks();
+    document.querySelectorAll('.doc-section.hidden, .toc li.hidden').forEach(function (n) { n.classList.remove('hidden'); });
+    if (q.length < 2) { note.textContent = ''; return; }
+    var ql = q.toLowerCase(), hits = 0;
+    sections.forEach(function (s) {
+      var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
+      s.classList.toggle('hidden', !match);
+      if (match) { hits++; markIn(s, q); }
+    });
+    tocItems.forEach(function (li) {
+      var target = document.getElementById(li.querySelector('a').getAttribute('href').slice(1));
+      var sec = target && target.closest('.doc-section');
+      li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
+    });
+    note.textContent = hits ? STR[lang].hits(hits, q) : STR[lang].noHits(q);
+  }
   var timer;
-  search.addEventListener('input', function () {
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      var q = search.value.trim();
-      clearMarks();
-      if (q.length < 2) {
-        sections.forEach(function (s) { s.classList.remove('hidden'); });
-        tocItems.forEach(function (li) { li.classList.remove('hidden'); });
-        note.textContent = ''; return;
-      }
-      var ql = q.toLowerCase(), hits = 0;
-      sections.forEach(function (s) {
-        var match = s.textContent.toLowerCase().indexOf(ql) !== -1;
-        s.classList.toggle('hidden', !match);
-        if (match) { hits++; markIn(s, q); }
-      });
-      tocItems.forEach(function (li) {
-        var id = li.querySelector('a').getAttribute('href').slice(1);
-        var target = document.getElementById(id);
-        var sec = target && target.closest('.doc-section');
-        li.classList.toggle('hidden', !sec || sec.classList.contains('hidden'));
-      });
-      note.textContent = hits ? hits + ' chapter' + (hits > 1 ? 's' : '') + ' mention "' + q + '"' : 'No matches for "' + q + '"';
-    }, 160);
+  search.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(runSearch, 160); });
+
+  // ---------- Start ----------
+  document.querySelectorAll('[data-set-lang]').forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.dataset.setLang, true); });
   });
+  window.addEventListener('hashchange', function () {
+    var h = location.hash.slice(1);
+    if (/-zh$/.test(h) || h === 'zh') setLang('zh', false);
+    else if (h === 'en' || (h && document.getElementById(h))) setLang('en', false);
+  });
+  lang = detectLang();
+  applyStrings();
+  buildChips();
+  render();
+  var startId = location.hash.slice(1);
+  if (startId && document.getElementById(startId)) document.getElementById(startId).scrollIntoView();
 })();
 </script>
 </body>
