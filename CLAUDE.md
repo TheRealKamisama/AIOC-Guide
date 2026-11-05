@@ -52,4 +52,10 @@ All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex,
   - Some rev 1.0 boards misbehave on 1.4.x, so recommend 1.3.0 for them.
 - **Change both languages together.** Edit the English guide, then make the same edit in the Chinese file, keeping section numbers and structure identical.
 - Keep the document version line at the top, and the firmware release table in Section 9.1, up to date when the information changes.
-- Planned next: a customer business-card leaflet with QR codes pointing to the published guide URL.
+
+## Quick start card (`card/`)
+
+A credit-card-size (ID-1, 85.60 × 53.98 mm) two-sided card shipped with products, one English and one Chinese. `node card/build.mjs` needs `qrencode` and `rsvg-convert`, and regenerates `card/dist/` (committed): `*-print-3mm-bleed.pdf` for print shops, `*-exact-size.pdf`, and rounded-corner PNG previews.
+
+- All card text is in `COPY` in `build.mjs`. It repeats facts from guide sections 1, 2.1, 2.3 and 4, so if those change, update both languages there too and rebuild. Text positions are fixed, so check the previews for overflow after editing copy.
+- The QR codes point to the live page with `#en` / `#zh`. Printed cards can't be updated, so keep those URLs working: renaming the repo, or turning Pages off, breaks every card already shipped.
