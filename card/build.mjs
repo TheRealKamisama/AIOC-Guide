@@ -34,14 +34,14 @@ const COPY = {
     ptt: {
       label: ['PTT'],
       rows: [
-        [[{ u: 'VPTT' }], [[{ u: 'On as shipped' }, ': TX audio keys the radio.'], 'No PTT setup needed. Change in AIOC Toolkit.']],
-        ['CM108', ['HID GPIO3. On by default. Try this first.']],
-        ['Serial', ['DTR=1 and RTS=0. On by default.']],
+        [[{ u: 'VPTT' }], [[{ u: 'PTT1, as shipped' }, ': TX audio keys the radio.'], 'No PTT setup needed in your software.']],
+        ['PTT2', ['CM108 GPIO4, for dual-PTT radios only.']],
+        ['Others', ['CM108 GPIO3 and serial DTR/RTS are off.', 'Add them in AIOC Toolkit → PTT Sources.']],
       ],
     },
     serial: {
       label: ['Serial'],
-      lines: ['Radio programming (CHIRP) and serial PTT.', ['Windows ', { mono: 'COMx' }, ' · Linux ', { mono: '/dev/ttyACMx' }], ['macOS ', { mono: '/dev/cu.usbmodem*' }]],
+      lines: ['Radio programming (CHIRP).', ['Windows ', { mono: 'COMx' }, ' · Linux ', { mono: '/dev/ttyACMx' }], ['macOS ', { mono: '/dev/cu.usbmodem*' }]],
     },
     legal: 'Transmitting needs a licence. Test into a dummy load or on low power.',
   },
@@ -57,14 +57,14 @@ const COPY = {
     ptt: {
       label: ['PTT'],
       rows: [
-        [[{ u: 'VPTT' }], [[{ u: '出厂已开启' }, '：有发射音频就自动发射。'], '无需设置 PTT，可在 AIOC Toolkit 中修改。']],
-        ['CM108', ['HID GPIO3，默认开启，优先尝试。']],
-        ['串口', ['DTR=1 且 RTS=0，默认开启。']],
+        [[{ u: 'VPTT' }], [[{ u: 'PTT1 出厂设置' }, '：有发射音频就自动发射。'], '软件里无需设置 PTT。']],
+        ['PTT2', ['CM108 GPIO4，仅用于双 PTT 电台。']],
+        ['其他', ['CM108 GPIO3 和串口 DTR/RTS 已关闭，', '需要时在 AIOC Toolkit → PTT Sources 中添加。']],
       ],
     },
     serial: {
       label: ['串口'],
-      lines: ['用于电台写频（CHIRP）和串口 PTT。', ['Windows ', { mono: 'COMx' }, ' · Linux ', { mono: '/dev/ttyACMx' }], ['macOS ', { mono: '/dev/cu.usbmodem*' }]],
+      lines: ['用于电台写频（CHIRP）。', ['Windows ', { mono: 'COMx' }, ' · Linux ', { mono: '/dev/ttyACMx' }], ['macOS ', { mono: '/dev/cu.usbmodem*' }]],
     },
     legal: '发射需持有业余无线电执照。测试时请接假负载或使用小功率。',
   },
@@ -123,7 +123,7 @@ function front(code) {
 
 function back(code) {
   const c = COPY[code], font = c.font;
-  const labelX = M, textX = M + 13, subX = textX + 10.5, lh = 3.4, size = 6.4;
+  const labelX = M, textX = M + 13, subX = textX + 10.5, lh = 3.2, size = 6.4;
   const out = [`<rect x="-5" y="-5" width="${W + 10}" height="${H + 10}" fill="#fff"/>`];
   out.push(text(M, 8, c.heading, { size: 9, weight: 700, fill: C.accent, font }));
 
@@ -134,17 +134,17 @@ function back(code) {
     draw();
     return top;
   };
-  const rule = () => { out.push(`<line x1="${M}" y1="${y - 3.3}" x2="${W - M}" y2="${y - 3.3}" stroke="${C.line}" stroke-width="0.2"/>`); };
+  const rule = () => { out.push(`<line x1="${M}" y1="${y - 3.1}" x2="${W - M}" y2="${y - 3.1}" stroke="${C.line}" stroke-width="0.2"/>`); };
 
   block(c.sound.label, () => { c.sound.lines.forEach((l) => { out.push(text(textX, y, l, { size, font })); y += lh; }); });
-  y += 1.6; rule();
+  y += 1.4; rule();
   block(c.ptt.label, () => {
     c.ptt.rows.forEach(([name, lines]) => {
       out.push(text(textX, y, name, { size, weight: 700, fill: C.accent, font }));
       lines.forEach((l) => { out.push(text(subX, y, l, { size, font })); y += lh; });
     });
   });
-  y += 1.6; rule();
+  y += 1.4; rule();
   block(c.serial.label, () => { c.serial.lines.forEach((l) => { out.push(text(textX, y, l, { size, font })); y += lh; }); });
 
   out.push(text(M, H - M + 0.4, c.legal, { size: 5.6, fill: C.muted, font }));
