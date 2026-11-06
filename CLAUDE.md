@@ -58,4 +58,5 @@ All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex,
 A credit-card-size (ID-1, 85.60 × 53.98 mm) two-sided card shipped with products, one English and one Chinese. `node card/build.mjs` needs `qrencode` and `rsvg-convert`, and regenerates `card/dist/` (committed): `*-print-3mm-bleed.pdf` for print shops, `*-exact-size.pdf`, and rounded-corner PNG previews.
 
 - All card text is in `COPY` in `build.mjs`. It repeats facts from guide sections 1, 2.1, 2.3 and 4, so if those change, update both languages there too and rebuild. Text positions are fixed, so check the previews for overflow after editing copy.
+- The retailer ships AIOCs with **VPTT switched on**, so the card lists VPTT first and underlines it (the `{ u }` run in `COPY`), and its sound-card line warns that system sounds will transmit. If the shipping configuration changes, update the card.
 - The QR codes point to the live page with `#en` / `#zh`. Printed cards can't be updated, so keep those URLs working: renaming the repo, or turning Pages off, breaks every card already shipped.

@@ -19,7 +19,8 @@ const pt = (n) => n * 0.3528;
 const C = { lcd: '#1c2a35', amber: '#ffb26b', accent: '#c2410c', ink: '#15212c', muted: '#566573', line: '#d5dce3', white: '#ffffff', onLcd: '#e3eaf0', onLcdMuted: '#a9b7c3' };
 const MONO = 'Noto Sans Mono';
 
-// A line is a string, or an array of runs: a string, or { mono } for commands and device names.
+// A line is a string, or an array of runs: a string, { mono } for commands and device names,
+// or { u } for underlined text (used to mark VPTT, which the retailer ships switched on).
 const COPY = {
   en: {
     font: 'Noto Sans', lang: 'en',
@@ -29,13 +30,13 @@ const COPY = {
     scan: 'Scan for the full guide',
     scanSub: 'Software setup · PTT fixes',
     heading: 'One cable: sound card + PTT + serial',
-    sound: { label: ['Sound', 'card'], lines: ['Shows as “All-In-One-Cable”: mono, 48 kHz, RX + TX audio.', 'Select it in your radio app. Don’t make it the system default.'] },
+    sound: { label: ['Sound', 'card'], lines: ['Shows as “All-In-One-Cable”: mono, 48 kHz, RX + TX audio.', 'Select it in your app only, or system sounds will transmit.'] },
     ptt: {
       label: ['PTT'],
       rows: [
+        [[{ u: 'VPTT' }], [[{ u: 'On as shipped' }, ': TX audio keys the radio.'], 'No PTT setup needed. Change in AIOC Toolkit.']],
         ['CM108', ['HID GPIO3. On by default. Try this first.']],
         ['Serial', ['DTR=1 and RTS=0. On by default.']],
-        ['VPTT', ['Keys on TX audio, for apps with no PTT control.', 'Firmware 1.3.0 or newer. Enable in AIOC Toolkit.']],
       ],
     },
     serial: {
@@ -52,13 +53,13 @@ const COPY = {
     scan: '扫码查看完整指南',
     scanSub: '软件配置 · PTT 排障',
     heading: '一根线顶三样：声卡 + PTT + 串口',
-    sound: { label: ['声卡'], lines: ['显示为“All-In-One-Cable”：单声道，48 kHz，收发音频。', '在电台软件里选择它，不要设为系统默认设备。'] },
+    sound: { label: ['声卡'], lines: ['显示为“All-In-One-Cable”：单声道，48 kHz，收发音频。', '只在电台软件里选择它，否则系统提示音也会被发射。'] },
     ptt: {
       label: ['PTT'],
       rows: [
+        [[{ u: 'VPTT' }], [[{ u: '出厂已开启' }, '：有发射音频就自动发射。'], '无需设置 PTT，可在 AIOC Toolkit 中修改。']],
         ['CM108', ['HID GPIO3，默认开启，优先尝试。']],
         ['串口', ['DTR=1 且 RTS=0，默认开启。']],
-        ['VPTT', ['有发射音频时自动发射，适合没有 PTT 控制的软件。', '需固件 1.3.0 或更新，用 AIOC Toolkit 开启。']],
       ],
     },
     serial: {
@@ -73,7 +74,9 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
 
 function text(x, y, line, { size, fill = C.ink, weight = 400, anchor = 'start', font }) {
   const runs = (Array.isArray(line) ? line : [line]).map((r) =>
-    typeof r === 'string' ? `<tspan>${esc(r)}</tspan>` : `<tspan font-family="${MONO}" font-size="${pt(size - 0.3).toFixed(3)}">${esc(r.mono)}</tspan>`);
+    typeof r === 'string' ? `<tspan>${esc(r)}</tspan>`
+      : r.u !== undefined ? `<tspan text-decoration="underline">${esc(r.u)}</tspan>`
+      : `<tspan font-family="${MONO}" font-size="${pt(size - 0.3).toFixed(3)}">${esc(r.mono)}</tspan>`);
   return `<text xml:space="preserve" x="${x}" y="${y}" font-family="${font}" font-size="${pt(size).toFixed(3)}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}">${runs.join('')}</text>`;
 }
 
