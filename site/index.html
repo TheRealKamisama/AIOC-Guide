@@ -268,6 +268,7 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <li class="l3"><a href="#s5-16">5.16 iPhone / iPad (RadioMail, Packet Commander)</a></li>
 <li class="l3"><a href="#s5-17">5.17 Reticulum (RNS, NomadNet, Sideband, MeshChat) over packet</a></li>
 <li class="l3"><a href="#s5-18">5.18 Mobile / HF radios (wiring the AIOC to a data or mic port)</a></li>
+<li class="l3"><a href="#s5-19">5.19 Build your own: AI voice chatbot over the radio (developer example)</a></li>
 <li class="l2"><a href="#s6">6. PTT Troubleshooting Flow</a></li>
 <li class="l2"><a href="#s7">7. Configuring the AIOC Itself (AIOC Toolkit / aioc-util)</a></li>
 <li class="l3"><a href="#s7-1">7.1 Requirements</a></li>
@@ -316,6 +317,7 @@ footer { max-width: 1240px; margin: 0 auto; padding: 8px 24px 40px; color: var(-
 <li class="l3"><a href="#s5-16-zh">5.16 iPhone / iPad（RadioMail、Packet Commander）</a></li>
 <li class="l3"><a href="#s5-17-zh">5.17 通过分组运行 Reticulum（RNS、NomadNet、Sideband、MeshChat）</a></li>
 <li class="l3"><a href="#s5-18-zh">5.18 车台 / 短波电台（把 AIOC 接到数据口或话筒口）</a></li>
+<li class="l3"><a href="#s5-19-zh">5.19 自己开发：通过电台对话的 AI 语音聊天机器人（开发示例）</a></li>
 <li class="l2"><a href="#s6-zh">6. PTT 故障排查流程</a></li>
 <li class="l2"><a href="#s7-zh">7. 配置 AIOC 本身（AIOC Toolkit / aioc-util）</a></li>
 <li class="l3"><a href="#s7-1-zh">7.1 使用条件</a></li>
@@ -721,6 +723,14 @@ You can also run <code>sudo systemctl disable --now ModemManager</code> if you d
 <td>same</td>
 <td>—</td>
 <td>5.18</td>
+</tr>
+<tr>
+<td><strong>AI voice chatbot on the air / write your own radio software</strong></td>
+<td>Python + Whisper + LLM + TTS (DIY)</td>
+<td>same; or w6rgc-ai / openclaw-radio</td>
+<td>same (DIY)</td>
+<td>—</td>
+<td>5.19</td>
 </tr>
 <tr>
 <td><strong>Fox hunt beacon (no PC)</strong></td>
@@ -1277,6 +1287,156 @@ Follow your country&#39;s amateur rules: no encryption is a common licence condi
 <li>Icom CI-V (single-wire bus) does <strong>not</strong> work without extra circuitry (GitHub #109, unresolved).</li>
 <li>Prefer a ready-made interface for your rig if you aren&#39;t comfortable with soldering. Wrong wiring can damage the radio or the AIOC.</li>
 </ul>
+<h3 id="s5-19"><a class="anchor" href="#s5-19" aria-label="Link to this section">#</a>5.19 Build your own: AI voice chatbot over the radio (developer example)</h3>
+<p><span class="tag tag-community">Community</span> People are using the AIOC as the radio interface for an <strong>AI voice assistant</strong>. The station looks like this:</p>
+<div class="code"><pre><code class="language-text"> Handheld user                     Bot station
+ ┌─────────┐   RF (simplex)   ┌─────────┐  K1  ┌──────┐  USB  ┌────────────────────────────────┐
+ │  HT  B  │ ───────────────▶ │  HT  A  │ ───▶ │ AIOC │ ────▶ │ PC / Pi: speech-to-text → LLM  │
+ │ (talks) │ ◀─────────────── │         │ ◀─── │      │ ◀──── │         → text-to-speech → PTT │
+ └─────────┘                  └─────────┘      └──────┘       └────────────────────────────────┘
+</code></pre></div>
+<p>The user presses PTT on handheld B and asks a question. Radio A receives it, and the computer turns the audio into text and sends it to a language model. It then turns the answer into speech and transmits it back through the AIOC.
+Use this section as a <strong>worked example of writing your own software with the AIOC as the interface</strong>. The same building blocks work for voice announcers, DTMF-controlled bots, transcription loggers and so on.</p>
+<p><strong>What the AIOC gives a program</strong> <span class="tag tag-official">Official</span> (see Sections 1 and 4):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Need</th>
+<th>AIOC interface</th>
+<th>How a program uses it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hear the radio</td>
+<td>USB sound card <strong>input</strong> (mono; 48 kHz preferred, also 32k/24k/22.05k/16k/12k/11.025k/8k)</td>
+<td>Any audio library (PortAudio/<code>sounddevice</code>, ALSA, WASAPI, Core Audio)</td>
+</tr>
+<tr>
+<td>Talk on the radio</td>
+<td>USB sound card <strong>output</strong></td>
+<td>Play the speech audio</td>
+</tr>
+<tr>
+<td>Key the transmitter</td>
+<td>CM108 HID <strong>GPIO3</strong>, or serial <strong>DTR=1 AND RTS=0</strong>, or <strong>VPTT</strong> (the AIOC keys by itself when audio plays)</td>
+<td>HID write, <code>pyserial</code>, or nothing at all with VPTT</td>
+</tr>
+<tr>
+<td>Know when someone is talking</td>
+<td><strong>VCOS</strong> (virtual carrier detect on the RX audio), or hardware COS on rev 1.2, both reported as CM108 <strong>Volume-Down</strong></td>
+<td>Read HID input reports, or measure the RX audio level in software</td>
+</tr>
+</tbody></table></div>
+<p><strong>Typical software stack</strong> <span class="tag tag-community">Community</span> (from the projects below; any equivalent works):</p>
+<ul>
+<li>Speech-to-text: <strong>Whisper</strong> / <strong>faster-whisper</strong> (runs locally; handles English, Chinese and many other languages).</li>
+<li>Language model: local (<strong>Ollama</strong> with a small model) or a cloud API (ChatGPT, Gemini, Claude…). Local means no internet and no API cost, but a GPU helps.</li>
+<li>Text-to-speech: <strong>Piper</strong> (local, fast, voices for many languages including <code>zh_CN</code>), or a cloud TTS.</li>
+<li>Optional: a wake word or a callsign prefix, so the bot only answers when it is addressed.</li>
+</ul>
+<p><strong>How the program works</strong> <span class="tag tag-typical">Typical</span>:</p>
+<ol>
+<li><strong>Wait for a transmission.</strong> Use VCOS/COS, or a software level threshold on the RX audio. The radio&#39;s <strong>squelch must be closed</strong> when the channel is idle (Section 2.4). A CTCSS/DCS tone on radio A stops other traffic from triggering the bot.</li>
+<li><strong>Record until the other station stops</strong> (about 1 s of silence after the carrier drops), then run speech-to-text.</li>
+<li><strong>Ask the model.</strong> Use a system prompt that asks for short, plain spoken answers (no lists or markdown), and limit the length so a reply fits within the radio&#39;s time-out timer.</li>
+<li><strong>Make speech and transmit:</strong> key PTT, wait about 200–300 ms for the radio to start transmitting, play the audio, wait about 200 ms, then unkey.<ul>
+<li>With <strong>VPTT</strong>, the AIOC keys when the audio starts, so the first word is easily cut off. Put a short lead-in tone (about 300 ms) in front of the speech.</li>
+<li>Raise the VPTT tail time (for example 500 ms = <code>--vptt-timctrl 8000</code>; timing is ms × 16) so pauses between sentences don&#39;t drop the carrier.</li>
+</ul>
+</li>
+<li><strong>Identify:</strong> have the bot speak your callsign as your licence requires (for example at the end of a reply and at least every 10 minutes).</li>
+</ol>
+<p><strong>Minimal Python example</strong> <span class="tag tag-typical">Typical — illustrative, not a tested product</span> (Linux; Windows and macOS work with a different port name):</p>
+<div class="code"><pre><code class="language-python"># aioc_ai_bot.py — radio &lt;-&gt; AI voice bot through an AIOC
+# pip install sounddevice numpy pyserial requests faster-whisper
+# Also needs: Ollama running locally (ollama pull llama3.2), and the Piper TTS binary + a voice .onnx file
+import subprocess, time, wave
+import numpy as np, requests, serial, sounddevice as sd
+from faster_whisper import WhisperModel
+
+DEV = &#39;All-In-One-Cable&#39;      # AIOC sound card (python -m sounddevice lists device names)
+PTT_PORT = &#39;/dev/ttyACM0&#39;     # or /dev/aioc (udev rule, 2.5), &#39;COM5&#39; on Windows; set to None if using VPTT
+VOICE = &#39;en_US-lessac-medium.onnx&#39;
+CALLSIGN = &#39;N0CALL&#39;
+SYSTEM = (&#39;You are a helpful assistant on an amateur radio voice channel. Answer in at most three short &#39;
+          &#39;spoken sentences. No lists, symbols or markdown. Never discuss business or play music.&#39;)
+
+stt = WhisperModel(&#39;small&#39;, device=&#39;cpu&#39;, compute_type=&#39;int8&#39;)
+ptt = None
+if PTT_PORT:
+    ptt = serial.Serial()
+    ptt.port, ptt.dtr, ptt.rts = PTT_PORT, False, False   # set before open() so the radio isn&#39;t keyed on open
+    ptt.open()
+
+def wait_for_over(rate=16000, threshold=0.02, hang_s=1.0):
+    &quot;&quot;&quot;Software squelch: record one transmission from the radio and return it as float32 audio.&quot;&quot;&quot;
+    blk, chunks, quiet, started = int(rate * 0.05), [], 0, False
+    with sd.InputStream(device=DEV, samplerate=rate, channels=1, dtype=&#39;float32&#39;) as s:
+        while True:
+            x, _ = s.read(blk)
+            loud = float(np.sqrt(np.mean(x ** 2))) &gt; threshold
+            started, quiet = started or loud, 0 if loud else quiet + 1
+            if started:
+                chunks.append(x[:, 0])
+                if quiet * 0.05 &gt; hang_s:
+                    return np.concatenate(chunks)
+
+def ask(history):
+    r = requests.post(&#39;http://localhost:11434/api/chat&#39;, timeout=120, json={
+        &#39;model&#39;: &#39;llama3.2&#39;, &#39;messages&#39;: history, &#39;stream&#39;: False, &#39;options&#39;: {&#39;num_predict&#39;: 120}})
+    return r.json()[&#39;message&#39;][&#39;content&#39;]
+
+def speak(text):
+    subprocess.run([&#39;piper&#39;, &#39;--model&#39;, VOICE, &#39;--output_file&#39;, &#39;reply.wav&#39;], input=text.encode(), check=True)
+    with wave.open(&#39;reply.wav&#39;) as w:
+        rate, pcm = w.getframerate(), w.readframes(w.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768 * 0.8, rate
+
+def transmit(audio, rate):
+    if ptt:                                   # serial PTT: DTR=1 AND RTS=0 (needs SERIALDTRNRTS in the PTT1 source)
+        ptt.dtr = True; time.sleep(0.3)
+    else:                                     # VPTT: a 300 ms lead-in tone keys the AIOC before the first word
+        t = np.arange(int(rate * 0.3)) / rate
+        audio = np.concatenate([0.3 * np.sin(2 * np.pi * 1000 * t).astype(np.float32), audio])
+    sd.play(audio, rate, device=DEV); sd.wait()
+    time.sleep(0.2)
+    if ptt: ptt.dtr = False
+
+history = [{&#39;role&#39;: &#39;system&#39;, &#39;content&#39;: SYSTEM}]
+while True:
+    heard = wait_for_over()
+    if len(heard) &lt; 16000 * 0.7:              # ignore squelch tails and short noise bursts
+        continue
+    question = &#39; &#39;.join(seg.text for seg in stt.transcribe(heard)[0]).strip()
+    if not question:
+        continue
+    print(&#39;RX:&#39;, question)
+    history.append({&#39;role&#39;: &#39;user&#39;, &#39;content&#39;: question})
+    answer = ask(history)
+    history = history[:1] + history[-9:] + [{&#39;role&#39;: &#39;assistant&#39;, &#39;content&#39;: answer}]
+    print(&#39;TX:&#39;, answer)
+    transmit(*speak(f&#39;{answer} This is {CALLSIGN}.&#39;))
+</code></pre></div>
+<p>Notes on the example:</p>
+<ul>
+<li>It records at 16 kHz (the rate Whisper uses) and plays Piper&#39;s 22.05 kHz output directly. Both are native AIOC rates. <span class="tag tag-official">Official</span></li>
+<li>If you use serial PTT, the AIOC&#39;s PTT1 source must include <code>SERIALDTRNRTS</code> (the firmware default). If PTT1 is set to <code>VPTT</code> only, set <code>PTT_PORT = None</code>, and the lead-in tone does the keying (Section 7 to check or change the PTT source).</li>
+<li>Swap the software squelch for VCOS or hardware COS (CM108 Volume-Down in the HID input report) once it works. That is more reliable on a noisy channel. Print the raw <code>/dev/hidrawN</code> reports to find the bit before you rely on it. <span class="tag tag-typical">Typical</span></li>
+<li>Make sure nothing else on the computer plays sound through the AIOC (Section 2.3), especially with VPTT.</li>
+</ul>
+<p><strong>Existing projects to study</strong> <span class="tag tag-community">Community</span>:</p>
+<ul>
+<li><strong>w6rgc-ai</strong> by W6RGC (<a href="https://github.com/richcannings/w6rgc-ai">https://github.com/richcannings/w6rgc-ai</a>, Apache 2.0). This is a voice-to-LLM bridge with <strong>built-in AIOC support</strong>: set <code>DEFAULT_RIL_TYPE = &quot;aioc&quot;</code> in <code>constants.py</code>. It uses serial PTT on <code>/dev/ttyACM0</code>, a wake word, Whisper speech-to-text, local Piper/Coqui voices, and Ollama (offline) or Gemini/ChatGPT. Linux only; an NVIDIA GPU (e.g. RTX 3060 12 GB) is recommended. Its README now marks it deprecated and points to a successor, an OpenClaw radio channel plugin.</li>
+<li><strong>openclaw-radio</strong> (OpenClaw plugin, Apache 2.0, first on-air QSO reported 2026-03-30). Its AIOC example uses <code>plughw:CARD=AllInOneCable</code> for audio and serial <strong>DTR</strong> PTT on <code>/dev/ttyACM0</code>. It notes that CM108 HID PTT needs AIOC firmware ≥ 1.2.0, while serial DTR PTT works on all versions.</li>
+<li>Search GitHub for &quot;ham radio LLM&quot; or &quot;radio chatbot&quot; for more. The same AIOC setup applies to any of them.</li>
+</ul>
+<p><strong>Rules and good practice</strong> <span class="tag tag-typical">Typical</span> (check your own licence conditions):</p>
+<ul>
+<li>You, the licensee, are responsible for everything the bot transmits. Filter what it says, keep a log (the example prints RX/TX text), and stay where you can shut it down.</li>
+<li>Many licences require a control operator, or allow automatic or unattended operation only on certain bands or with a permit. Check this before leaving a bot running.</li>
+<li>Identify with your callsign. No music, no business or advertising, and no encryption. Keep replies short on shared channels, and pick a simplex frequency that is not a calling channel or a repeater input.</li>
+<li>Handhelds get hot on long transmissions: use low power, and set the radio&#39;s time-out timer as a safety net.</li>
+</ul>
 </section>
 <section class="doc-section"><h2 id="s6"><a class="anchor" href="#s6" aria-label="Link to this section">#</a>6. PTT Troubleshooting Flow</h2>
 <div class="code"><pre><code>Radio does not transmit when the software &quot;keys&quot;?
@@ -1731,6 +1891,8 @@ Yes. Direwolf, AllStarLink 3, SvxLink, Pat, QtSoundModem and LinBPQ all run on R
 Partly. iOS sees the AIOC only as a sound card. <strong>RadioMail</strong> (Winlink) and <strong>Packet Commander</strong> have shown it working with AIOC fw 1.4.1 and <strong>Virtual PTT</strong> turned on (Section 5.16). CHIRP programming and serial or CM108 PTT are not possible on iOS.</p>
 <p><strong>Q: Can I use voice (talk through the computer)?</strong>
 Yes. Choose the AIOC as microphone/speaker in a VoIP or linking app (AllStarLink, SvxLink, EchoLink, Mumble bridges). Voice PTT needs CM108/serial control or VPTT.</p>
+<p><strong>Q: Can I put an AI chatbot (or my own program) on the radio?</strong>
+Yes. To a program, the AIOC is a sound card plus a PTT line. Record from it, run speech-to-text, a language model and text-to-speech, then key PTT (serial DTR, CM108 GPIO3, or VPTT) and play the reply. Section 5.19 has the station layout, a Python example and existing projects. The licensee is responsible for what the bot transmits.</p>
 <p><strong>Q: My radio has two PTTs (dual-band HT)?</strong>
 PTT1 is the CM108 GPIO3/serial default and PTT2 is CM108 GPIO4. Use <code>--swap-ptt</code> or <code>--ptt2</code> to change them.</p>
 <p><strong>Q: Is 9600 baud packet supported?</strong>
@@ -1752,6 +1914,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 <li>AIOC GitHub issues (search before asking): <a href="https://github.com/skuep/AIOC/issues">https://github.com/skuep/AIOC/issues</a></li>
 <li>Videos: Ham Radio Dude (<a href="https://www.youtube.com/watch?v=xRCmXQYRLE0">https://www.youtube.com/watch?v=xRCmXQYRLE0</a>), Temporarily Offline (<a href="https://www.youtube.com/watch?v=RZjoPNe634o">https://www.youtube.com/watch?v=RZjoPNe634o</a>), AllStar node builds (<a href="https://youtu.be/7LB6D2FLGZk">https://youtu.be/7LB6D2FLGZk</a>, <a href="https://youtu.be/k0iP4dECx6A">https://youtu.be/k0iP4dECx6A</a>)</li>
 <li>German 4-part AIOC article (DL-Nordwest): linked from the AIOC README</li>
+<li>AI voice bot example with AIOC support (W6RGC): <a href="https://github.com/richcannings/w6rgc-ai">https://github.com/richcannings/w6rgc-ai</a> · Whisper: <a href="https://github.com/openai/whisper">https://github.com/openai/whisper</a> · faster-whisper: <a href="https://github.com/SYSTRAN/faster-whisper">https://github.com/SYSTRAN/faster-whisper</a> · Piper TTS: <a href="https://github.com/rhasspy/piper">https://github.com/rhasspy/piper</a> · Ollama: <a href="https://ollama.com">https://ollama.com</a></li>
 <li>Direwolf: <a href="https://github.com/wb2osz/direwolf">https://github.com/wb2osz/direwolf</a></li>
 <li>CHIRP: <a href="https://chirpmyradio.com">https://chirpmyradio.com</a></li>
 <li>AllStarLink: <a href="https://www.allstarlink.org">https://www.allstarlink.org</a></li>
@@ -2122,6 +2285,14 @@ aioc-util 项目也自带现成的 udev 规则（<code>udev/rules.d/91-aioc.rule
 <td>同左</td>
 <td>—</td>
 <td>5.18</td>
+</tr>
+<tr>
+<td><strong>在电台上运行 AI 语音聊天机器人 / 自己开发电台软件</strong></td>
+<td>Python + Whisper + LLM + TTS（自己开发）</td>
+<td>同左；或 w6rgc-ai / openclaw-radio</td>
+<td>同左（自己开发）</td>
+<td>—</td>
+<td>5.19</td>
 </tr>
 <tr>
 <td><strong>猎狐信标（无需电脑）</strong></td>
@@ -2661,6 +2832,156 @@ PTT CM108                         # 或：PTT /dev/ttyACM0 DTR -RTS   （不要�
 <li>艾可慕 Icom 的 CI-V（单线总线）不加额外电路 <strong>无法</strong> 工作（GitHub #109，尚未解决）。</li>
 <li>如果不熟悉焊接，建议买现成的专用接口。接错线可能损坏电台或 AIOC。</li>
 </ul>
+<h3 id="s5-19-zh"><a class="anchor" href="#s5-19-zh" aria-label="本节链接">#</a>5.19 自己开发：通过电台对话的 AI 语音聊天机器人（开发示例）</h3>
+<p><span class="tag tag-community">社区</span> 已经有人把 AIOC 用作 <strong>AI 语音助手</strong> 的电台接口。电台布置如下：</p>
+<div class="code"><pre><code class="language-text"> 手台用户                          机器人电台
+ ┌─────────┐   射频（同频）   ┌─────────┐  K1  ┌──────┐  USB  ┌────────────────────────────────┐
+ │ 手台 B  │ ───────────────▶ │ 手台 A  │ ───▶ │ AIOC │ ────▶ │ 电脑/树莓派：语音转文字 → LLM  │
+ │ （说话）│ ◀─────────────── │         │ ◀─── │      │ ◀──── │         → 文字转语音 → PTT     │
+ └─────────┘                  └─────────┘      └──────┘       └────────────────────────────────┘
+</code></pre></div>
+<p>用户按下手台 B 的 PTT 提问。电台 A 收到后，电脑把音频转成文字交给大语言模型，再把回答转成语音，通过 AIOC 发射回去。
+可以把本节当作 <strong>以 AIOC 为接口开发自己软件的完整示例</strong>。同样的组件也可用于语音播报、DTMF 控制的机器人、通联转写记录等。</p>
+<p><strong>AIOC 能为程序提供什么</strong> <span class="tag tag-official">官方</span> （见第 1 节和第 4 节）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>需求</th>
+<th>AIOC 接口</th>
+<th>程序如何使用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>听电台</td>
+<td>USB 声卡 <strong>输入</strong> （单声道；首选 48 kHz，也支持 32k/24k/22.05k/16k/12k/11.025k/8k）</td>
+<td>任意音频库（PortAudio/<code>sounddevice</code>、ALSA、WASAPI、Core Audio）</td>
+</tr>
+<tr>
+<td>在电台上说话</td>
+<td>USB 声卡 <strong>输出</strong></td>
+<td>播放语音音频</td>
+</tr>
+<tr>
+<td>控制发射</td>
+<td>CM108 HID <strong>GPIO3</strong> ，或串口 <strong>DTR=1 且 RTS=0</strong> ，或 <strong>VPTT</strong> （有音频播放时 AIOC 自动发射）</td>
+<td>写 HID、用 <code>pyserial</code>，用 VPTT 则什么都不用做</td>
+</tr>
+<tr>
+<td>知道有人在说话</td>
+<td><strong>VCOS</strong> （基于接收音频的虚拟载波检测），或 rev 1.2 的硬件 COS，二者都以 CM108 <strong>音量减（Volume-Down）</strong> 按键上报</td>
+<td>读取 HID 输入报告，或在软件里测量接收音频电平</td>
+</tr>
+</tbody></table></div>
+<p><strong>常见软件组合</strong> <span class="tag tag-community">社区</span> （来自下面的项目，用其他同类软件也可以）：</p>
+<ul>
+<li>语音转文字： <strong>Whisper</strong> / <strong>faster-whisper</strong> （本地运行，支持中文、英文等多种语言）。</li>
+<li>语言模型：本地（ <strong>Ollama</strong> 加一个小模型）或云端 API（ChatGPT、Gemini、Claude 等）。本地运行不需要联网、没有 API 费用，但最好有显卡。</li>
+<li>文字转语音： <strong>Piper</strong> （本地、速度快，有包括 <code>zh_CN</code> 在内的多种语言音色），或云端 TTS。</li>
+<li>可选：唤醒词或呼号前缀，让机器人只在被呼叫时回答。</li>
+</ul>
+<p><strong>程序的工作流程</strong> <span class="tag tag-typical">常规</span> ：</p>
+<ol>
+<li><strong>等待对方发射。</strong> 用 VCOS/COS，或在软件里对接收音频设电平门限。信道空闲时电台的 <strong>静噪必须关闭</strong> （第 2.4 节）。在电台 A 上设置 CTCSS/DCS 亚音，可以避免其他信号触发机器人。</li>
+<li><strong>录音直到对方停止</strong> （载波消失后约 1 秒静音），然后做语音转文字。</li>
+<li><strong>询问模型。</strong> 系统提示词要求简短、口语化的回答（不要列表或 markdown），并限制长度，让一次回答不超过电台的发射限时（TOT）。</li>
+<li><strong>生成语音并发射：</strong> 按下 PTT，等约 200–300 毫秒让电台开始发射，播放音频，再等约 200 毫秒后松开。<ul>
+<li>用 <strong>VPTT</strong> 时，AIOC 在音频开始时才发射，第一个字容易被切掉。在语音前加一段约 300 毫秒的引导音。</li>
+<li>调大 VPTT 拖尾时间（例如 500 毫秒 = <code>--vptt-timctrl 8000</code>；时间单位为毫秒 × 16），避免句子之间的停顿导致断开发射。</li>
+</ul>
+</li>
+<li><strong>报呼号：</strong> 按执照要求让机器人报出你的呼号（例如每次回答结束时，且至少每 10 分钟一次）。</li>
+</ol>
+<p><strong>最简 Python 示例</strong> <span class="tag tag-typical">常规 — 仅作示意，未经测试</span> （Linux；Windows 和 macOS 改端口名即可）：</p>
+<div class="code"><pre><code class="language-python"># aioc_ai_bot.py — 通过 AIOC 实现 电台 &lt;-&gt; AI 语音机器人
+# pip install sounddevice numpy pyserial requests faster-whisper
+# 另需：本地运行的 Ollama（ollama pull qwen2.5），以及 Piper TTS 程序和一个音色 .onnx 文件
+import subprocess, time, wave
+import numpy as np, requests, serial, sounddevice as sd
+from faster_whisper import WhisperModel
+
+DEV = &#39;All-In-One-Cable&#39;      # AIOC 声卡（python -m sounddevice 可列出设备名）
+PTT_PORT = &#39;/dev/ttyACM0&#39;     # 或 /dev/aioc（udev 规则，2.5 节），Windows 上为 &#39;COM5&#39;；用 VPTT 时设为 None
+VOICE = &#39;zh_CN-huayan-medium.onnx&#39;
+CALLSIGN = &#39;BA0XXX&#39;           # 换成你的呼号
+SYSTEM = (&#39;你是业余无线电语音信道上的助手。用最多三句简短的口语回答，&#39;
+          &#39;不要列表、符号或 markdown。不谈商业内容，不播放音乐。&#39;)
+
+stt = WhisperModel(&#39;small&#39;, device=&#39;cpu&#39;, compute_type=&#39;int8&#39;)
+ptt = None
+if PTT_PORT:
+    ptt = serial.Serial()
+    ptt.port, ptt.dtr, ptt.rts = PTT_PORT, False, False   # 在 open() 之前设置，打开串口时不会触发发射
+    ptt.open()
+
+def wait_for_over(rate=16000, threshold=0.02, hang_s=1.0):
+    &quot;&quot;&quot;软件静噪：录下电台的一次发射，返回 float32 音频。&quot;&quot;&quot;
+    blk, chunks, quiet, started = int(rate * 0.05), [], 0, False
+    with sd.InputStream(device=DEV, samplerate=rate, channels=1, dtype=&#39;float32&#39;) as s:
+        while True:
+            x, _ = s.read(blk)
+            loud = float(np.sqrt(np.mean(x ** 2))) &gt; threshold
+            started, quiet = started or loud, 0 if loud else quiet + 1
+            if started:
+                chunks.append(x[:, 0])
+                if quiet * 0.05 &gt; hang_s:
+                    return np.concatenate(chunks)
+
+def ask(history):
+    r = requests.post(&#39;http://localhost:11434/api/chat&#39;, timeout=120, json={
+        &#39;model&#39;: &#39;qwen2.5&#39;, &#39;messages&#39;: history, &#39;stream&#39;: False, &#39;options&#39;: {&#39;num_predict&#39;: 120}})
+    return r.json()[&#39;message&#39;][&#39;content&#39;]
+
+def speak(text):
+    subprocess.run([&#39;piper&#39;, &#39;--model&#39;, VOICE, &#39;--output_file&#39;, &#39;reply.wav&#39;], input=text.encode(), check=True)
+    with wave.open(&#39;reply.wav&#39;) as w:
+        rate, pcm = w.getframerate(), w.readframes(w.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768 * 0.8, rate
+
+def transmit(audio, rate):
+    if ptt:                                   # 串口 PTT：DTR=1 且 RTS=0（PTT1 源需包含 SERIALDTRNRTS）
+        ptt.dtr = True; time.sleep(0.3)
+    else:                                     # VPTT：先放 300 毫秒引导音，让 AIOC 在第一个字之前开始发射
+        t = np.arange(int(rate * 0.3)) / rate
+        audio = np.concatenate([0.3 * np.sin(2 * np.pi * 1000 * t).astype(np.float32), audio])
+    sd.play(audio, rate, device=DEV); sd.wait()
+    time.sleep(0.2)
+    if ptt: ptt.dtr = False
+
+history = [{&#39;role&#39;: &#39;system&#39;, &#39;content&#39;: SYSTEM}]
+while True:
+    heard = wait_for_over()
+    if len(heard) &lt; 16000 * 0.7:              # 忽略静噪尾音和短促的噪声
+        continue
+    question = &#39; &#39;.join(seg.text for seg in stt.transcribe(heard)[0]).strip()
+    if not question:
+        continue
+    print(&#39;RX:&#39;, question)
+    history.append({&#39;role&#39;: &#39;user&#39;, &#39;content&#39;: question})
+    answer = ask(history)
+    history = history[:1] + history[-9:] + [{&#39;role&#39;: &#39;assistant&#39;, &#39;content&#39;: answer}]
+    print(&#39;TX:&#39;, answer)
+    transmit(*speak(f&#39;{answer} 这里是 {CALLSIGN}。&#39;))
+</code></pre></div>
+<p>关于这个示例：</p>
+<ul>
+<li>它以 16 kHz（Whisper 使用的采样率）录音，并直接播放 Piper 输出的 22.05 kHz 音频。这两个都是 AIOC 原生支持的采样率。 <span class="tag tag-official">官方</span></li>
+<li>使用串口 PTT 时，AIOC 的 PTT1 源必须包含 <code>SERIALDTRNRTS</code> （固件默认值）。如果 PTT1 只设成了 <code>VPTT</code> ，就把 <code>PTT_PORT</code> 设为 <code>None</code> ，由引导音触发发射（查看或修改 PTT 源见第 7 节）。</li>
+<li>跑通之后，建议把软件静噪换成 VCOS 或硬件 COS（HID 输入报告中的 CM108 音量减），在噪声大的信道上更可靠。先打印 <code>/dev/hidrawN</code> 的原始报告找到对应的位，再依赖它。 <span class="tag tag-typical">常规</span></li>
+<li>确保电脑上没有其他程序通过 AIOC 发声（第 2.3 节），用 VPTT 时尤其要注意。</li>
+</ul>
+<p><strong>可参考的现有项目</strong> <span class="tag tag-community">社区</span> ：</p>
+<ul>
+<li>W6RGC 的 <strong>w6rgc-ai</strong> （<a href="https://github.com/richcannings/w6rgc-ai">https://github.com/richcannings/w6rgc-ai</a> ，Apache 2.0）。这是一个语音到 LLM 的桥接程序， <strong>内置 AIOC 支持</strong> ：在 <code>constants.py</code> 中设置 <code>DEFAULT_RIL_TYPE = &quot;aioc&quot;</code> 。它用 <code>/dev/ttyACM0</code> 串口 PTT、唤醒词、Whisper 语音识别、本地 Piper/Coqui 音色，以及 Ollama（离线）或 Gemini/ChatGPT。仅支持 Linux，建议 NVIDIA 显卡（如 RTX 3060 12 GB）。其 README 现已标注为弃用，并指向后继项目：一个 OpenClaw 电台频道插件。</li>
+<li><strong>openclaw-radio</strong> （OpenClaw 插件，Apache 2.0，报告于 2026-03-30 完成首次空中通联）。它的 AIOC 示例音频用 <code>plughw:CARD=AllInOneCable</code> ，PTT 用 <code>/dev/ttyACM0</code> 上的串口 <strong>DTR</strong> 。它指出 CM108 HID PTT 需要 AIOC 固件 ≥ 1.2.0，串口 DTR PTT 在所有版本上都能用。</li>
+<li>在 GitHub 上搜索“ham radio LLM”或“radio chatbot”可以找到更多项目，AIOC 的设置方法对它们都适用。</li>
+</ul>
+<p><strong>规定与良好习惯</strong> <span class="tag tag-typical">常规</span> （请核对你自己的执照条件）：</p>
+<ul>
+<li>你作为执照持有人，要对机器人发射的所有内容负责。过滤它说的话，保留记录（示例会打印 RX/TX 文本），并保证随时能关掉它。</li>
+<li>许多地区要求有操作员在场控制，或只允许在特定频段、经许可后进行自动或无人值守操作。让机器人长期运行前先确认当地规定。</li>
+<li>报呼号。不播放音乐，不做商业或广告内容，不加密。在共用信道上保持回答简短，选择一个不是呼叫频率、也不是中继上行频率的同频频点。</li>
+<li>长时间发射会让手台发热：用低功率，并设置电台的发射限时（TOT）作为保护。</li>
+</ul>
 </section>
 <section class="doc-section"><h2 id="s6-zh"><a class="anchor" href="#s6-zh" aria-label="本节链接">#</a>6. PTT 故障排查流程</h2>
 <div class="code"><pre><code>软件已经“按下发射”，但电台没有发射？
@@ -3112,6 +3433,8 @@ pip install hid
 部分可以。iOS 只把 AIOC 识别为声卡。<strong>RadioMail</strong>（Winlink）和 <strong>Packet Commander</strong> 已在 AIOC 固件 1.4.1 + 开启 <strong>虚拟 PTT</strong> 的情况下验证可用（5.16 节）。在 iOS 上无法用 CHIRP 写频，也无法使用串口或 CM108 PTT。</p>
 <p><strong>问：能用电脑通话（语音）吗？</strong>
 能。在 VoIP 或联网应用（AllStarLink、SvxLink、EchoLink、Mumble 桥接）里把 AIOC 选为麦克风/扬声器即可。语音 PTT 需要 CM108/串口控制或 VPTT。</p>
+<p><strong>问：能把 AI 聊天机器人（或我自己的程序）接到电台上吗？</strong>
+可以。对程序来说，AIOC 就是一块声卡加一路 PTT。从它录音，依次做语音转文字、大语言模型和文字转语音，然后控制 PTT（串口 DTR、CM108 GPIO3 或 VPTT）并播放回答。第 5.19 节有电台布置、Python 示例和现有项目。执照持有人要对机器人发射的内容负责。</p>
 <p><strong>问：我的电台有两个 PTT（双段手台）？</strong>
 PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 <code>--swap-ptt</code> 或 <code>--ptt2</code> 修改。</p>
 <p><strong>问：支持 9600 波特分组吗？</strong>
@@ -3133,6 +3456,7 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 <code>--swap-ptt<
 <li>AIOC GitHub issues（提问前先搜索）：<a href="https://github.com/skuep/AIOC/issues">https://github.com/skuep/AIOC/issues</a></li>
 <li>视频：Ham Radio Dude（<a href="https://www.youtube.com/watch?v=xRCmXQYRLE0%EF%BC%89%E3%80%81Temporarily">https://www.youtube.com/watch?v=xRCmXQYRLE0）、Temporarily</a> Offline（<a href="https://www.youtube.com/watch?v=RZjoPNe634o%EF%BC%89%E3%80%81AllStar">https://www.youtube.com/watch?v=RZjoPNe634o）、AllStar</a> 节点搭建（<a href="https://youtu.be/7LB6D2FLGZk">https://youtu.be/7LB6D2FLGZk</a> 、<a href="https://youtu.be/k0iP4dECx6A%EF%BC%89">https://youtu.be/k0iP4dECx6A）</a></li>
 <li>DL-Nordwest 四篇 AIOC 文章（德语）：见 AIOC README 中的链接</li>
+<li>支持 AIOC 的 AI 语音机器人示例（W6RGC）：<a href="https://github.com/richcannings/w6rgc-ai">https://github.com/richcannings/w6rgc-ai</a> · Whisper：<a href="https://github.com/openai/whisper">https://github.com/openai/whisper</a> · faster-whisper：<a href="https://github.com/SYSTRAN/faster-whisper">https://github.com/SYSTRAN/faster-whisper</a> · Piper TTS：<a href="https://github.com/rhasspy/piper">https://github.com/rhasspy/piper</a> · Ollama：<a href="https://ollama.com">https://ollama.com</a></li>
 <li>Direwolf：<a href="https://github.com/wb2osz/direwolf">https://github.com/wb2osz/direwolf</a></li>
 <li>CHIRP：<a href="https://chirpmyradio.com">https://chirpmyradio.com</a></li>
 <li>AllStarLink：<a href="https://www.allstarlink.org">https://www.allstarlink.org</a></li>
@@ -3158,7 +3482,7 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 <code>--swap-ptt<
 > this document should be able to answer: *"I have an AIOC and radio X. I want to
 > do Y on computer Z. What software do I install and how do I set it up?"*
 >
-> **Document version:** 2026-10-31 (rev 3: community research, AIOC Toolkit) · Written for AIOC firmware **v1.4.1**
+> **Document version:** 2026-11-09 (rev 4: AI voice chatbot / developer example) · Written for AIOC firmware **v1.4.1**
 > (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
 
 ---
@@ -3344,6 +3668,7 @@ The aioc-util project also ships a ready-made udev rule (`udev/rules.d/91-aioc.r
 | **Mesh / off-grid networking over packet** | Reticulum via Direwolf KISS | Reticulum (RNS, NomadNet, Sideband) via Direwolf KISS | Reticulum | Sideband | 5.17 |
 | **AllStar-style linking on GMRS** | — | GMRSLive (AllStar-based) | — | — | 5.12 |
 | **Wire to a mobile/HF rig (audio + PTT + CAT)** | WSJT-X/fldigi + CAT | same | same | — | 5.18 |
+| **AI voice chatbot on the air / write your own radio software** | Python + Whisper + LLM + TTS (DIY) | same; or w6rgc-ai / openclaw-radio | same (DIY) | — | 5.19 |
 | **Fox hunt beacon (no PC)** | AIOC Toolkit or aioc-util (to set it up) | same | same | — | 7.4 |
 | **Change AIOC settings (PTT source, VPTT/VCOS, gain)** | **AIOC Toolkit** (Chrome/Edge) | AIOC Toolkit or aioc-util | AIOC Toolkit or aioc-util | — | 7 |
 | **Update AIOC firmware** | **AIOC Toolkit** (Flash Firmware tab) | dfu-util or AIOC Toolkit | dfu-util or AIOC Toolkit | — | 9 |
@@ -3750,6 +4075,132 @@ Follow your country's amateur rules: no encryption is a common licence condition
 - Icom CI-V (single-wire bus) does **not** work without extra circuitry (GitHub #109, unresolved).
 - Prefer a ready-made interface for your rig if you aren't comfortable with soldering. Wrong wiring can damage the radio or the AIOC.
 
+### 5.19 Build your own: AI voice chatbot over the radio (developer example)
+**[Community]** People are using the AIOC as the radio interface for an **AI voice assistant**. The station looks like this:
+
+```text
+ Handheld user                     Bot station
+ ┌─────────┐   RF (simplex)   ┌─────────┐  K1  ┌──────┐  USB  ┌────────────────────────────────┐
+ │  HT  B  │ ───────────────▶ │  HT  A  │ ───▶ │ AIOC │ ────▶ │ PC / Pi: speech-to-text → LLM  │
+ │ (talks) │ ◀─────────────── │         │ ◀─── │      │ ◀──── │         → text-to-speech → PTT │
+ └─────────┘                  └─────────┘      └──────┘       └────────────────────────────────┘
+```
+The user presses PTT on handheld B and asks a question. Radio A receives it, and the computer turns the audio into text and sends it to a language model. It then turns the answer into speech and transmits it back through the AIOC.
+Use this section as a **worked example of writing your own software with the AIOC as the interface**. The same building blocks work for voice announcers, DTMF-controlled bots, transcription loggers and so on.
+
+**What the AIOC gives a program** **[Official]** (see Sections 1 and 4):
+
+| Need | AIOC interface | How a program uses it |
+|---|---|---|
+| Hear the radio | USB sound card **input** (mono; 48 kHz preferred, also 32k/24k/22.05k/16k/12k/11.025k/8k) | Any audio library (PortAudio/`sounddevice`, ALSA, WASAPI, Core Audio) |
+| Talk on the radio | USB sound card **output** | Play the speech audio |
+| Key the transmitter | CM108 HID **GPIO3**, or serial **DTR=1 AND RTS=0**, or **VPTT** (the AIOC keys by itself when audio plays) | HID write, `pyserial`, or nothing at all with VPTT |
+| Know when someone is talking | **VCOS** (virtual carrier detect on the RX audio), or hardware COS on rev 1.2, both reported as CM108 **Volume-Down** | Read HID input reports, or measure the RX audio level in software |
+
+**Typical software stack** **[Community]** (from the projects below; any equivalent works):
+- Speech-to-text: **Whisper** / **faster-whisper** (runs locally; handles English, Chinese and many other languages).
+- Language model: local (**Ollama** with a small model) or a cloud API (ChatGPT, Gemini, Claude…). Local means no internet and no API cost, but a GPU helps.
+- Text-to-speech: **Piper** (local, fast, voices for many languages including `zh_CN`), or a cloud TTS.
+- Optional: a wake word or a callsign prefix, so the bot only answers when it is addressed.
+
+**How the program works** **[Typical]**:
+1. **Wait for a transmission.** Use VCOS/COS, or a software level threshold on the RX audio. The radio's **squelch must be closed** when the channel is idle (Section 2.4). A CTCSS/DCS tone on radio A stops other traffic from triggering the bot.
+2. **Record until the other station stops** (about 1 s of silence after the carrier drops), then run speech-to-text.
+3. **Ask the model.** Use a system prompt that asks for short, plain spoken answers (no lists or markdown), and limit the length so a reply fits within the radio's time-out timer.
+4. **Make speech and transmit:** key PTT, wait about 200–300 ms for the radio to start transmitting, play the audio, wait about 200 ms, then unkey.
+   - With **VPTT**, the AIOC keys when the audio starts, so the first word is easily cut off. Put a short lead-in tone (about 300 ms) in front of the speech.
+   - Raise the VPTT tail time (for example 500 ms = `--vptt-timctrl 8000`; timing is ms × 16) so pauses between sentences don't drop the carrier.
+5. **Identify:** have the bot speak your callsign as your licence requires (for example at the end of a reply and at least every 10 minutes).
+
+**Minimal Python example** **[Typical — illustrative, not a tested product]** (Linux; Windows and macOS work with a different port name):
+```python
+# aioc_ai_bot.py — radio <-> AI voice bot through an AIOC
+# pip install sounddevice numpy pyserial requests faster-whisper
+# Also needs: Ollama running locally (ollama pull llama3.2), and the Piper TTS binary + a voice .onnx file
+import subprocess, time, wave
+import numpy as np, requests, serial, sounddevice as sd
+from faster_whisper import WhisperModel
+
+DEV = 'All-In-One-Cable'      # AIOC sound card (python -m sounddevice lists device names)
+PTT_PORT = '/dev/ttyACM0'     # or /dev/aioc (udev rule, 2.5), 'COM5' on Windows; set to None if using VPTT
+VOICE = 'en_US-lessac-medium.onnx'
+CALLSIGN = 'N0CALL'
+SYSTEM = ('You are a helpful assistant on an amateur radio voice channel. Answer in at most three short '
+          'spoken sentences. No lists, symbols or markdown. Never discuss business or play music.')
+
+stt = WhisperModel('small', device='cpu', compute_type='int8')
+ptt = None
+if PTT_PORT:
+    ptt = serial.Serial()
+    ptt.port, ptt.dtr, ptt.rts = PTT_PORT, False, False   # set before open() so the radio isn't keyed on open
+    ptt.open()
+
+def wait_for_over(rate=16000, threshold=0.02, hang_s=1.0):
+    """Software squelch: record one transmission from the radio and return it as float32 audio."""
+    blk, chunks, quiet, started = int(rate * 0.05), [], 0, False
+    with sd.InputStream(device=DEV, samplerate=rate, channels=1, dtype='float32') as s:
+        while True:
+            x, _ = s.read(blk)
+            loud = float(np.sqrt(np.mean(x ** 2))) > threshold
+            started, quiet = started or loud, 0 if loud else quiet + 1
+            if started:
+                chunks.append(x[:, 0])
+                if quiet * 0.05 > hang_s:
+                    return np.concatenate(chunks)
+
+def ask(history):
+    r = requests.post('http://localhost:11434/api/chat', timeout=120, json={
+        'model': 'llama3.2', 'messages': history, 'stream': False, 'options': {'num_predict': 120}})
+    return r.json()['message']['content']
+
+def speak(text):
+    subprocess.run(['piper', '--model', VOICE, '--output_file', 'reply.wav'], input=text.encode(), check=True)
+    with wave.open('reply.wav') as w:
+        rate, pcm = w.getframerate(), w.readframes(w.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768 * 0.8, rate
+
+def transmit(audio, rate):
+    if ptt:                                   # serial PTT: DTR=1 AND RTS=0 (needs SERIALDTRNRTS in the PTT1 source)
+        ptt.dtr = True; time.sleep(0.3)
+    else:                                     # VPTT: a 300 ms lead-in tone keys the AIOC before the first word
+        t = np.arange(int(rate * 0.3)) / rate
+        audio = np.concatenate([0.3 * np.sin(2 * np.pi * 1000 * t).astype(np.float32), audio])
+    sd.play(audio, rate, device=DEV); sd.wait()
+    time.sleep(0.2)
+    if ptt: ptt.dtr = False
+
+history = [{'role': 'system', 'content': SYSTEM}]
+while True:
+    heard = wait_for_over()
+    if len(heard) < 16000 * 0.7:              # ignore squelch tails and short noise bursts
+        continue
+    question = ' '.join(seg.text for seg in stt.transcribe(heard)[0]).strip()
+    if not question:
+        continue
+    print('RX:', question)
+    history.append({'role': 'user', 'content': question})
+    answer = ask(history)
+    history = history[:1] + history[-9:] + [{'role': 'assistant', 'content': answer}]
+    print('TX:', answer)
+    transmit(*speak(f'{answer} This is {CALLSIGN}.'))
+```
+Notes on the example:
+- It records at 16 kHz (the rate Whisper uses) and plays Piper's 22.05 kHz output directly. Both are native AIOC rates. **[Official]**
+- If you use serial PTT, the AIOC's PTT1 source must include `SERIALDTRNRTS` (the firmware default). If PTT1 is set to `VPTT` only, set `PTT_PORT = None`, and the lead-in tone does the keying (Section 7 to check or change the PTT source).
+- Swap the software squelch for VCOS or hardware COS (CM108 Volume-Down in the HID input report) once it works. That is more reliable on a noisy channel. Print the raw `/dev/hidrawN` reports to find the bit before you rely on it. **[Typical]**
+- Make sure nothing else on the computer plays sound through the AIOC (Section 2.3), especially with VPTT.
+
+**Existing projects to study** **[Community]**:
+- **w6rgc-ai** by W6RGC (https://github.com/richcannings/w6rgc-ai, Apache 2.0). This is a voice-to-LLM bridge with **built-in AIOC support**: set `DEFAULT_RIL_TYPE = "aioc"` in `constants.py`. It uses serial PTT on `/dev/ttyACM0`, a wake word, Whisper speech-to-text, local Piper/Coqui voices, and Ollama (offline) or Gemini/ChatGPT. Linux only; an NVIDIA GPU (e.g. RTX 3060 12 GB) is recommended. Its README now marks it deprecated and points to a successor, an OpenClaw radio channel plugin.
+- **openclaw-radio** (OpenClaw plugin, Apache 2.0, first on-air QSO reported 2026-03-30). Its AIOC example uses `plughw:CARD=AllInOneCable` for audio and serial **DTR** PTT on `/dev/ttyACM0`. It notes that CM108 HID PTT needs AIOC firmware ≥ 1.2.0, while serial DTR PTT works on all versions.
+- Search GitHub for "ham radio LLM" or "radio chatbot" for more. The same AIOC setup applies to any of them.
+
+**Rules and good practice** **[Typical]** (check your own licence conditions):
+- You, the licensee, are responsible for everything the bot transmits. Filter what it says, keep a log (the example prints RX/TX text), and stay where you can shut it down.
+- Many licences require a control operator, or allow automatic or unattended operation only on certain bands or with a permit. Check this before leaving a bot running.
+- Identify with your callsign. No music, no business or advertising, and no encryption. Keep replies short on shared channels, and pick a simplex frequency that is not a calling channel or a repeater input.
+- Handhelds get hot on long transmissions: use low power, and set the radio's time-out timer as a safety net.
+
 ---
 
 ## 6. PTT Troubleshooting Flow
@@ -3979,6 +4430,9 @@ Partly. iOS sees the AIOC only as a sound card. **RadioMail** (Winlink) and **Pa
 **Q: Can I use voice (talk through the computer)?**
 Yes. Choose the AIOC as microphone/speaker in a VoIP or linking app (AllStarLink, SvxLink, EchoLink, Mumble bridges). Voice PTT needs CM108/serial control or VPTT.
 
+**Q: Can I put an AI chatbot (or my own program) on the radio?**
+Yes. To a program, the AIOC is a sound card plus a PTT line. Record from it, run speech-to-text, a language model and text-to-speech, then key PTT (serial DTR, CM108 GPIO3, or VPTT) and play the reply. Section 5.19 has the station layout, a Python example and existing projects. The licensee is responsible for what the bot transmits.
+
 **Q: My radio has two PTTs (dual-band HT)?**
 PTT1 is the CM108 GPIO3/serial default and PTT2 is CM108 GPIO4. Use `--swap-ptt` or `--ptt2` to change them.
 
@@ -4002,6 +4456,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 - AIOC GitHub issues (search before asking): https://github.com/skuep/AIOC/issues
 - Videos: Ham Radio Dude (https://www.youtube.com/watch?v=xRCmXQYRLE0), Temporarily Offline (https://www.youtube.com/watch?v=RZjoPNe634o), AllStar node builds (https://youtu.be/7LB6D2FLGZk, https://youtu.be/k0iP4dECx6A)
 - German 4-part AIOC article (DL-Nordwest): linked from the AIOC README
+- AI voice bot example with AIOC support (W6RGC): https://github.com/richcannings/w6rgc-ai · Whisper: https://github.com/openai/whisper · faster-whisper: https://github.com/SYSTRAN/faster-whisper · Piper TTS: https://github.com/rhasspy/piper · Ollama: https://ollama.com
 - Direwolf: https://github.com/wb2osz/direwolf
 - CHIRP: https://chirpmyradio.com
 - AllStarLink: https://www.allstarlink.org
@@ -4017,7 +4472,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 > 这是一份同时供人和 AI 助手（Agent）使用的知识库。拿到本文档的 AI 助手应能回答：
 > *“我有一个 AIOC 和某款电台，想在某台电脑上做某件事，要装什么软件、怎么设置？”*
 >
-> **文档版本：** 2026-10-31（第 3 版：社区资料、AIOC Toolkit）· 适用于 AIOC 固件 **v1.4.1**
+> **文档版本：** 2026-11-09（第 4 版：AI 语音聊天机器人 / 开发示例）· 适用于 AIOC 固件 **v1.4.1**
 > （截至 2026-10-31 仍是最新版）及硬件版本 rev 1.0–1.2。英文原版为准，本文为简体中文译本。
 
 ---
@@ -4183,6 +4638,7 @@ aioc-util 项目也自带现成的 udev 规则（`udev/rules.d/91-aioc.rules`）
 | **基于分组的 Mesh / 离网组网** | Reticulum，经 Direwolf KISS | Reticulum（RNS、NomadNet、Sideband），经 Direwolf KISS | Reticulum | Sideband | 5.17 |
 | **GMRS 上的 AllStar 式联网** | — | GMRSLive（基于 AllStar） | — | — | 5.12 |
 | **接车台/短波电台（音频 + PTT + CAT）** | WSJT-X/fldigi + CAT | 同左 | 同左 | — | 5.18 |
+| **在电台上运行 AI 语音聊天机器人 / 自己开发电台软件** | Python + Whisper + LLM + TTS（自己开发） | 同左；或 w6rgc-ai / openclaw-radio | 同左（自己开发） | — | 5.19 |
 | **猎狐信标（无需电脑）** | AIOC Toolkit 或 aioc-util（用于设置） | 同左 | 同左 | — | 7.4 |
 | **修改 AIOC 设置（PTT 源、VPTT/VCOS、增益）** | **AIOC Toolkit**（Chrome/Edge） | AIOC Toolkit 或 aioc-util | AIOC Toolkit 或 aioc-util | — | 7 |
 | **升级 AIOC 固件** | **AIOC Toolkit**（Flash Firmware 选项卡） | dfu-util 或 AIOC Toolkit | dfu-util 或 AIOC Toolkit | — | 9 |
@@ -4572,6 +5028,132 @@ PTT CM108                         # 或：PTT /dev/ttyACM0 DTR -RTS   （不要�
 - 艾可慕 Icom 的 CI-V（单线总线）不加额外电路 **无法** 工作（GitHub #109，尚未解决）。
 - 如果不熟悉焊接，建议买现成的专用接口。接错线可能损坏电台或 AIOC。
 
+### 5.19 自己开发：通过电台对话的 AI 语音聊天机器人（开发示例）
+**[Community]** 已经有人把 AIOC 用作 **AI 语音助手** 的电台接口。电台布置如下：
+
+```text
+ 手台用户                          机器人电台
+ ┌─────────┐   射频（同频）   ┌─────────┐  K1  ┌──────┐  USB  ┌────────────────────────────────┐
+ │ 手台 B  │ ───────────────▶ │ 手台 A  │ ───▶ │ AIOC │ ────▶ │ 电脑/树莓派：语音转文字 → LLM  │
+ │ （说话）│ ◀─────────────── │         │ ◀─── │      │ ◀──── │         → 文字转语音 → PTT     │
+ └─────────┘                  └─────────┘      └──────┘       └────────────────────────────────┘
+```
+用户按下手台 B 的 PTT 提问。电台 A 收到后，电脑把音频转成文字交给大语言模型，再把回答转成语音，通过 AIOC 发射回去。
+可以把本节当作 **以 AIOC 为接口开发自己软件的完整示例**。同样的组件也可用于语音播报、DTMF 控制的机器人、通联转写记录等。
+
+**AIOC 能为程序提供什么** **[Official]** （见第 1 节和第 4 节）：
+
+| 需求 | AIOC 接口 | 程序如何使用 |
+|---|---|---|
+| 听电台 | USB 声卡 **输入** （单声道；首选 48 kHz，也支持 32k/24k/22.05k/16k/12k/11.025k/8k） | 任意音频库（PortAudio/`sounddevice`、ALSA、WASAPI、Core Audio） |
+| 在电台上说话 | USB 声卡 **输出** | 播放语音音频 |
+| 控制发射 | CM108 HID **GPIO3** ，或串口 **DTR=1 且 RTS=0** ，或 **VPTT** （有音频播放时 AIOC 自动发射） | 写 HID、用 `pyserial`，用 VPTT 则什么都不用做 |
+| 知道有人在说话 | **VCOS** （基于接收音频的虚拟载波检测），或 rev 1.2 的硬件 COS，二者都以 CM108 **音量减（Volume-Down）** 按键上报 | 读取 HID 输入报告，或在软件里测量接收音频电平 |
+
+**常见软件组合** **[Community]** （来自下面的项目，用其他同类软件也可以）：
+- 语音转文字： **Whisper** / **faster-whisper** （本地运行，支持中文、英文等多种语言）。
+- 语言模型：本地（ **Ollama** 加一个小模型）或云端 API（ChatGPT、Gemini、Claude 等）。本地运行不需要联网、没有 API 费用，但最好有显卡。
+- 文字转语音： **Piper** （本地、速度快，有包括 `zh_CN` 在内的多种语言音色），或云端 TTS。
+- 可选：唤醒词或呼号前缀，让机器人只在被呼叫时回答。
+
+**程序的工作流程** **[Typical]** ：
+1. **等待对方发射。** 用 VCOS/COS，或在软件里对接收音频设电平门限。信道空闲时电台的 **静噪必须关闭** （第 2.4 节）。在电台 A 上设置 CTCSS/DCS 亚音，可以避免其他信号触发机器人。
+2. **录音直到对方停止** （载波消失后约 1 秒静音），然后做语音转文字。
+3. **询问模型。** 系统提示词要求简短、口语化的回答（不要列表或 markdown），并限制长度，让一次回答不超过电台的发射限时（TOT）。
+4. **生成语音并发射：** 按下 PTT，等约 200–300 毫秒让电台开始发射，播放音频，再等约 200 毫秒后松开。
+   - 用 **VPTT** 时，AIOC 在音频开始时才发射，第一个字容易被切掉。在语音前加一段约 300 毫秒的引导音。
+   - 调大 VPTT 拖尾时间（例如 500 毫秒 = `--vptt-timctrl 8000`；时间单位为毫秒 × 16），避免句子之间的停顿导致断开发射。
+5. **报呼号：** 按执照要求让机器人报出你的呼号（例如每次回答结束时，且至少每 10 分钟一次）。
+
+**最简 Python 示例** **[Typical — illustrative, not a tested product]** （Linux；Windows 和 macOS 改端口名即可）：
+```python
+# aioc_ai_bot.py — 通过 AIOC 实现 电台 <-> AI 语音机器人
+# pip install sounddevice numpy pyserial requests faster-whisper
+# 另需：本地运行的 Ollama（ollama pull qwen2.5），以及 Piper TTS 程序和一个音色 .onnx 文件
+import subprocess, time, wave
+import numpy as np, requests, serial, sounddevice as sd
+from faster_whisper import WhisperModel
+
+DEV = 'All-In-One-Cable'      # AIOC 声卡（python -m sounddevice 可列出设备名）
+PTT_PORT = '/dev/ttyACM0'     # 或 /dev/aioc（udev 规则，2.5 节），Windows 上为 'COM5'；用 VPTT 时设为 None
+VOICE = 'zh_CN-huayan-medium.onnx'
+CALLSIGN = 'BA0XXX'           # 换成你的呼号
+SYSTEM = ('你是业余无线电语音信道上的助手。用最多三句简短的口语回答，'
+          '不要列表、符号或 markdown。不谈商业内容，不播放音乐。')
+
+stt = WhisperModel('small', device='cpu', compute_type='int8')
+ptt = None
+if PTT_PORT:
+    ptt = serial.Serial()
+    ptt.port, ptt.dtr, ptt.rts = PTT_PORT, False, False   # 在 open() 之前设置，打开串口时不会触发发射
+    ptt.open()
+
+def wait_for_over(rate=16000, threshold=0.02, hang_s=1.0):
+    """软件静噪：录下电台的一次发射，返回 float32 音频。"""
+    blk, chunks, quiet, started = int(rate * 0.05), [], 0, False
+    with sd.InputStream(device=DEV, samplerate=rate, channels=1, dtype='float32') as s:
+        while True:
+            x, _ = s.read(blk)
+            loud = float(np.sqrt(np.mean(x ** 2))) > threshold
+            started, quiet = started or loud, 0 if loud else quiet + 1
+            if started:
+                chunks.append(x[:, 0])
+                if quiet * 0.05 > hang_s:
+                    return np.concatenate(chunks)
+
+def ask(history):
+    r = requests.post('http://localhost:11434/api/chat', timeout=120, json={
+        'model': 'qwen2.5', 'messages': history, 'stream': False, 'options': {'num_predict': 120}})
+    return r.json()['message']['content']
+
+def speak(text):
+    subprocess.run(['piper', '--model', VOICE, '--output_file', 'reply.wav'], input=text.encode(), check=True)
+    with wave.open('reply.wav') as w:
+        rate, pcm = w.getframerate(), w.readframes(w.getnframes())
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768 * 0.8, rate
+
+def transmit(audio, rate):
+    if ptt:                                   # 串口 PTT：DTR=1 且 RTS=0（PTT1 源需包含 SERIALDTRNRTS）
+        ptt.dtr = True; time.sleep(0.3)
+    else:                                     # VPTT：先放 300 毫秒引导音，让 AIOC 在第一个字之前开始发射
+        t = np.arange(int(rate * 0.3)) / rate
+        audio = np.concatenate([0.3 * np.sin(2 * np.pi * 1000 * t).astype(np.float32), audio])
+    sd.play(audio, rate, device=DEV); sd.wait()
+    time.sleep(0.2)
+    if ptt: ptt.dtr = False
+
+history = [{'role': 'system', 'content': SYSTEM}]
+while True:
+    heard = wait_for_over()
+    if len(heard) < 16000 * 0.7:              # 忽略静噪尾音和短促的噪声
+        continue
+    question = ' '.join(seg.text for seg in stt.transcribe(heard)[0]).strip()
+    if not question:
+        continue
+    print('RX:', question)
+    history.append({'role': 'user', 'content': question})
+    answer = ask(history)
+    history = history[:1] + history[-9:] + [{'role': 'assistant', 'content': answer}]
+    print('TX:', answer)
+    transmit(*speak(f'{answer} 这里是 {CALLSIGN}。'))
+```
+关于这个示例：
+- 它以 16 kHz（Whisper 使用的采样率）录音，并直接播放 Piper 输出的 22.05 kHz 音频。这两个都是 AIOC 原生支持的采样率。 **[Official]**
+- 使用串口 PTT 时，AIOC 的 PTT1 源必须包含 `SERIALDTRNRTS` （固件默认值）。如果 PTT1 只设成了 `VPTT` ，就把 `PTT_PORT` 设为 `None` ，由引导音触发发射（查看或修改 PTT 源见第 7 节）。
+- 跑通之后，建议把软件静噪换成 VCOS 或硬件 COS（HID 输入报告中的 CM108 音量减），在噪声大的信道上更可靠。先打印 `/dev/hidrawN` 的原始报告找到对应的位，再依赖它。 **[Typical]**
+- 确保电脑上没有其他程序通过 AIOC 发声（第 2.3 节），用 VPTT 时尤其要注意。
+
+**可参考的现有项目** **[Community]** ：
+- W6RGC 的 **w6rgc-ai** （https://github.com/richcannings/w6rgc-ai ，Apache 2.0）。这是一个语音到 LLM 的桥接程序， **内置 AIOC 支持** ：在 `constants.py` 中设置 `DEFAULT_RIL_TYPE = "aioc"` 。它用 `/dev/ttyACM0` 串口 PTT、唤醒词、Whisper 语音识别、本地 Piper/Coqui 音色，以及 Ollama（离线）或 Gemini/ChatGPT。仅支持 Linux，建议 NVIDIA 显卡（如 RTX 3060 12 GB）。其 README 现已标注为弃用，并指向后继项目：一个 OpenClaw 电台频道插件。
+- **openclaw-radio** （OpenClaw 插件，Apache 2.0，报告于 2026-03-30 完成首次空中通联）。它的 AIOC 示例音频用 `plughw:CARD=AllInOneCable` ，PTT 用 `/dev/ttyACM0` 上的串口 **DTR** 。它指出 CM108 HID PTT 需要 AIOC 固件 ≥ 1.2.0，串口 DTR PTT 在所有版本上都能用。
+- 在 GitHub 上搜索“ham radio LLM”或“radio chatbot”可以找到更多项目，AIOC 的设置方法对它们都适用。
+
+**规定与良好习惯** **[Typical]** （请核对你自己的执照条件）：
+- 你作为执照持有人，要对机器人发射的所有内容负责。过滤它说的话，保留记录（示例会打印 RX/TX 文本），并保证随时能关掉它。
+- 许多地区要求有操作员在场控制，或只允许在特定频段、经许可后进行自动或无人值守操作。让机器人长期运行前先确认当地规定。
+- 报呼号。不播放音乐，不做商业或广告内容，不加密。在共用信道上保持回答简短，选择一个不是呼叫频率、也不是中继上行频率的同频频点。
+- 长时间发射会让手台发热：用低功率，并设置电台的发射限时（TOT）作为保护。
+
 ---
 
 ## 6. PTT 故障排查流程
@@ -4798,6 +5380,9 @@ USB 描述符里不报告固件版本。实用的判断方法：
 **问：能用电脑通话（语音）吗？**
 能。在 VoIP 或联网应用（AllStarLink、SvxLink、EchoLink、Mumble 桥接）里把 AIOC 选为麦克风/扬声器即可。语音 PTT 需要 CM108/串口控制或 VPTT。
 
+**问：能把 AI 聊天机器人（或我自己的程序）接到电台上吗？**
+可以。对程序来说，AIOC 就是一块声卡加一路 PTT。从它录音，依次做语音转文字、大语言模型和文字转语音，然后控制 PTT（串口 DTR、CM108 GPIO3 或 VPTT）并播放回答。第 5.19 节有电台布置、Python 示例和现有项目。执照持有人要对机器人发射的内容负责。
+
 **问：我的电台有两个 PTT（双段手台）？**
 PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 `--ptt2` 修改。
 
@@ -4821,6 +5406,7 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 
 - AIOC GitHub issues（提问前先搜索）：https://github.com/skuep/AIOC/issues
 - 视频：Ham Radio Dude（https://www.youtube.com/watch?v=xRCmXQYRLE0）、Temporarily Offline（https://www.youtube.com/watch?v=RZjoPNe634o）、AllStar 节点搭建（https://youtu.be/7LB6D2FLGZk 、https://youtu.be/k0iP4dECx6A）
 - DL-Nordwest 四篇 AIOC 文章（德语）：见 AIOC README 中的链接
+- 支持 AIOC 的 AI 语音机器人示例（W6RGC）：https://github.com/richcannings/w6rgc-ai · Whisper：https://github.com/openai/whisper · faster-whisper：https://github.com/SYSTRAN/faster-whisper · Piper TTS：https://github.com/rhasspy/piper · Ollama：https://ollama.com
 - Direwolf：https://github.com/wb2osz/direwolf
 - CHIRP：https://chirpmyradio.com
 - AllStarLink：https://www.allstarlink.org
@@ -4913,6 +5499,8 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 
       ptt: 'Direwolf does the PTT.', tip: 'Check your licence rules on encryption first.', sec: [['s5-17', 'Reticulum']] },
     { id: 'rig', label: 'Mobile / HF rig', sw: { win: 'Hand-wired AIOC + WSJT-X, fldigi, VARA', linux: 'Hand-wired AIOC + WSJT-X, fldigi, Direwolf', mac: 'Hand-wired AIOC + WSJT-X, fldigi', android: NO_PHONE, ios: NO_PHONE },
       ptt: 'AIOC PTT, or CAT PTT over the AIOC serial port.', tip: 'Hardware rev 1.2 separates PTT from serial data. Icom CI-V does not work.', sec: [['s5-18', 'Wiring to other radios']] },
+    { id: 'aibot', label: 'AI voice chatbot / own software', sw: { win: 'Your own program: Python + Whisper + an LLM (Ollama or cloud) + Piper TTS', linux: 'Your own program, or w6rgc-ai / openclaw-radio (built-in AIOC support)', mac: 'Your own program: Python + Whisper + an LLM + Piper TTS', android: NO_PHONE, ios: NO_PHONE },
+      ptt: 'Serial DTR=1 AND RTS=0 from your code (pyserial), CM108 GPIO3, or AIOC Virtual PTT with a short lead-in tone.', tip: 'Close the squelch and use a CTCSS tone so only real calls wake the bot. Identify with your callsign; you are responsible for what it says.', sec: [['s5-19', 'AI chatbot example'], ['s4', 'PTT methods']] },
     { id: 'foxhunt', label: 'Fox-hunt beacon', sw: { win: 'AIOC Toolkit in Chrome/Edge (Foxhunt box)', linux: 'AIOC Toolkit or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: 'Set it up on a computer, then run from a power bank', ios: 'Set it up on a computer, then run from a power bank' },
       ptt: 'The AIOC keys the radio itself.', tip: 'Needs firmware 1.4.0 or newer.', sec: [['s7-4', 'Fox-hunt mode']] },
     { id: 'config', label: 'Change AIOC settings', sw: { win: 'AIOC Toolkit in Chrome/Edge (no install)', linux: 'AIOC Toolkit (install the udev rule) or aioc-util', mac: 'AIOC Toolkit or aioc-util', android: NO_PHONE, ios: NO_PHONE },
@@ -4957,6 +5545,8 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 
       ptt: '由 Direwolf 控制 PTT。', tip: '先确认你的执照对加密的规定。', sec: ['Reticulum'] },
     rig: { label: '车台 / 短波电台', sw: { win: '手工接线的 AIOC + WSJT-X、fldigi、VARA', linux: '手工接线的 AIOC + WSJT-X、fldigi、Direwolf', mac: '手工接线的 AIOC + WSJT-X、fldigi', android: ZNP, ios: ZNP },
       ptt: 'AIOC 的 PTT，或通过 AIOC 串口用 CAT 控制发射。', tip: '硬件 rev 1.2 把 PTT 和串口数据分开了。艾可慕 CI-V 不能用。', sec: ['接到其他电台'] },
+    aibot: { label: 'AI 语音机器人 / 自己开发', sw: { win: '自己写程序：Python + Whisper + LLM（Ollama 或云端）+ Piper TTS', linux: '自己写程序，或用 w6rgc-ai / openclaw-radio（内置 AIOC 支持）', mac: '自己写程序：Python + Whisper + LLM + Piper TTS', android: ZNP, ios: ZNP },
+      ptt: '在代码里用串口 DTR=1 且 RTS=0（pyserial）、CM108 GPIO3，或 AIOC 虚拟 PTT 加一段短引导音。', tip: '关闭静噪并设置 CTCSS 亚音，只让真正的呼叫唤醒机器人。记得报呼号；你要对它说的话负责。', sec: ['AI 机器人示例', 'PTT 方式'] },
     foxhunt: { label: '猎狐信标', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（Foxhunt 区）', linux: 'AIOC Toolkit 或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: '先在电脑上设置好，再用充电宝供电运行', ios: '先在电脑上设置好，再用充电宝供电运行' },
       ptt: 'AIOC 自己控制电台发射。', tip: '需要固件 1.4.0 或更新。', sec: ['猎狐模式'] },
     config: { label: '修改 AIOC 设置', sw: { win: 'Chrome/Edge 中的 AIOC Toolkit（免安装）', linux: 'AIOC Toolkit（需安装 udev 规则）或 aioc-util', mac: 'AIOC Toolkit 或 aioc-util', android: ZNP, ios: ZNP },

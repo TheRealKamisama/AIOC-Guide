@@ -11,7 +11,7 @@ const LANGS = [
 
 // Display names for the source tags in the Chinese page (the Markdown keeps the English tags).
 const ZH_TAG_WORDS = [
-  ['Official example', '官方示例'], ['Official settings', '官方设置'], ['Typical extras', '常规补充'],
+  ['Typical — illustrative, not a tested product', '常规 — 仅作示意，未经测试'], ['Official example', '官方示例'], ['Official settings', '官方设置'], ['Typical extras', '常规补充'],
   ['firmware settings.h', '固件 settings.h'], ['used in G1LRO&#39;s guide', 'G1LRO 教程采用'], ['Dec 2025', '2025年12月'],
   ['Official', '官方'], ['Tool docs', '工具文档'], ['Community', '社区'], ['Typical', '常规'],
 ];
