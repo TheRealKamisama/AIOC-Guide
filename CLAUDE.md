@@ -55,7 +55,9 @@ All CSS and JS are inline. The only outside requests are Google Fonts (IBM Plex,
 
 ## Quick start card (`card/`)
 
-A credit-card-size (ID-1, 85.60 × 53.98 mm) two-sided card shipped with products, one English and one Chinese. `node card/build.mjs` needs `qrencode` and `rsvg-convert`, and regenerates `card/dist/` (committed): `*-print-3mm-bleed.pdf` for print shops, `*-exact-size.pdf`, and rounded-corner PNG previews.
+A credit-card-size (ID-1, 85.60 × 53.98 mm) two-sided card shipped with products, one English and one Chinese. `node card/build.mjs` needs `qrencode`, `rsvg-convert` and poppler (`pdftocairo`, `pdffonts`), and regenerates `card/dist/` (committed): `*-print-3mm-bleed.pdf` for print shops, `*-exact-size.pdf`, and rounded-corner PNG previews.
+
+- **All text in the PDFs is converted to outlines** (no fonts embedded), because the card designer's software substituted fonts. The build round-trips PDF → SVG → PDF with `pdftocairo -svg -origpagesizes -noshrink -nocenter`; without those flags pdftocairo shrinks the page about 0.6% to fit a default paper size. The build fails if `pdffonts` finds any font. Previews are rendered from the outlined pages, so they match the print exactly. Backgrounds are drawn exactly to the canvas edge (`<rect class="bg">`, sized in `svg()`), because a rectangle running past the page gets clipped short during the round trip.
 
 - All card text is in `COPY` in `build.mjs`. It repeats facts from guide sections 1, 2.1, 2.3 and 4, so if those change, update both languages there too and rebuild. Text positions are fixed, so check the previews for overflow after editing copy.
 - The retailer ships AIOCs with **PTT1 source = VPTT only** and **PTT2 source = CM108GPIO4**, so CM108 GPIO3 and serial DTR/RTS PTT are off as shipped. The card's PTT block says exactly this (VPTT underlined via the `{ u }` run in `COPY`), and its sound-card line warns that system sounds will transmit. If the shipping configuration changes, update the card.

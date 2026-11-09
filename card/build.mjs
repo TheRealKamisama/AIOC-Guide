@@ -1,12 +1,15 @@
 // Builds the credit-card-size quick start card (English + Simplified Chinese) into card/dist/.
-// Usage: node card/build.mjs   Needs: qrencode, rsvg-convert (no npm packages).
+// Usage: node card/build.mjs   Needs: qrencode, rsvg-convert, pdftocairo + pdffonts (poppler); no npm packages.
+//
+// The PDFs have all text converted to outlines (vector paths, no fonts), which is what print designers
+// ask for: text is drawn with rsvg, then round-tripped PDF -> SVG (pdftocairo turns glyphs into paths) -> PDF.
 //
 // All card text lives in COPY below. Every statement comes from the guide (sections 1, 2.1, 2.3, 4),
 // so when those change, change this too, in both languages.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 const OUT = new URL('./dist/', import.meta.url).pathname;
 const GUIDE_URL = 'therealkamisama.github.io/AIOC-Guide';
@@ -105,7 +108,7 @@ function front(code) {
   const q = qr(`https://${GUIDE_URL}/#${code}`, tx, M, tile);
   const stepY = [23.6, 28, 32.4];
   const body = [
-    `<rect x="-5" y="-5" width="${W + 10}" height="${H + 10}" fill="${C.lcd}"/>`,
+    `<rect class="bg" fill="${C.lcd}"/>`,
     text(M, 14, 'AIOC', { size: 30, weight: 700, fill: C.amber, font: 'Noto Sans' }),
     text(M, 18.6, c.subtitle, { size: 7.5, fill: C.white, font }),
     ...c.steps.flatMap((s, i) => [
@@ -128,7 +131,7 @@ function front(code) {
 function back(code) {
   const c = COPY[code], font = c.font;
   const labelX = M, textX = M + 13, subX = textX + 10.5, lh = 3.2, size = 6.4;
-  const out = [`<rect x="-5" y="-5" width="${W + 10}" height="${H + 10}" fill="#fff"/>`];
+  const out = [`<rect class="bg" fill="#fff"/>`];
   out.push(text(M, 8, c.heading, { size: 9, weight: 700, fill: C.accent, font }));
 
   let y = 13.2;
@@ -156,12 +159,31 @@ function back(code) {
 }
 
 // bleed: for a print shop, artwork extends BLEED mm past the cut. trim: exact card size.
-// preview: exact card size with the rounded ID-1 corners, to show what the cut card looks like.
+// The background is drawn exactly to the canvas edge: a rect past the page gets clipped short in the outline step.
 function svg({ body, lang }, mode) {
   const b = mode === 'bleed' ? BLEED : 0;
-  const clip = mode === 'preview' ? `<clipPath id="c"><rect width="${W}" height="${H}" rx="${CORNER}"/></clipPath>` : '';
-  const inner = mode === 'preview' ? `<g clip-path="url(#c)">${body}</g>` : body;
-  return `<svg xmlns="http://www.w3.org/2000/svg" xml:lang="${lang}" width="${(W + 2 * b).toFixed(2)}mm" height="${(H + 2 * b).toFixed(2)}mm" viewBox="${-b} ${-b} ${W + 2 * b} ${H + 2 * b}">${clip}${inner}</svg>`;
+  const bg = `<rect x="${-b}" y="${-b}" width="${W + 2 * b}" height="${H + 2 * b}"`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xml:lang="${lang}" width="${(W + 2 * b).toFixed(2)}mm" height="${(H + 2 * b).toFixed(2)}mm" viewBox="${-b} ${-b} ${W + 2 * b} ${H + 2 * b}">${body.replace('<rect class="bg"', bg)}</svg>`;
+}
+
+// Text PDF -> one outlined SVG per page -> outlined PDF. Returns the page SVGs.
+function outline(textPdf, outPdf, stem) {
+  const pages = [1, 2].map((n) => {
+    const p = `${stem}-p${n}.svg`;
+    execFileSync('pdftocairo', ['-svg', '-origpagesizes', '-noshrink', '-nocenter', '-f', String(n), '-l', String(n), textPdf, p]);
+    return p;
+  });
+  execFileSync('rsvg-convert', ['-f', 'pdf', '-o', outPdf, ...pages]);
+  const fonts = execFileSync('pdffonts', [outPdf], { encoding: 'utf8' }).trim().split('\n').slice(2);
+  if (fonts.length) throw new Error(`${outPdf} still contains fonts:\n${fonts.join('\n')}`);
+  return pages;
+}
+
+// Preview PNG of the cut card (rounded ID-1 corners), drawn from the outlined page so it matches the print exactly.
+function preview(pageSvg, outPng) {
+  const p = pageSvg.replace(/\.svg$/, '-preview.svg');
+  writeFileSync(p, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}"><clipPath id="c"><rect width="${W}" height="${H}" rx="${CORNER}"/></clipPath><g clip-path="url(#c)"><image xlink:href="${basename(pageSvg)}" width="${W}" height="${H}"/></g></svg>`);
+  execFileSync('rsvg-convert', ['-d', '600', '-p', '600', '-o', outPng, p]);
 }
 
 rmSync(OUT, { recursive: true, force: true });
@@ -174,11 +196,15 @@ for (const code of Object.keys(COPY)) {
     writeFileSync(p, svg(page, mode));
     return p;
   });
-  execFileSync('rsvg-convert', ['-f', 'pdf', '-o', `${OUT}aioc-card-${code}-print-3mm-bleed.pdf`, ...pages('bleed')]);
-  execFileSync('rsvg-convert', ['-f', 'pdf', '-o', `${OUT}aioc-card-${code}-exact-size.pdf`, ...pages('trim')]);
-  const [pf, pb] = pages('preview');
-  execFileSync('rsvg-convert', ['-d', '600', '-p', '600', '-o', `${OUT}aioc-card-${code}-front.png`, pf]);
-  execFileSync('rsvg-convert', ['-d', '600', '-p', '600', '-o', `${OUT}aioc-card-${code}-back.png`, pb]);
+  const build = (mode, name) => {
+    const textPdf = join(tmp, `${code}-${mode}-text.pdf`);
+    execFileSync('rsvg-convert', ['-f', 'pdf', '-o', textPdf, ...pages(mode)]);
+    return outline(textPdf, `${OUT}aioc-card-${code}-${name}.pdf`, join(tmp, `${code}-${mode}-outlined`));
+  };
+  build('bleed', 'print-3mm-bleed');
+  const [pf, pb] = build('trim', 'exact-size');
+  preview(pf, `${OUT}aioc-card-${code}-front.png`);
+  preview(pb, `${OUT}aioc-card-${code}-back.png`);
   console.log(`${code}: QR ${f.q.n}x${f.q.n} modules, ${f.q.moduleMm.toFixed(2)} mm per module`);
 }
 rmSync(tmp, { recursive: true, force: true });
