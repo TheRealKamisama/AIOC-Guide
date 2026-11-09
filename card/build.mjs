@@ -29,6 +29,7 @@ const COPY = {
     noDrivers: 'No drivers on Windows, Linux or macOS.',
     scan: 'Scan for the full guide',
     scanSub: 'Software setup · PTT fixes',
+    ai: 'Send it to an AI agent for help',
     heading: 'One cable: sound card + PTT + serial',
     sound: { label: ['Sound', 'card'], lines: ['Shows as “All-In-One-Cable”: mono, 48 kHz, RX + TX audio.', 'Select it in your app only, or system sounds will transmit.'] },
     ptt: {
@@ -52,6 +53,7 @@ const COPY = {
     noDrivers: 'Windows、Linux、macOS 均免驱。',
     scan: '扫码查看完整指南',
     scanSub: '软件配置 · PTT 排障',
+    ai: '可发给 AI 助手，帮你了解 AIOC',
     heading: '一根线顶三样：声卡 + PTT + 串口',
     sound: { label: ['声卡'], lines: ['显示为“All-In-One-Cable”：单声道，48 kHz，收发音频。', '只在电台软件里选择它，否则系统提示音也会被发射。'] },
     ptt: {
@@ -113,10 +115,12 @@ function front(code) {
     ]),
     text(M, 37.6, c.noDrivers, { size: 6.4, fill: C.onLcdMuted, font }),
     q.svg,
-    text(tx + tile / 2, 38, c.scan, { size: 7, weight: 700, fill: C.amber, anchor: 'middle', font }),
-    text(tx + tile / 2, 41.2, c.scanSub, { size: 5.8, fill: C.onLcdMuted, anchor: 'middle', font }),
-    `<line x1="${M}" y1="44.6" x2="${W - M}" y2="44.6" stroke="#3a4a57" stroke-width="0.2"/>`,
-    text(M, 48.6, [{ mono: GUIDE_URL }], { size: 7.2, fill: C.onLcd, font }),
+    text(tx + tile / 2, 37.4, c.scan, { size: 7, weight: 700, fill: C.amber, anchor: 'middle', font }),
+    text(tx + tile / 2, 40.4, c.scanSub, { size: 5.8, fill: C.onLcdMuted, anchor: 'middle', font }),
+    // The guide is written for AI agents (and the page copies it for them), so point customers at that.
+    text(tx + tile / 2, 43.4, c.ai, { size: 5.8, fill: C.onLcd, anchor: 'middle', font }),
+    `<line x1="${M}" y1="45.4" x2="${W - M}" y2="45.4" stroke="#3a4a57" stroke-width="0.2"/>`,
+    text(M, 49.2, [{ mono: GUIDE_URL }], { size: 7.2, fill: C.onLcd, font }),
   ];
   return { body: body.join(''), lang: c.lang, q };
 }
