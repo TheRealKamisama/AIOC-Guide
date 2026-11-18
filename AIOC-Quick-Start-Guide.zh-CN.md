@@ -4,7 +4,7 @@
 > 这是一份同时供人和 AI 助手（Agent）使用的知识库。拿到本文档的 AI 助手应能回答：
 > *“我有一个 AIOC 和某款电台，想在某台电脑上做某件事，要装什么软件、怎么设置？”*
 >
-> **文档版本：** 2026-11-09（第 4 版：AI 语音聊天机器人 / 开发示例）· 适用于 AIOC 固件 **v1.4.1**
+> **文档版本：** 2026-11-18（第 5 版：固件 1.4.x 修复 macOS/iOS 发射音频）· 适用于 AIOC 固件 **v1.4.1**
 > （截至 2026-10-31 仍是最新版）及硬件版本 rev 1.0–1.2。英文原版为准，本文为简体中文译本。
 
 ---
@@ -821,13 +821,13 @@ AIOC 只需 USB 供电（例如充电宝）就能自己发送摩尔斯电码识�
 | 收发音频时有时无，PTT 时灵时不灵 | TRS 插头接触 / 焊点问题（自焊板），或插头没插到底 | 重新插好。自焊板可以在侧向按压触点的同时重新熔化 TRS 焊片的焊点 **[Official]** |
 | 解码失败，声音失真 | 发射电平太高（频偏过大）或接收削波 | 调低系统输出音量；调低电台音量；接收增益改回 1× |
 | 软件里什么都听不到 | 静噪关着 / 音量为零 / 输入设备选错 | 打开静噪，调大电台音量，在软件里选择 AIOC 输入 |
-| macOS 上发射音频断断续续 | 固件旧 | 升级到 ≥ v1.4.0（含 macOS 修复） **[Official]** |
+| **Mac 上电台收不到音频，或发射音频断断续续** ，但输出设备“All-In-One-Cable”识别正常（固件 1.3.0 或更早） | **[Official]** 1.4.0 之前的固件发送的 USB 音频反馈值长度不被 macOS 接受，macOS 会不断重置输出音频流（GitHub #13，由 PR #99 修复）。录音（接收）不受影响。名为 `1.3.0-rc.2-uacquirk` 的测试版含有修复，但 **v1.3.0 正式版不含** 。 | 把 AIOC 升级到 **v1.4.1** （第 9 节） **[Official]** 。 **[Community]** 已确认：升级到 v1.4.1 后问题解决。 **[Typical]** iPhone/iPad 很可能有同样的问题；Packet Commander 要求固件 ≥ 1.4.1 **[Tool docs]** 。在 Mac/iOS 上即使是 rev 1.0 板也请保持 1.4.1。 |
 | UV-K5 刷固件中途失败 | 旧固件串口缓冲区不够 | 把 AIOC 升级到 ≥ v1.4.0 **[Official]** |
 | Direwolf 的 CM108 警告 | Direwolf 本身的行为 | 无害，忽略即可（direwolf issue #448） **[Official]** |
 | Linux 上 /dev/ttyACM0 或 /dev/hidraw“permission denied” | 用户不在 dialout/plugdev 组；没有 udev 规则 | 2.5 节 |
 | aioc-util“Unexpected magic”/ 打不开 | 固件 < 1.3、USB ID 被改过，或 Windows 缺少 hidapi.dll | 升级固件；用 `--open-usb`；添加 hidapi.dll；或用浏览器里的 AIOC Toolkit（7.1），它能找到 USB ID 被改过的 AIOC |
 | aioc-util 报 `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Python 包装错了（Debian 的 `python3-hid`/`hidapi`） | 用虚拟环境并 `pip install hid`；卸载 apt 安装的包 **[Community]** |
-| **rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下**，或在 Windows 虚拟机里音频报“代码 10” | 旧硬件上的固件缺陷（GitHub #120/#138） | 刷回 **v1.3.0** **[Community]** |
+| **rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下**，或在 Windows 虚拟机里音频报“代码 10” | 旧硬件上的固件缺陷（GitHub #120/#138） | 刷回 **v1.3.0** **[Community]** 。在 Mac/iPhone 上使用时不要这样做：1.3.0 会重新出现上面的 macOS 发射音频问题。 |
 | Android：音频应用卡住、音量键失灵、AIOC 反复重连 | 出现在 **Android 11** 手机上；Android 12 及以上正常（GitHub #121） | 换一台手机或其他 Android 版本 **[Community]** |
 | APRSdroid 不用 AIOC（其他应用正常） | 部分手机上 APRSdroid 对 USB 麦克风的缺陷（aprsdroid #149） | 试试“Lesser AudioSwitch”应用强制使用 USB 音频 **[Community]** |
 | 插上 AIOC 后 S 表底噪升高 | 地环路 / 电脑噪声经 USB 线进入 | 用同轴线让天线离手台至少 1 米、加卡扣磁环、用 **USB 隔离器**，或让笔记本用电池供电 **[Community]** |

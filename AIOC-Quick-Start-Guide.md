@@ -5,7 +5,7 @@
 > this document should be able to answer: *"I have an AIOC and radio X. I want to
 > do Y on computer Z. What software do I install and how do I set it up?"*
 >
-> **Document version:** 2026-11-09 (rev 4: AI voice chatbot / developer example) · Written for AIOC firmware **v1.4.1**
+> **Document version:** 2026-11-18 (rev 5: macOS/iOS TX audio fix in fw 1.4.x) · Written for AIOC firmware **v1.4.1**
 > (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
 
 ---
@@ -861,13 +861,13 @@ Users must follow local rules for unattended beacons and station identification.
 | Intermittent RX/TX audio, PTT works sometimes | TRS plug contact / solder joint (on DIY units), or plug not fully inserted | Re-seat. On DIY builds, re-flow the TRS tab joints while pressing the contact sideways **[Official]** |
 | Decodes fail, audio sounds distorted | TX level too high (over-deviation) or RX clipping | Lower the OS output volume; lower the radio volume; RX gain back to 1× |
 | Can't hear anything in software | Squelch closed / volume zero / wrong input device | Open squelch, raise the radio volume, choose the AIOC input in the software |
-| Stuttering TX audio on macOS | Old firmware | Update to ≥ v1.4.0 (macOS fix) **[Official]** |
+| **Mac: the radio gets no audio, or choppy/broken TX audio**, although "All-In-One-Cable" shows correctly as the output device (fw 1.3.0 or older) | **[Official]** Firmware before 1.4.0 sends the USB audio feedback value in a size macOS rejects, so macOS keeps resetting the output stream (GitHub #13, fixed by PR #99). Recording (RX) is not affected. A test build called `1.3.0-rc.2-uacquirk` had the fix, but the **v1.3.0 release does not**. | Update the AIOC to **v1.4.1** (Section 9) **[Official]**. **[Community]** Confirmed: updating to v1.4.1 fixed it. **[Typical]** iPhone/iPad very likely has the same problem; Packet Commander requires fw ≥ 1.4.1 **[Tool docs]**. Keep 1.4.1 on Mac/iOS even on rev 1.0 boards. |
 | UV-K5 firmware flash fails partway | Serial buffer limits in old firmware | Update the AIOC to ≥ v1.4.0 **[Official]** |
 | Direwolf CM108 warnings | Upstream Direwolf behaviour | Harmless; ignore (direwolf issue #448) **[Official]** |
 | Linux "permission denied" on /dev/ttyACM0 or /dev/hidraw | User not in dialout/plugdev; no udev rule | Section 2.5 |
 | aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the AIOC Toolkit in the browser (7.1), which finds AIOCs with changed USB IDs |
 | aioc-util `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Wrong Python package (Debian's `python3-hid`/`hidapi`) | Use a venv and `pip install hid`; remove the apt package **[Community]** |
-| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]** |
+| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]**. Not for Mac/iPhone use: 1.3.0 brings back the macOS TX audio bug above. |
 | Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting | Seen on **Android 11** phones; Android 12+ was fine (GitHub #121) | Try another phone or Android version **[Community]** |
 | APRSdroid ignores the AIOC (works in other apps) | APRSdroid bug with USB microphones on some phones (aprsdroid #149) | Try the "Lesser AudioSwitch" app to force USB audio routing **[Community]** |
 | S-meter noise floor rises when the AIOC is plugged in | Ground loop / PC noise on the USB cable | Antenna on coax at least 1 m away from the HT, clip-on ferrites, a **USB isolator**, or run from a laptop on battery **[Community]** |

@@ -1716,9 +1716,9 @@ Users must follow local rules for unattended beacons and station identification.
 <td>Open squelch, raise the radio volume, choose the AIOC input in the software</td>
 </tr>
 <tr>
-<td>Stuttering TX audio on macOS</td>
-<td>Old firmware</td>
-<td>Update to ≥ v1.4.0 (macOS fix) <span class="tag tag-official">Official</span></td>
+<td><strong>Mac: the radio gets no audio, or choppy/broken TX audio</strong>, although &quot;All-In-One-Cable&quot; shows correctly as the output device (fw 1.3.0 or older)</td>
+<td><span class="tag tag-official">Official</span> Firmware before 1.4.0 sends the USB audio feedback value in a size macOS rejects, so macOS keeps resetting the output stream (GitHub #13, fixed by PR #99). Recording (RX) is not affected. A test build called <code>1.3.0-rc.2-uacquirk</code> had the fix, but the <strong>v1.3.0 release does not</strong>.</td>
+<td>Update the AIOC to <strong>v1.4.1</strong> (Section 9) <span class="tag tag-official">Official</span>. <span class="tag tag-community">Community</span> Confirmed: updating to v1.4.1 fixed it. <span class="tag tag-typical">Typical</span> iPhone/iPad very likely has the same problem; Packet Commander requires fw ≥ 1.4.1 <span class="tag tag-tool">Tool docs</span>. Keep 1.4.1 on Mac/iOS even on rev 1.0 boards.</td>
 </tr>
 <tr>
 <td>UV-K5 firmware flash fails partway</td>
@@ -1748,7 +1748,7 @@ Users must follow local rules for unattended beacons and station identification.
 <tr>
 <td><strong>Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x</strong>, or audio &quot;Code 10&quot; in a Windows VM</td>
 <td>Firmware bug on old hardware (GitHub #120/#138)</td>
-<td>Flash <strong>v1.3.0</strong> <span class="tag tag-community">Community</span></td>
+<td>Flash <strong>v1.3.0</strong> <span class="tag tag-community">Community</span>. Not for Mac/iPhone use: 1.3.0 brings back the macOS TX audio bug above.</td>
 </tr>
 <tr>
 <td>Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting</td>
@@ -3259,9 +3259,9 @@ pip install hid
 <td>打开静噪，调大电台音量，在软件里选择 AIOC 输入</td>
 </tr>
 <tr>
-<td>macOS 上发射音频断断续续</td>
-<td>固件旧</td>
-<td>升级到 ≥ v1.4.0（含 macOS 修复） <span class="tag tag-official">官方</span></td>
+<td><strong>Mac 上电台收不到音频，或发射音频断断续续</strong> ，但输出设备“All-In-One-Cable”识别正常（固件 1.3.0 或更早）</td>
+<td><span class="tag tag-official">官方</span> 1.4.0 之前的固件发送的 USB 音频反馈值长度不被 macOS 接受，macOS 会不断重置输出音频流（GitHub #13，由 PR #99 修复）。录音（接收）不受影响。名为 <code>1.3.0-rc.2-uacquirk</code> 的测试版含有修复，但 <strong>v1.3.0 正式版不含</strong> 。</td>
+<td>把 AIOC 升级到 <strong>v1.4.1</strong> （第 9 节） <span class="tag tag-official">官方</span> 。 <span class="tag tag-community">社区</span> 已确认：升级到 v1.4.1 后问题解决。 <span class="tag tag-typical">常规</span> iPhone/iPad 很可能有同样的问题；Packet Commander 要求固件 ≥ 1.4.1 <span class="tag tag-tool">工具文档</span> 。在 Mac/iOS 上即使是 rev 1.0 板也请保持 1.4.1。</td>
 </tr>
 <tr>
 <td>UV-K5 刷固件中途失败</td>
@@ -3291,7 +3291,7 @@ pip install hid
 <tr>
 <td><strong>rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下</strong>，或在 Windows 虚拟机里音频报“代码 10”</td>
 <td>旧硬件上的固件缺陷（GitHub #120/#138）</td>
-<td>刷回 <strong>v1.3.0</strong> <span class="tag tag-community">社区</span></td>
+<td>刷回 <strong>v1.3.0</strong> <span class="tag tag-community">社区</span> 。在 Mac/iPhone 上使用时不要这样做：1.3.0 会重新出现上面的 macOS 发射音频问题。</td>
 </tr>
 <tr>
 <td>Android：音频应用卡住、音量键失灵、AIOC 反复重连</td>
@@ -3482,7 +3482,7 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 <code>--swap-ptt<
 > this document should be able to answer: *"I have an AIOC and radio X. I want to
 > do Y on computer Z. What software do I install and how do I set it up?"*
 >
-> **Document version:** 2026-11-09 (rev 4: AI voice chatbot / developer example) · Written for AIOC firmware **v1.4.1**
+> **Document version:** 2026-11-18 (rev 5: macOS/iOS TX audio fix in fw 1.4.x) · Written for AIOC firmware **v1.4.1**
 > (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
 
 ---
@@ -4338,13 +4338,13 @@ Users must follow local rules for unattended beacons and station identification.
 | Intermittent RX/TX audio, PTT works sometimes | TRS plug contact / solder joint (on DIY units), or plug not fully inserted | Re-seat. On DIY builds, re-flow the TRS tab joints while pressing the contact sideways **[Official]** |
 | Decodes fail, audio sounds distorted | TX level too high (over-deviation) or RX clipping | Lower the OS output volume; lower the radio volume; RX gain back to 1× |
 | Can't hear anything in software | Squelch closed / volume zero / wrong input device | Open squelch, raise the radio volume, choose the AIOC input in the software |
-| Stuttering TX audio on macOS | Old firmware | Update to ≥ v1.4.0 (macOS fix) **[Official]** |
+| **Mac: the radio gets no audio, or choppy/broken TX audio**, although "All-In-One-Cable" shows correctly as the output device (fw 1.3.0 or older) | **[Official]** Firmware before 1.4.0 sends the USB audio feedback value in a size macOS rejects, so macOS keeps resetting the output stream (GitHub #13, fixed by PR #99). Recording (RX) is not affected. A test build called `1.3.0-rc.2-uacquirk` had the fix, but the **v1.3.0 release does not**. | Update the AIOC to **v1.4.1** (Section 9) **[Official]**. **[Community]** Confirmed: updating to v1.4.1 fixed it. **[Typical]** iPhone/iPad very likely has the same problem; Packet Commander requires fw ≥ 1.4.1 **[Tool docs]**. Keep 1.4.1 on Mac/iOS even on rev 1.0 boards. |
 | UV-K5 firmware flash fails partway | Serial buffer limits in old firmware | Update the AIOC to ≥ v1.4.0 **[Official]** |
 | Direwolf CM108 warnings | Upstream Direwolf behaviour | Harmless; ignore (direwolf issue #448) **[Official]** |
 | Linux "permission denied" on /dev/ttyACM0 or /dev/hidraw | User not in dialout/plugdev; no udev rule | Section 2.5 |
 | aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the AIOC Toolkit in the browser (7.1), which finds AIOCs with changed USB IDs |
 | aioc-util `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Wrong Python package (Debian's `python3-hid`/`hidapi`) | Use a venv and `pip install hid`; remove the apt package **[Community]** |
-| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]** |
+| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]**. Not for Mac/iPhone use: 1.3.0 brings back the macOS TX audio bug above. |
 | Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting | Seen on **Android 11** phones; Android 12+ was fine (GitHub #121) | Try another phone or Android version **[Community]** |
 | APRSdroid ignores the AIOC (works in other apps) | APRSdroid bug with USB microphones on some phones (aprsdroid #149) | Try the "Lesser AudioSwitch" app to force USB audio routing **[Community]** |
 | S-meter noise floor rises when the AIOC is plugged in | Ground loop / PC noise on the USB cable | Antenna on coax at least 1 m away from the HT, clip-on ferrites, a **USB isolator**, or run from a laptop on battery **[Community]** |
@@ -4472,7 +4472,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 > 这是一份同时供人和 AI 助手（Agent）使用的知识库。拿到本文档的 AI 助手应能回答：
 > *“我有一个 AIOC 和某款电台，想在某台电脑上做某件事，要装什么软件、怎么设置？”*
 >
-> **文档版本：** 2026-11-09（第 4 版：AI 语音聊天机器人 / 开发示例）· 适用于 AIOC 固件 **v1.4.1**
+> **文档版本：** 2026-11-18（第 5 版：固件 1.4.x 修复 macOS/iOS 发射音频）· 适用于 AIOC 固件 **v1.4.1**
 > （截至 2026-10-31 仍是最新版）及硬件版本 rev 1.0–1.2。英文原版为准，本文为简体中文译本。
 
 ---
@@ -5289,13 +5289,13 @@ AIOC 只需 USB 供电（例如充电宝）就能自己发送摩尔斯电码识�
 | 收发音频时有时无，PTT 时灵时不灵 | TRS 插头接触 / 焊点问题（自焊板），或插头没插到底 | 重新插好。自焊板可以在侧向按压触点的同时重新熔化 TRS 焊片的焊点 **[Official]** |
 | 解码失败，声音失真 | 发射电平太高（频偏过大）或接收削波 | 调低系统输出音量；调低电台音量；接收增益改回 1× |
 | 软件里什么都听不到 | 静噪关着 / 音量为零 / 输入设备选错 | 打开静噪，调大电台音量，在软件里选择 AIOC 输入 |
-| macOS 上发射音频断断续续 | 固件旧 | 升级到 ≥ v1.4.0（含 macOS 修复） **[Official]** |
+| **Mac 上电台收不到音频，或发射音频断断续续** ，但输出设备“All-In-One-Cable”识别正常（固件 1.3.0 或更早） | **[Official]** 1.4.0 之前的固件发送的 USB 音频反馈值长度不被 macOS 接受，macOS 会不断重置输出音频流（GitHub #13，由 PR #99 修复）。录音（接收）不受影响。名为 `1.3.0-rc.2-uacquirk` 的测试版含有修复，但 **v1.3.0 正式版不含** 。 | 把 AIOC 升级到 **v1.4.1** （第 9 节） **[Official]** 。 **[Community]** 已确认：升级到 v1.4.1 后问题解决。 **[Typical]** iPhone/iPad 很可能有同样的问题；Packet Commander 要求固件 ≥ 1.4.1 **[Tool docs]** 。在 Mac/iOS 上即使是 rev 1.0 板也请保持 1.4.1。 |
 | UV-K5 刷固件中途失败 | 旧固件串口缓冲区不够 | 把 AIOC 升级到 ≥ v1.4.0 **[Official]** |
 | Direwolf 的 CM108 警告 | Direwolf 本身的行为 | 无害，忽略即可（direwolf issue #448） **[Official]** |
 | Linux 上 /dev/ttyACM0 或 /dev/hidraw“permission denied” | 用户不在 dialout/plugdev 组；没有 udev 规则 | 2.5 节 |
 | aioc-util“Unexpected magic”/ 打不开 | 固件 < 1.3、USB ID 被改过，或 Windows 缺少 hidapi.dll | 升级固件；用 `--open-usb`；添加 hidapi.dll；或用浏览器里的 AIOC Toolkit（7.1），它能找到 USB ID 被改过的 AIOC |
 | aioc-util 报 `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Python 包装错了（Debian 的 `python3-hid`/`hidapi`） | 用虚拟环境并 `pip install hid`；卸载 apt 安装的包 **[Community]** |
-| **rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下**，或在 Windows 虚拟机里音频报“代码 10” | 旧硬件上的固件缺陷（GitHub #120/#138） | 刷回 **v1.3.0** **[Community]** |
+| **rev 1.0 板升级到 1.4.x 后卡死、PTT 一直按下**，或在 Windows 虚拟机里音频报“代码 10” | 旧硬件上的固件缺陷（GitHub #120/#138） | 刷回 **v1.3.0** **[Community]** 。在 Mac/iPhone 上使用时不要这样做：1.3.0 会重新出现上面的 macOS 发射音频问题。 |
 | Android：音频应用卡住、音量键失灵、AIOC 反复重连 | 出现在 **Android 11** 手机上；Android 12 及以上正常（GitHub #121） | 换一台手机或其他 Android 版本 **[Community]** |
 | APRSdroid 不用 AIOC（其他应用正常） | 部分手机上 APRSdroid 对 USB 麦克风的缺陷（aprsdroid #149） | 试试“Lesser AudioSwitch”应用强制使用 USB 音频 **[Community]** |
 | 插上 AIOC 后 S 表底噪升高 | 地环路 / 电脑噪声经 USB 线进入 | 用同轴线让天线离手台至少 1 米、加卡扣磁环、用 **USB 隔离器**，或让笔记本用电池供电 **[Community]** |
