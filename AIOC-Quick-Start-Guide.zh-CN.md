@@ -4,7 +4,7 @@
 > 这是一份同时供人和 AI 助手（Agent）使用的知识库。拿到本文档的 AI 助手应能回答：
 > *“我有一个 AIOC 和某款电台，想在某台电脑上做某件事，要装什么软件、怎么设置？”*
 >
-> **文档版本：** 2026-11-18（第 5 版：固件 1.4.x 修复 macOS/iOS 发射音频）· 适用于 AIOC 固件 **v1.4.1**
+> **文档版本：** 2026-11-18（第 5 版：固件 1.4.x 修复 macOS/iOS 发射音频；NA6D 网页刷写工具）· 适用于 AIOC 固件 **v1.4.1**
 > （截至 2026-10-31 仍是最新版）及硬件版本 rev 1.0–1.2。英文原版为准，本文为简体中文译本。
 
 ---
@@ -172,8 +172,8 @@ aioc-util 项目也自带现成的 udev 规则（`udev/rules.d/91-aioc.rules`）
 | **接车台/短波电台（音频 + PTT + CAT）** | WSJT-X/fldigi + CAT | 同左 | 同左 | — | 5.18 |
 | **在电台上运行 AI 语音聊天机器人 / 自己开发电台软件** | Python + Whisper + LLM + TTS（自己开发） | 同左；或 w6rgc-ai / openclaw-radio | 同左（自己开发） | — | 5.19 |
 | **猎狐信标（无需电脑）** | AIOC Toolkit 或 aioc-util（用于设置） | 同左 | 同左 | — | 7.4 |
-| **修改 AIOC 设置（PTT 源、VPTT/VCOS、增益）** | **AIOC Toolkit**（Chrome/Edge） | AIOC Toolkit 或 aioc-util | AIOC Toolkit 或 aioc-util | — | 7 |
-| **升级 AIOC 固件** | **AIOC Toolkit**（Flash Firmware 选项卡） | dfu-util 或 AIOC Toolkit | dfu-util 或 AIOC Toolkit | — | 9 |
+| **修改 AIOC 设置（PTT 源、VPTT/VCOS、增益）** | **AIOC Toolkit** 或 **NA6D 网页配置工具** （Chrome/Edge） | AIOC Toolkit、NA6D 或 aioc-util | AIOC Toolkit、NA6D 或 aioc-util | — | 7 |
+| **升级 AIOC 固件** | **NA6D 网页刷写工具** （最简单）或 AIOC Toolkit | NA6D 网页刷写工具或 dfu-util | NA6D 网页刷写工具或 dfu-util | — | 9 |
 | **录制或监听接收音频、扫描记录** | Audacity / 任意录音软件 | Audacity / arecord / rtl 类工具 | Audacity | 任意录音应用 | 2.4 |
 
 ---
@@ -363,7 +363,7 @@ APRSdroid 设置 **[Typical]** ：
 pat configure        # 设置 mycall、secure_login_password、locator
 ```
 - **通过 Direwolf 走分组（AGWPE）：** 在 `config.json` 中设置 `"ax25": {"engine": "agwpe", ...}` 和 `"agwpe": {"addr": "localhost:8000"}`。
-  连接：`pat connect ax25:///GATEWAYCALL-10`（或使用网页界面：运行 `pat http`，然后打开 http://localhost:8080）。
+  连接：`pat connect ax25:///GATEWAYCALL-10`（或使用网页界面：运行 `pat http`，然后打开 <http://localhost:8080>）。
 - **改用 Linux 内核 AX.25：** 用 `kissattach` 连接 Direwolf 的 PTY，然后设置 `"engine": "linux"` 和 `"port": "wl2k"`。
 - **VARA FM：** 在 Wine 下运行 VARA FM（AIOC 作声卡，COM 口 PTT 设为“DTR only”），然后在 Pat 中设置 `"varafm": {"addr": "localhost:8300"}`，用 `pat connect varafm:///GATEWAYCALL` 连接。
 
@@ -722,13 +722,13 @@ while True:
 
 ## 7. 配置 AIOC 本身（AIOC Toolkit / aioc-util）
 
-本文中每一条 `aioc-util` 命令，在浏览器版 **AIOC Toolkit**（https://g1lro.github.io/aioc-toolkit/）里都有对应的控件。例如 `--ptt1 VPTT` 对应 **PTT Sources → Auto PTT1 (VPTT)**，`--store` 对应 **Store to Flash**。不会用命令行的客户，请推荐他们用 Toolkit。 **[Tool docs]**
+本文中每一条 `aioc-util` 命令，在浏览器版 **AIOC Toolkit**（<https://g1lro.github.io/aioc-toolkit/>）里都有对应的控件。例如 `--ptt1 VPTT` 对应 **PTT Sources → Auto PTT1 (VPTT)**，`--store` 对应 **Store to Flash**。不会用命令行的客户，请推荐他们用 Toolkit。 **[Tool docs]**
 
 ### 7.1 使用条件 **[Tool docs]**
 - AIOC **固件 ≥ 1.3.0**（已在 1.3 和 1.4.1 上测试；1.2 **不能** 用）。
 - **命令行：** TF3HR（Hrafnkell Eiríksson）开发的 `aioc-util` —— https://github.com/hrafnkelle/aioc-util
 - **浏览器工具（免安装；需要电脑上的 Chrome 或 Edge 89+；Linux 上必须先安装 2.5 节的 udev 规则）：**
-  - **G1LRO 的 AIOC Toolkit：https://g1lro.github.io/aioc-toolkit/（推荐）。** **[Tool docs]** 同时支持修改设置和刷固件，基于 aioc-util 和 webdfu 开发（源码：https://github.com/G1LRO/aioc-toolkit）。
+  - **G1LRO 的 AIOC Toolkit：<https://g1lro.github.io/aioc-toolkit/>（推荐）。** **[Tool docs]** 同时支持修改设置和刷固件，基于 aioc-util 和 webdfu 开发（源码：<https://github.com/G1LRO/aioc-toolkit>）。
     - **Configure** 选项卡：**Connect (WebHID)** 即使 AIOC 的 USB ID 被改过也能找到它（通过读取“AIOC”识别寄存器）。功能包括：
       - 实时 **GPIO Status**（PTT1/PTT2 输出、Vol+、Vol−/VCOS、静音键）
       - **Manual PTT State** 开/关，不用其他软件就能测试发射
@@ -743,8 +743,13 @@ while True:
       - **Raw Register Dump**（原始寄存器）
     - **Flash Firmware** 选项卡：见 9.2 节。
     - 每次都要先点 **Apply** 再点 **Store to Flash**，否则拔下 AIOC 后设置会丢失。修改 USB ID 要在 **Store** 之后再 **Reboot** 才生效。
-  - 较早的单一功能网页：https://aioc-util.tf3hr.net/（TF3HR）和 https://g1lro.github.io/aioc-util/（G1LRO）。 **[Community]**
-  - **推荐不熟悉技术的客户使用 Toolkit**：不需要 Python、hidapi.dll 或 Zadig。
+  - **NA6D 的 AIOC Web Flasher & Configurator：https://flash.na6d.com/** **[Tool docs]** （源码：<https://github.com/legonigel/na6d-flash>）。一个页面完成设置、刷固件和测试：
+    - **Configure AIOC** （WebHID）：点 **Connect AIOC Settings** ，然后选快速预设（ **Default Config** 、 **CHIRP Programming (RTS+DTR)** 、 **Digital Modes (CM108 GPIO 1)** 、 **AllStarLink (CM108 Emulation)** 、 **Custom (Show All)** ）。可设置 PTT1/PTT2 源、接收增益 1–16× 和发射增强、VCOS/VPTT 电平与时间、猎狐信标（固件 ≥ 1.4）以及 USB VID/PID 覆盖。
+      **Apply Temporarily (Resets on Unplug)** 或 **Save Permanently to AIOC** 。 **Copy Shareable Link** 可以把一套配置存成链接，方便把准确的设置发给客户，或在升级固件后重新应用。
+    - **Update Firmware** （WebUSB）：见 9.2。
+    - 测试选项卡： **TX Audio & PTT** （按键发射、测试音、摩尔斯呼号）、 **RX Audio** （VU 表、COS 引脚）和 **Serial Console** 。不装电台软件也能检查线缆。
+  - 较早的单一功能网页：<https://aioc-util.tf3hr.net/>（TF3HR）和 <https://g1lro.github.io/aioc-util/>（G1LRO）。 **[Community]**
+  - **推荐不熟悉技术的客户使用浏览器工具** （Toolkit 或 NA6D）：不需要 Python 或 hidapi.dll。Firefox 和 Safari 不支持 WebHID/WebUSB；Brave 需关闭 Shields。 **[Tool docs]**
 
 **安装（Linux/macOS）：**
 ```bash
@@ -866,8 +871,15 @@ dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
 AIOC 会自动重启进入引导程序、刷写，然后自行重启。
 - **Linux/macOS：** 安装 `dfu-util`（`apt install dfu-util` / `brew install dfu-util`）。可能需要 `sudo` 或加入 `plugdev` 组。
 - **Windows：** dfu-util 需要给 DFU 接口安装 **libusb/WinUSB 驱动**。用 **Zadig** 给 AIOC 的 DFU 接口 /“STM32 BOOTLOADER”设备安装 WinUSB。（参见 AIOC README 中链接的教程：yeswolf.github.io/dfu。）
-  **[Community]** Windows 11 上的 dfu-util 经常卡住或报 `LIBUSB_ERROR_NOT_SUPPORTED`（GitHub #28）。最简单的办法：用浏览器里的 AIOC Toolkit（见下文），或换一台 Linux 电脑或树莓派。
-- **用 AIOC Toolkit 在浏览器中刷写（最简单，尤其适合 Windows）** **[Tool docs]** ：
+  **[Community]** Windows 11 上的 dfu-util 经常卡住或报 `LIBUSB_ERROR_NOT_SUPPORTED`（GitHub #28）。最简单的办法：用浏览器刷写工具（见下文），或换一台 Linux 电脑或树莓派。
+- **用 NA6D 网页刷写工具在浏览器中刷写（最简单：不用下载文件，不用短接针脚）** **[Tool docs]** ：
+  1. 用 Chrome 或 Edge 打开 https://flash.na6d.com/ → **Update Firmware** 。
+  2. 点击 **Connect AIOC for Update** ，在浏览器弹窗中选择 AIOC。如果 AIOC 已经是固件 ≥ 1.2.0，页面会自动把它重启到升级模式。更旧或无响应的设备：插 USB 时短接排针最外侧的两个针脚（9.3）。
+  3. **Select Firmware Version** → **AIOC Firmware v1.4.1 (Recommended)** （列表里还有 1.4.0、1.3.0、1.2.0 和 **Upload Local File...** ）。可以先点 **Backup Firmware** 备份，再点 **Write Firmware** 。
+  4. 刷完如果一直停在升级模式，拔插一下 USB。
+  - **Windows：** 如果浏览器找不到 AIOC，用 **Zadig** 装一次 WinUSB 驱动（Options → **List All Devices** ）：普通模式下选 **AIOC DFU Runtime (Interface 6)** ，引导模式下选 **STM32 BOOTLOADER** 。
+  - 该页面说明，刷写（WebUSB）在 Android 版 Chrome 上也可用；修改设置（WebHID）需要电脑浏览器。 **[Tool docs]**
+- **用 AIOC Toolkit 在浏览器中刷写** **[Tool docs]** ：
   1. 在 https://g1lro.github.io/aioc-toolkit/ → **Flash Firmware** 选项卡的 **Latest Firmware** 框里，通过 **Download Firmware** 链接下载 `.bin`。浏览器不能直接读取 GitHub 发布的文件，所以要先保存文件再选择它。
   2. **先让 AIOC 进入引导模式**（9.3 第 1 步：短接排针最外侧的两个针脚，再插上 USB）。Toolkit 不会自己切换模式，AIOC 处于普通“DFU 运行时”模式时会阻止刷写。进入引导模式后它显示为 `0483:df11`。
   3. 连接，查看 **Device Status**，选择文件，点击 **Flash Firmware** 开始刷写并观察 **Log**。完成后去掉短接，重新插拔。
@@ -884,7 +896,7 @@ AIOC 会自动重启进入引导程序、刷写，然后自行重启。
 
 ### 9.4 怎么知道我的固件版本？
 USB 描述符里不报告固件版本。实用的判断方法：
-- aioc-util 或 AIOC Toolkit 能连上 → ≥ 1.3.0。能读出音频设置 / 猎狐设置 → ≥ 1.4.0。
+- aioc-util、AIOC Toolkit 或 NA6D 配置工具能连上 → ≥ 1.3.0。能读出音频设置 / 猎狐设置 → ≥ 1.4.0。
 - 不确定的话，直接刷最新版（9.2）。这是解决大多数问题的推荐做法。
 
 ---
@@ -930,13 +942,14 @@ PTT1 默认是 CM108 GPIO3/串口，PTT2 是 CM108 GPIO4。用 `--swap-ptt` 或 
 - aioc-util（命令行）：https://github.com/hrafnkelle/aioc-util · 网页版：https://aioc-util.tf3hr.net/
 - G1LRO 的 AIOC + ASL3 教程（最新）：https://g1lro.uk/?p=1593 · 旧版教程：https://g1lro.uk/?p=676 · 脚本：https://github.com/G1LRO/AIOC-ASL3-Config
 - **AIOC Toolkit（在浏览器中配置 + 刷固件）：** https://g1lro.github.io/aioc-toolkit/ · 源码：https://github.com/G1LRO/aioc-toolkit
+- **NA6D AIOC 网页刷写与配置工具：** https://flash.na6d.com/ · 源码：https://github.com/legonigel/na6d-flash
 - 较早的浏览器工具：G1LRO 配置页 https://g1lro.github.io/aioc-util/ · WebDFU 刷写工具 https://devanlai.github.io/webdfu/dfu-util/
 - AllStarLink 论坛，AIOC 替代 CM108：https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225
 - M0AWS 用 AIOC 搭建 AllStar 节点：https://m0aws.co.uk/?cat=408
 - DL-Nordwest AIOC 系列（德语），第 4 部分故障排查：https://dl-nordwest.com/index.php/2024/09/22/aioc-der-wunderadapter-fuer-handfunkgeraete-teil-4-fehlersuche/
 - DigiPi + AIOC 修改方法（Google 群组）：https://groups.google.com/g/digipi/c/1NfZeLpsT4M
 - AIOC GitHub issues（提问前先搜索）：https://github.com/skuep/AIOC/issues
-- 视频：Ham Radio Dude（https://www.youtube.com/watch?v=xRCmXQYRLE0）、Temporarily Offline（https://www.youtube.com/watch?v=RZjoPNe634o）、AllStar 节点搭建（https://youtu.be/7LB6D2FLGZk 、https://youtu.be/k0iP4dECx6A）
+- 视频：Ham Radio Dude（<https://www.youtube.com/watch?v=xRCmXQYRLE0>）、Temporarily Offline（<https://www.youtube.com/watch?v=RZjoPNe634o>）、AllStar 节点搭建（https://youtu.be/7LB6D2FLGZk 、<https://youtu.be/k0iP4dECx6A>）
 - DL-Nordwest 四篇 AIOC 文章（德语）：见 AIOC README 中的链接
 - 支持 AIOC 的 AI 语音机器人示例（W6RGC）：https://github.com/richcannings/w6rgc-ai · Whisper：https://github.com/openai/whisper · faster-whisper：https://github.com/SYSTRAN/faster-whisper · Piper TTS：https://github.com/rhasspy/piper · Ollama：https://ollama.com
 - Direwolf：https://github.com/wb2osz/direwolf
