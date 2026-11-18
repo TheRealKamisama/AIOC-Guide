@@ -5,7 +5,7 @@
 > this document should be able to answer: *"I have an AIOC and radio X. I want to
 > do Y on computer Z. What software do I install and how do I set it up?"*
 >
-> **Document version:** 2026-11-09 (rev 4: AI voice chatbot / developer example) · Written for AIOC firmware **v1.4.1**
+> **Document version:** 2026-11-18 (rev 5: macOS/iOS TX audio fix in fw 1.4.x; NA6D web flasher) · Written for AIOC firmware **v1.4.1**
 > (still the latest release on 2026-10-31) and hardware rev 1.0–1.2.
 
 ---
@@ -193,8 +193,8 @@ The aioc-util project also ships a ready-made udev rule (`udev/rules.d/91-aioc.r
 | **Wire to a mobile/HF rig (audio + PTT + CAT)** | WSJT-X/fldigi + CAT | same | same | — | 5.18 |
 | **AI voice chatbot on the air / write your own radio software** | Python + Whisper + LLM + TTS (DIY) | same; or w6rgc-ai / openclaw-radio | same (DIY) | — | 5.19 |
 | **Fox hunt beacon (no PC)** | AIOC Toolkit or aioc-util (to set it up) | same | same | — | 7.4 |
-| **Change AIOC settings (PTT source, VPTT/VCOS, gain)** | **AIOC Toolkit** (Chrome/Edge) | AIOC Toolkit or aioc-util | AIOC Toolkit or aioc-util | — | 7 |
-| **Update AIOC firmware** | **AIOC Toolkit** (Flash Firmware tab) | dfu-util or AIOC Toolkit | dfu-util or AIOC Toolkit | — | 9 |
+| **Change AIOC settings (PTT source, VPTT/VCOS, gain)** | **AIOC Toolkit** or **NA6D Web Configurator** (Chrome/Edge) | AIOC Toolkit, NA6D, or aioc-util | AIOC Toolkit, NA6D, or aioc-util | — | 7 |
+| **Update AIOC firmware** | **NA6D Web Flasher** (easiest) or AIOC Toolkit | NA6D Web Flasher or dfu-util | NA6D Web Flasher or dfu-util | — | 9 |
 | **Record or monitor RX audio, scanner logging** | Audacity / any recorder | Audacity / arecord / rtl-style tools | Audacity | Any recorder | 2.4 |
 
 ---
@@ -783,8 +783,13 @@ Every `aioc-util` command in this guide has a matching control in the browser-ba
       - **Raw Register Dump**
     - **Flash Firmware** tab: covered in 9.2.
     - Always press **Apply**, then **Store to Flash**, or changes are lost when the AIOC is unplugged. A USB ID change only takes effect after **Store** and then **Reboot**.
+  - **AIOC Web Flasher & Configurator by NA6D: https://flash.na6d.com/** **[Tool docs]** (source: https://github.com/legonigel/na6d-flash). One page for settings, firmware and testing:
+    - **Configure AIOC** (WebHID): **Connect AIOC Settings**, then quick presets (**Default Config**, **CHIRP Programming (RTS+DTR)**, **Digital Modes (CM108 GPIO 1)**, **AllStarLink (CM108 Emulation)**, **Custom (Show All)**). It covers PTT1/PTT2 sources, RX gain 1–16× and TX boost, VCOS/VPTT levels and times, fox-hunt beacon (fw ≥ 1.4) and USB VID/PID override.
+      **Apply Temporarily (Resets on Unplug)** or **Save Permanently to AIOC**. **Copy Shareable Link** saves a configuration as a link, handy for sending a customer their exact settings or re-applying them after a firmware update.
+    - **Update Firmware** (WebUSB): covered in 9.2.
+    - Test tabs: **TX Audio & PTT** (press-to-talk button, test tone, Morse callsign), **RX Audio** (VU meter, COS pins) and a **Serial Console**. Useful for checking a cable without installing radio software.
   - Older single-purpose pages: https://aioc-util.tf3hr.net/ (TF3HR) and https://g1lro.github.io/aioc-util/ (G1LRO). **[Community]**
-  - **Recommend the Toolkit to non-technical customers**: no Python, no hidapi.dll, no Zadig.
+  - **Recommend a browser tool to non-technical customers** (Toolkit or NA6D): no Python, no hidapi.dll. Firefox and Safari don't support WebHID/WebUSB; Brave only with Shields off. **[Tool docs]**
 
 **Install (Linux/macOS):**
 ```bash
@@ -861,13 +866,13 @@ Users must follow local rules for unattended beacons and station identification.
 | Intermittent RX/TX audio, PTT works sometimes | TRS plug contact / solder joint (on DIY units), or plug not fully inserted | Re-seat. On DIY builds, re-flow the TRS tab joints while pressing the contact sideways **[Official]** |
 | Decodes fail, audio sounds distorted | TX level too high (over-deviation) or RX clipping | Lower the OS output volume; lower the radio volume; RX gain back to 1× |
 | Can't hear anything in software | Squelch closed / volume zero / wrong input device | Open squelch, raise the radio volume, choose the AIOC input in the software |
-| Stuttering TX audio on macOS | Old firmware | Update to ≥ v1.4.0 (macOS fix) **[Official]** |
+| **Mac: the radio gets no audio, or choppy/broken TX audio**, although "All-In-One-Cable" shows correctly as the output device (fw 1.3.0 or older) | **[Official]** Firmware before 1.4.0 sends the USB audio feedback value in a size macOS rejects, so macOS keeps resetting the output stream (GitHub #13, fixed by PR #99). Recording (RX) is not affected. A test build called `1.3.0-rc.2-uacquirk` had the fix, but the **v1.3.0 release does not**. | Update the AIOC to **v1.4.1** (Section 9) **[Official]**. **[Community]** Confirmed: updating to v1.4.1 fixed it. **[Typical]** iPhone/iPad very likely has the same problem; Packet Commander requires fw ≥ 1.4.1 **[Tool docs]**. Keep 1.4.1 on Mac/iOS even on rev 1.0 boards. |
 | UV-K5 firmware flash fails partway | Serial buffer limits in old firmware | Update the AIOC to ≥ v1.4.0 **[Official]** |
 | Direwolf CM108 warnings | Upstream Direwolf behaviour | Harmless; ignore (direwolf issue #448) **[Official]** |
 | Linux "permission denied" on /dev/ttyACM0 or /dev/hidraw | User not in dialout/plugdev; no udev rule | Section 2.5 |
 | aioc-util "Unexpected magic" / can't open | fw < 1.3, USB ID was changed, or Windows missing hidapi.dll | Update firmware; use `--open-usb`; add hidapi.dll; or use the AIOC Toolkit in the browser (7.1), which finds AIOCs with changed USB IDs |
 | aioc-util `module 'hid' has no attribute 'Device'` / `No module named 'hid'` | Wrong Python package (Debian's `python3-hid`/`hidapi`) | Use a venv and `pip install hid`; remove the apt package **[Community]** |
-| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]** |
+| **Rev 1.0 board hangs with PTT stuck on after updating to 1.4.x**, or audio "Code 10" in a Windows VM | Firmware bug on old hardware (GitHub #120/#138) | Flash **v1.3.0** **[Community]**. Not for Mac/iPhone use: 1.3.0 brings back the macOS TX audio bug above. |
 | Android: audio app freezes, volume keys stop working, AIOC keeps reconnecting | Seen on **Android 11** phones; Android 12+ was fine (GitHub #121) | Try another phone or Android version **[Community]** |
 | APRSdroid ignores the AIOC (works in other apps) | APRSdroid bug with USB microphones on some phones (aprsdroid #149) | Try the "Lesser AudioSwitch" app to force USB audio routing **[Community]** |
 | S-meter noise floor rises when the AIOC is plugged in | Ground loop / PC noise on the USB cable | Antenna on coax at least 1 m away from the HT, clip-on ferrites, a **USB isolator**, or run from a laptop on battery **[Community]** |
@@ -906,8 +911,15 @@ dfu-util -d 1209:7388 -a 0 -s 0x08000000:leave -D aioc-fw-1.4.1.bin
 The AIOC reboots into the bootloader, flashes, and restarts on its own.
 - **Linux/macOS:** install `dfu-util` (`apt install dfu-util` / `brew install dfu-util`). You may need `sudo` or the `plugdev` group.
 - **Windows:** dfu-util needs a **libusb/WinUSB driver** for the DFU interface. Use **Zadig** to install WinUSB for the AIOC DFU interface / "STM32 BOOTLOADER" device. (See the guide linked in the AIOC README: yeswolf.github.io/dfu.)
-  **[Community]** dfu-util on Windows 11 often hangs or reports `LIBUSB_ERROR_NOT_SUPPORTED` (GitHub #28). Easiest fixes: use the AIOC Toolkit in the browser (below), or a Linux PC or Raspberry Pi.
-- **Browser flashing with the AIOC Toolkit (easiest, especially on Windows)** **[Tool docs]**:
+  **[Community]** dfu-util on Windows 11 often hangs or reports `LIBUSB_ERROR_NOT_SUPPORTED` (GitHub #28). Easiest fixes: use a browser flasher (below), or a Linux PC or Raspberry Pi.
+- **Browser flashing with the NA6D Web Flasher (easiest: no file download, no pin shorting)** **[Tool docs]**:
+  1. Open https://flash.na6d.com/ in Chrome or Edge → **Update Firmware**.
+  2. Click **Connect AIOC for Update** and pick the AIOC in the browser prompt. If the AIOC already runs fw ≥ 1.2.0, the page restarts it into update mode by itself. Older or unresponsive units: short the two outer header pins while plugging in (9.3).
+  3. **Select Firmware Version** → **AIOC Firmware v1.4.1 (Recommended)** (1.4.0, 1.3.0 and 1.2.0 are also listed, plus **Upload Local File...**). Optionally **Backup Firmware** first, then **Write Firmware**.
+  4. If it stays in update mode afterwards, unplug and replug.
+  - **Windows:** if the browser doesn't find the AIOC, install the WinUSB driver once with **Zadig** (Options → **List All Devices**): choose **AIOC DFU Runtime (Interface 6)** in normal mode, or **STM32 BOOTLOADER** in bootloader mode.
+  - The page says flashing (WebUSB) also works in Chrome on Android; settings (WebHID) need a desktop browser. **[Tool docs]**
+- **Browser flashing with the AIOC Toolkit** **[Tool docs]**:
   1. Download the `.bin` from the **Latest Firmware** box (**Download Firmware** link) on https://g1lro.github.io/aioc-toolkit/ → **Flash Firmware** tab. Browsers can't fetch GitHub release files directly, so you save the file and then select it.
   2. **Put the AIOC in bootloader mode first** (9.3, step 1: short the two outer header pins, then plug in). The Toolkit doesn't switch modes itself and blocks flashing while the AIOC is in normal "DFU runtime" mode. In bootloader mode it shows up as `0483:df11`.
   3. Connect, check **Device Status**, choose the file, start **Flash Firmware** and watch the **Log**. Remove the short and replug when it's done.
@@ -925,7 +937,7 @@ After any update: **re-apply your aioc-util settings** (they are erased).
 
 ### 9.4 Which firmware do I have?
 The USB descriptor doesn't report the firmware version. Practical checks:
-- aioc-util or the AIOC Toolkit can connect → ≥ 1.3.0. Audio settings / fox-hunt can be read → ≥ 1.4.0.
+- aioc-util, the AIOC Toolkit or the NA6D configurator can connect → ≥ 1.3.0. Audio settings / fox-hunt can be read → ≥ 1.4.0.
 - If unsure, just flash the latest release (9.2). That is the recommended fix for most issues.
 
 ---
@@ -971,6 +983,7 @@ Not through the K1 jack (the audio is filtered). Use 1200 baud AFSK or VARA FM N
 - aioc-util (CLI): https://github.com/hrafnkelle/aioc-util · Web version: https://aioc-util.tf3hr.net/
 - G1LRO AIOC + ASL3 guide (current): https://g1lro.uk/?p=1593 · older guide: https://g1lro.uk/?p=676 · scripts: https://github.com/G1LRO/AIOC-ASL3-Config
 - **AIOC Toolkit (configure + flash in the browser):** https://g1lro.github.io/aioc-toolkit/ · source: https://github.com/G1LRO/aioc-toolkit
+- **NA6D AIOC Web Flasher & Configurator:** https://flash.na6d.com/ · source: https://github.com/legonigel/na6d-flash
 - Older browser tools: G1LRO config https://g1lro.github.io/aioc-util/ · WebDFU flasher https://devanlai.github.io/webdfu/dfu-util/
 - AllStarLink forum, AIOC as a CM108 alternative: https://community.allstarlink.org/t/aioc-now-working-well-as-an-alternative-to-cm108-to-make-a-node-without-soldering/21225
 - M0AWS AllStar node build with an AIOC: https://m0aws.co.uk/?cat=408
