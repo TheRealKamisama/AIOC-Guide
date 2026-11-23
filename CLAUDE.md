@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A knowledge base for the **AIOC (ham radio All-In-One-Cable)**, maintained by an AIOC retailer. The guide exists in two languages, and both feed one web page:
 
 1. `AIOC-Quick-Start-Guide.md` (English, the master) and `AIOC-Quick-Start-Guide.zh-CN.md` (Simplified Chinese translation): the guide itself. It is written so that **AI agents** can answer customer questions ("I have radio X and OS Y and want to do Z: which software and settings?"). It is also pasted into chat assistants as-is.
-2. `site/index.html`: a single-file bilingual web page built from both Markdown files, with an English/中文 toggle. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It is live on GitHub Pages (see Deploy). A private copy is published as a claude.ai artifact (slug `9723f2b5-e6cd-4cc2-bf58-b291fc9e5947`); republish it with `publish_files` after rebuilding.
+2. `site/index.html`: a single-file bilingual web page built from both Markdown files, with an English/中文 toggle. It has a "Find your setup" selector, search, copy buttons, and a button that copies the whole Markdown for AI assistants. It is live on GitHub Pages (see Deploy).
 
 ## Build
 
